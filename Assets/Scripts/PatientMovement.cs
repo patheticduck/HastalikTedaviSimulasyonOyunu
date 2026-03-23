@@ -4,9 +4,20 @@ public class PatientMovement : MonoBehaviour
 {
     public Transform targetPoint;
     public float moveSpeed = 2f;
-    public float stopDistance = 0.05f;
+    public float stopDistance = 0.2f;
 
     private bool hasArrived = false;
+    private DialogueManager dialogueManager;
+
+    void Start()
+    {
+        dialogueManager = FindObjectOfType<DialogueManager>();
+
+        if (dialogueManager == null)
+        {
+            Debug.LogWarning("DialogueManager bulunamadı.");
+        }
+    }
 
     void Update()
     {
@@ -37,6 +48,12 @@ public class PatientMovement : MonoBehaviour
         {
             hasArrived = true;
             Debug.Log("Hasta hedef noktaya ulaştı.");
+
+            if (dialogueManager != null)
+            {
+                Debug.Log("Diyalog başlatılıyor.");
+                dialogueManager.StartDialogue();
+            }
         }
     }
 }

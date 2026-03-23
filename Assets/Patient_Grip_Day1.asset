@@ -1,0 +1,44 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 2fb738e7044b7cc4dae6b9c5d16348a1, type: 3}
+  m_Name: Patient_Grip_Day1
+  m_EditorClassIdentifier: Assembly-CSharp::PatientCaseData
+  patientName: Hasta 1
+  correctDiagnosis: Grip
+  startText: "Kendimi iyi hissetmiyorum doktor. \xD6ks\xFCr\xFCyorum."
+  startAssistantText: "\u0130lk olarak semptom s\xFCresini ve ate\u015Fi sorgula."
+  initialOptions:
+  - questionText: "Ka\xE7 g\xFCnd\xFCr \xF6ks\xFCr\xFCyorsunuz?"
+    patientResponse: "Yakla\u015F\u0131k 5 g\xFCnd\xFCr \xF6ks\xFCr\xFCyorum. "
+    infoTag: cough_5days
+    triggersAssistant: 1
+    assistantText: "Semptom s\xFCresi \xF6nemli. \u015Eimdi ate\u015F ve di\u011Fer
+      belirtileri netle\u015Ftir."
+    endsDialogue: 0
+  - questionText: "Ate\u015Finiz var m\u0131?"
+    patientResponse: "Evet, ate\u015Fim 39 dereceye kadar \xE7\u0131kt\u0131."
+    infoTag: fever_high
+    triggersAssistant: 1
+    assistantText: "Y\xFCksek ate\u015F enfeksiyon ihtimalini g\xFC\xE7lendiriyor."
+    endsDialogue: 0
+  - questionText: "Bo\u011Faz\u0131n\u0131z a\u011Fr\u0131yor mu?"
+    patientResponse: "Evet, bo\u011Faz\u0131m da a\u011Fr\u0131yor."
+    infoTag: throat_pain
+    triggersAssistant: 1
+    assistantText: "Bo\u011Faz a\u011Fr\u0131s\u0131 varsa yutkunma durumunu da sorgula."
+    endsDialogue: 0
+  - questionText: "Te\u015Fhis koymak istiyorum."
+    patientResponse: Tamam doktor.
+    infoTag: 
+    triggersAssistant: 0
+    assistantText: 
+    endsDialogue: 1
