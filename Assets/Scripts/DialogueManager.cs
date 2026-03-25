@@ -1,83 +1,348 @@
 using System.Collections;
 using System.Collections.Generic;
+using System.Linq;
 using UnityEngine;
 using TMPro;
 using UnityEngine.UI;
 
 public class DialogueManager : MonoBehaviour
 {
+    [Header("UI")]
     public GameObject dialoguePanel;
-
     public Transform contentRoot;
     public GameObject dialogueLinePrefab;
     public GameObject optionButtonPrefab;
     public ScrollRect scrollRect;
 
+    [Header("Case")]
     public PatientCaseData currentCase;
 
     private GameObject currentOptionsGroup;
+    private GameObject lastDoctorHeader;
+
+    private HashSet<string> discoveredTags = new HashSet<string>();
+    private HashSet<string> usedHiddenChoices = new HashSet<string>();
+
+    private string currentNodeId;
+    private string rootNodeId;
 
     public void StartDialogue()
     {
-        dialoguePanel.SetActive(true);
-
-        AddDialogueLine("HASTA — " + currentCase.startText);
-
-        if (!string.IsNullOrEmpty(currentCase.startAssistantText))
+        if (currentCase == null)
         {
-            AddDialogueLine("ASİSTAN — " + currentCase.startAssistantText);
-        }
-
-        ShowOptions_FromData(currentCase.initialOptions);
-    }
-
-    public void SelectOptionData(QuestionOption option)
-    {
-        RemoveCurrentOptions();
-
-        AddDialogueLine("DOKTOR — " + option.questionText);
-        AddDialogueLine("HASTA — " + option.patientResponse);
-
-        if (option.triggersAssistant && !string.IsNullOrEmpty(option.assistantText))
-        {
-            AddDialogueLine("ASİSTAN — " + option.assistantText);
-        }
-
-        if (option.endsDialogue)
-        {
-            AddDialogueLine("SİSTEM — Teşhis ekranı açılacak.");
+            Debug.LogError("DialogueManager: Current Case atanmadı.");
             return;
         }
 
-        ShowOptions_FromData(currentCase.initialOptions);
+        if (string.IsNullOrEmpty(currentCase.rootNodeId))
+        {
+            Debug.LogError("DialogueManager: rootNodeId boş.");
+            return;
+        }
+
+        dialoguePanel.SetActive(true);
+
+        discoveredTags.Clear();
+        usedHiddenChoices.Clear();
+
+        rootNodeId = currentCase.rootNodeId;
+        currentNodeId = rootNodeId;
+
+        AddDialogueLine(FormatLine("HASTA", currentCase.startText));
+
+        if (!string.IsNullOrEmpty(currentCase.startAssistantText))
+        {
+            AddDialogueLine(FormatLine("ASİSTAN", currentCase.startAssistantText));
+        }
+
+        ShowNode(rootNodeId, false);
     }
 
-    void ShowOptions_FromData(List<QuestionOption> options)
+    public void SelectChoice(DialogueChoiceData choice)
     {
+        if (choice == null)
+            return;
+
+        RemoveDoctorHeader();
+        RemoveCurrentOptions();
+
+        if (!string.IsNullOrEmpty(choice.doctorLine))
+            AddDialogueLine(FormatLine("DOKTOR", choice.doctorLine));
+
+        if (!string.IsNullOrEmpty(choice.patientReply))
+            AddDialogueLine(FormatLine("HASTA", choice.patientReply));
+
+        if (!string.IsNullOrEmpty(choice.assistantReply))
+            AddDialogueLine(FormatLine("ASİSTAN", choice.assistantReply));
+
+        if (choice.gainedTags != null)
+        {
+            foreach (string tag in choice.gainedTags)
+            {
+                if (!string.IsNullOrEmpty(tag))
+                    discoveredTags.Add(tag);
+            }
+        }
+
+        if (choice.hideAfterUse)
+        {
+            string key = BuildChoiceKey(currentNodeId, choice.choiceText);
+            usedHiddenChoices.Add(key);
+        }
+
+        if (choice.opensDiagnosisPanel)
+        {
+            OpenDiagnosisPanel();
+            return;
+        }
+
+        if (choice.returnToHub)
+        {
+            ShowNode(rootNodeId, false);
+            return;
+        }
+
+        if (!string.IsNullOrEmpty(choice.nextNodeId))
+        {
+            ShowNode(choice.nextNodeId, true);
+            return;
+        }
+
+        ShowNode(rootNodeId, false);
+    }
+
+    public void SelectDiagnosis(DiagnosisChoiceData diagnosis)
+    {
+        if (diagnosis == null)
+            return;
+
+        RemoveDoctorHeader();
+        RemoveCurrentOptions();
+
+        AddDialogueLine(FormatLine("DOKTOR", "Sizin hastalığınızın " + diagnosis.diagnosisName + " olduğunu düşünüyorum."));
+
+        if (!string.IsNullOrEmpty(diagnosis.resultText))
+        {
+            AddDialogueLine(FormatLine("SİSTEM", diagnosis.resultText));
+        }
+        else
+        {
+            if (diagnosis.isCorrectDiagnosis)
+                AddDialogueLine(FormatLine("SİSTEM", "Doğru teşhis."));
+            else
+                AddDialogueLine(FormatLine("SİSTEM", "Yanlış teşhis."));
+        }
+
+        Canvas.ForceUpdateCanvases();
+        StartCoroutine(ScrollToBottom());
+    }
+
+    void OpenDiagnosisPanel()
+    {
+        if (currentCase.diagnosisChoices == null || currentCase.diagnosisChoices.Count == 0)
+        {
+            AddDialogueLine(FormatLine("SİSTEM", "Teşhis seçenekleri tanımlanmamış."));
+            Canvas.ForceUpdateCanvases();
+            StartCoroutine(ScrollToBottom());
+            return;
+        }
+
+        RemoveDoctorHeader();
+
+        // Geçici doktor başlığı
+        lastDoctorHeader = AddDialogueLineReturn(FormatLine("DOKTOR", ""), false);
+
         CreateOptionsGroup();
 
-        foreach (var option in options)
+        foreach (DiagnosisChoiceData diagnosis in currentCase.diagnosisChoices)
         {
             GameObject optionObj = Instantiate(optionButtonPrefab, currentOptionsGroup.transform);
             DialogueOptionButton optionScript = optionObj.GetComponent<DialogueOptionButton>();
 
             if (optionScript != null)
             {
-                optionScript.Setup(option.questionText, option.patientResponse, this);
-                optionScript.optionData = option;
+                optionScript.SetupDiagnosisChoice(diagnosis, this);
             }
+        }
+
+        StartCoroutine(ScrollToBottom());
+    }
+
+    void ShowNode(string nodeId, bool showNodeIntro)
+    {
+        DialogueNodeData node = GetNodeById(nodeId);
+
+        if (node == null)
+        {
+            Debug.LogError("Node bulunamadı: " + nodeId);
+            return;
+        }
+
+        currentNodeId = nodeId;
+
+        if (showNodeIntro)
+        {
+            if (!string.IsNullOrEmpty(node.nodeIntroText))
+                AddDialogueLine(FormatLine("SİSTEM", node.nodeIntroText));
+
+            if (!string.IsNullOrEmpty(node.nodeAssistantText))
+                AddDialogueLine(FormatLine("ASİSTAN", node.nodeAssistantText));
+        }
+
+        ShowChoices(node);
+    }
+
+    void ShowChoices(DialogueNodeData node)
+    {
+        RemoveDoctorHeader();
+
+        // Geçici doktor başlığı
+        lastDoctorHeader = AddDialogueLineReturn(FormatLine("DOKTOR", ""), false);
+
+        CreateOptionsGroup();
+
+        foreach (DialogueChoiceData choice in GetAvailableChoices(node))
+        {
+            GameObject optionObj = Instantiate(optionButtonPrefab, currentOptionsGroup.transform);
+            DialogueOptionButton optionScript = optionObj.GetComponent<DialogueOptionButton>();
+
+            if (optionScript != null)
+            {
+                optionScript.SetupChoice(choice, this);
+            }
+        }
+
+        StartCoroutine(ScrollToBottom());
+    }
+
+    List<DialogueChoiceData> GetAvailableChoices(DialogueNodeData node)
+    {
+        List<DialogueChoiceData> result = new List<DialogueChoiceData>();
+
+        if (node == null || node.choices == null)
+            return result;
+
+        foreach (DialogueChoiceData choice in node.choices)
+        {
+            if (choice == null)
+                continue;
+
+            if (!choice.reusable && choice.hideAfterUse)
+            {
+                string key = BuildChoiceKey(node.nodeId, choice.choiceText);
+                if (usedHiddenChoices.Contains(key))
+                    continue;
+            }
+
+            if (!AreRequiredTagsMet(choice.requiredTags))
+                continue;
+
+            if (HasAnyBlockedTag(choice.blockedTags))
+                continue;
+
+            result.Add(choice);
+        }
+
+        return result;
+    }
+
+    bool AreRequiredTagsMet(List<string> requiredTags)
+    {
+        if (requiredTags == null || requiredTags.Count == 0)
+            return true;
+
+        foreach (string tag in requiredTags)
+        {
+            if (!string.IsNullOrEmpty(tag) && !discoveredTags.Contains(tag))
+                return false;
+        }
+
+        return true;
+    }
+
+    bool HasAnyBlockedTag(List<string> blockedTags)
+    {
+        if (blockedTags == null || blockedTags.Count == 0)
+            return false;
+
+        foreach (string tag in blockedTags)
+        {
+            if (!string.IsNullOrEmpty(tag) && discoveredTags.Contains(tag))
+                return true;
+        }
+
+        return false;
+    }
+
+    DialogueNodeData GetNodeById(string nodeId)
+    {
+        if (currentCase == null || currentCase.allNodes == null)
+            return null;
+
+        return currentCase.allNodes.FirstOrDefault(n => n != null && n.nodeId == nodeId);
+    }
+
+    string BuildChoiceKey(string nodeId, string choiceText)
+    {
+        return nodeId + "::" + choiceText;
+    }
+
+    void RemoveDoctorHeader()
+    {
+        if (lastDoctorHeader != null)
+        {
+            Destroy(lastDoctorHeader);
+            lastDoctorHeader = null;
         }
     }
 
-    void AddDialogueLine(string text)
+    string FormatLine(string speaker, string text)
+    {
+        switch (speaker)
+        {
+            case "HASTA":
+                return $"<size=26><color=#FFFFFF><b>HASTA —</b></color> {text}</size>";
+
+            case "DOKTOR":
+                if (string.IsNullOrWhiteSpace(text))
+                    return $"<size=25><color=#FF8C42><b>DOKTOR —</b></color></size>";
+                return $"<size=25><color=#FF8C42><b>DOKTOR —</b></color> {text}</size>";
+
+            case "ASİSTAN":
+                return $"<size=22><color=#CFCFCF><i>ASİSTAN — {text}</i></color></size>";
+
+            case "SİSTEM":
+                return $"<size=21><color=#AAAAAA><i>SİSTEM — {text}</i></color></size>";
+
+            default:
+                return text;
+        }
+    }
+
+    void AddDialogueLine(string text, bool autoScroll = true)
     {
         GameObject lineObj = Instantiate(dialogueLinePrefab, contentRoot);
-        TextMeshProUGUI lineText = lineObj.GetComponent<TextMeshProUGUI>();
+        TextMeshProUGUI lineText = lineObj.GetComponentInChildren<TextMeshProUGUI>();
 
         if (lineText != null)
             lineText.text = text;
 
-        StartCoroutine(ScrollToBottom());
+        if (autoScroll)
+            StartCoroutine(ScrollToBottom());
+    }
+
+    GameObject AddDialogueLineReturn(string text, bool autoScroll = true)
+    {
+        GameObject lineObj = Instantiate(dialogueLinePrefab, contentRoot);
+        TextMeshProUGUI lineText = lineObj.GetComponentInChildren<TextMeshProUGUI>();
+
+        if (lineText != null)
+            lineText.text = text;
+
+        if (autoScroll)
+            StartCoroutine(ScrollToBottom());
+
+        return lineObj;
     }
 
     void CreateOptionsGroup()
@@ -88,7 +353,11 @@ public class DialogueManager : MonoBehaviour
         currentOptionsGroup.transform.SetParent(contentRoot, false);
 
         VerticalLayoutGroup layout = currentOptionsGroup.AddComponent<VerticalLayoutGroup>();
-        layout.spacing = 8;
+        layout.spacing = 2;
+        layout.padding.top = 0;
+        layout.padding.bottom = 0;
+        layout.padding.left = 0;
+        layout.padding.right = 0;
         layout.childControlWidth = true;
         layout.childControlHeight = true;
         layout.childForceExpandWidth = true;
@@ -97,8 +366,6 @@ public class DialogueManager : MonoBehaviour
         ContentSizeFitter fitter = currentOptionsGroup.AddComponent<ContentSizeFitter>();
         fitter.verticalFit = ContentSizeFitter.FitMode.PreferredSize;
         fitter.horizontalFit = ContentSizeFitter.FitMode.Unconstrained;
-
-        StartCoroutine(ScrollToBottom());
     }
 
     void RemoveCurrentOptions()
@@ -113,9 +380,20 @@ public class DialogueManager : MonoBehaviour
     IEnumerator ScrollToBottom()
     {
         yield return null;
+        yield return null;
+
         Canvas.ForceUpdateCanvases();
 
+        RectTransform contentRect = contentRoot as RectTransform;
+        if (contentRect != null)
+        {
+            LayoutRebuilder.ForceRebuildLayoutImmediate(contentRect);
+        }
+
         if (scrollRect != null)
+        {
+            scrollRect.StopMovement();
             scrollRect.verticalNormalizedPosition = 0f;
+        }
     }
 }

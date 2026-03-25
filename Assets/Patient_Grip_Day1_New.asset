@@ -1,0 +1,423 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 2fb738e7044b7cc4dae6b9c5d16348a1, type: 3}
+  m_Name: Patient_Grip_Day1_New
+  m_EditorClassIdentifier: Assembly-CSharp::PatientCaseData
+  patientName: Buse
+  correctDiagnosis: Grip
+  startText: "Merhaba doktor, ben Buse. Yakla\u015F\u0131k 5 g\xFCnd\xFCr \xF6ks\xFCr\xFCyorum
+    ve kendimi pek iyi hissetmiyorum."
+  startAssistantText: "\xD6nce semptomlar\u0131n s\xFCresini, ate\u015Fi ve temas
+    \xF6yk\xFCs\xFCn\xFC netle\u015Ftir."
+  rootNodeId: hub_main
+  allNodes:
+  - nodeId: hub_main
+    isHubNode: 1
+    nodeIntroText: 
+    nodeAssistantText: 
+    choices:
+    - choiceText: "Ka\xE7 g\xFCnd\xFCr \xF6ks\xFCr\xFCyorsunuz?"
+      doctorLine: "Ka\xE7 g\xFCnd\xFCr \xF6ks\xFCr\xFCyorsunuz?"
+      patientReply: 
+      assistantReply: 
+      nextNodeId: branch_cough_duration
+      returnToHub: 0
+      opensDiagnosisPanel: 0
+      reusable: 1
+      hideAfterUse: 1
+      gainedTags: []
+      requiredTags: []
+      blockedTags: []
+    - choiceText: "Ate\u015Finiz oldu mu?"
+      doctorLine: "Ate\u015Finiz oldu mu?"
+      patientReply: 
+      assistantReply: 
+      nextNodeId: branch_fever
+      returnToHub: 0
+      opensDiagnosisPanel: 0
+      reusable: 1
+      hideAfterUse: 1
+      gainedTags: []
+      requiredTags: []
+      blockedTags: []
+    - choiceText: "Evde hasta biri var m\u0131?"
+      doctorLine: "Evde hasta biri var m\u0131?"
+      patientReply: 
+      assistantReply: 
+      nextNodeId: branch_contact
+      returnToHub: 0
+      opensDiagnosisPanel: 0
+      reusable: 1
+      hideAfterUse: 1
+      gainedTags: []
+      requiredTags: []
+      blockedTags: []
+    - choiceText: "Bo\u011Faz\u0131n\u0131z a\u011Fr\u0131yor mu?"
+      doctorLine: "Bo\u011Faz\u0131n\u0131z a\u011Fr\u0131yor mu?"
+      patientReply: 
+      assistantReply: 
+      nextNodeId: branch_throat
+      returnToHub: 0
+      opensDiagnosisPanel: 0
+      reusable: 1
+      hideAfterUse: 1
+      gainedTags: []
+      requiredTags: []
+      blockedTags: []
+    - choiceText: "Halsizlik ya da kas a\u011Fr\u0131n\u0131z var m\u0131?"
+      doctorLine: "Halsizlik ya da kas a\u011Fr\u0131n\u0131z var m\u0131?"
+      patientReply: 
+      assistantReply: 
+      nextNodeId: branch_fatigue
+      returnToHub: 0
+      opensDiagnosisPanel: 0
+      reusable: 1
+      hideAfterUse: 1
+      gainedTags: []
+      requiredTags: []
+      blockedTags: []
+    - choiceText: "Te\u015Fhis koymak istiyorum."
+      doctorLine: "Sizi de\u011Ferlendirdim. Bir te\u015Fhis koymak istiyorum."
+      patientReply: 
+      assistantReply: 
+      nextNodeId: 
+      returnToHub: 0
+      opensDiagnosisPanel: 1
+      reusable: 0
+      hideAfterUse: 0
+      gainedTags: []
+      requiredTags: []
+      blockedTags: []
+  - nodeId: branch_cough_duration
+    isHubNode: 0
+    nodeIntroText: "Hasta \xF6ks\xFCr\xFC\u011F\xFCn s\xFCresiyle ilgili daha fazla
+      bilgi vermeye haz\u0131r g\xF6r\xFCn\xFCyor."
+    nodeAssistantText: 
+    choices:
+    - choiceText: "\xD6ks\xFCr\xFC\u011F\xFCn\xFCz kuru mu, balgaml\u0131 m\u0131?"
+      doctorLine: "\xD6ks\xFCr\xFC\u011F\xFCn\xFCz kuru mu, balgaml\u0131 m\u0131?"
+      patientReply: "Daha \xE7ok kuru ama bazen az miktarda balgam da geliyor."
+      assistantReply: 
+      nextNodeId: 
+      returnToHub: 0
+      opensDiagnosisPanel: 0
+      reusable: 0
+      hideAfterUse: 0
+      gainedTags:
+      - cough_5days
+      - dry_cough
+      requiredTags: []
+      blockedTags: []
+    - choiceText: "G\xFCn i\xE7inde ne zaman art\u0131yor?"
+      doctorLine: "G\xFCn i\xE7inde ne zaman art\u0131yor?"
+      patientReply: "\xD6zellikle geceye do\u011Fru daha rahats\u0131z edici oluyor
+        doktor."
+      assistantReply: 
+      nextNodeId: 
+      returnToHub: 0
+      opensDiagnosisPanel: 0
+      reusable: 0
+      hideAfterUse: 0
+      gainedTags:
+      - cough_night_worse
+      requiredTags: []
+      blockedTags: []
+    - choiceText: "\xD6ks\xFCr\xFCrken a\u011Fr\u0131 oluyor mu?"
+      doctorLine: "\xD6ks\xFCr\xFCrken a\u011Fr\u0131 oluyor mu?"
+      patientReply: "Hay\u0131r, belirgin bir g\xF6\u011F\xFCs a\u011Fr\u0131m olmuyor."
+      assistantReply: 
+      nextNodeId: 
+      returnToHub: 0
+      opensDiagnosisPanel: 0
+      reusable: 0
+      hideAfterUse: 0
+      gainedTags:
+      - no_chest_pain
+      requiredTags: []
+      blockedTags: []
+    - choiceText: "Anlad\u0131m, verdi\u011Finiz bilgiler i\xE7in te\u015Fekk\xFCr
+        ederim. Devam edelim."
+      doctorLine: "Anlad\u0131m, verdi\u011Finiz bilgiler i\xE7in te\u015Fekk\xFCr
+        ederim."
+      patientReply: 
+      assistantReply: 
+      nextNodeId: 
+      returnToHub: 1
+      opensDiagnosisPanel: 0
+      reusable: 0
+      hideAfterUse: 0
+      gainedTags: []
+      requiredTags: []
+      blockedTags: []
+  - nodeId: branch_fever
+    isHubNode: 0
+    nodeIntroText: 
+    nodeAssistantText: 
+    choices:
+    - choiceText: "Ka\xE7 dereceye kadar \xE7\u0131kt\u0131?"
+      doctorLine: "Ate\u015Finiz ka\xE7 dereceye kadar \xE7\u0131kt\u0131?"
+      patientReply: "38 bu\xE7uk, 39 civar\u0131n\u0131 g\xF6rd\xFCm."
+      assistantReply: 
+      nextNodeId: 
+      returnToHub: 0
+      opensDiagnosisPanel: 0
+      reusable: 0
+      hideAfterUse: 0
+      gainedTags:
+      - fever_high
+      requiredTags: []
+      blockedTags: []
+    - choiceText: "Ate\u015F birden mi y\xFCkseldi?"
+      doctorLine: "Ate\u015F birden mi y\xFCkseldi?"
+      patientReply: "Evet, birden bast\u0131rd\u0131 diyebilirim."
+      assistantReply: 
+      nextNodeId: 
+      returnToHub: 0
+      opensDiagnosisPanel: 0
+      reusable: 0
+      hideAfterUse: 0
+      gainedTags:
+      - sudden_onset
+      requiredTags: []
+      blockedTags: []
+    - choiceText: "Kas a\u011Fr\u0131n\u0131z da e\u015Flik etti mi?"
+      doctorLine: "Kas a\u011Fr\u0131n\u0131z da oldu mu?"
+      patientReply: "Evet, \xF6zellikle bacaklar\u0131mda ve s\u0131rt\u0131mda a\u011Fr\u0131
+        vard\u0131."
+      assistantReply: "Ani ba\u015Flang\u0131\xE7l\u0131 ate\u015F ve yayg\u0131n
+        kas a\u011Fr\u0131s\u0131 grip lehine g\xFC\xE7l\xFC bir kombinasyon."
+      nextNodeId: 
+      returnToHub: 0
+      opensDiagnosisPanel: 0
+      reusable: 0
+      hideAfterUse: 0
+      gainedTags:
+      - muscle_pain
+      - fever_high
+      requiredTags: []
+      blockedTags: []
+    - choiceText: Tamam, devam edelim.
+      doctorLine: Tamam, devam edelim.
+      patientReply: 
+      assistantReply: 
+      nextNodeId: 
+      returnToHub: 1
+      opensDiagnosisPanel: 0
+      reusable: 0
+      hideAfterUse: 0
+      gainedTags: []
+      requiredTags: []
+      blockedTags: []
+  - nodeId: branch_contact
+    isHubNode: 0
+    nodeIntroText: 
+    nodeAssistantText: 
+    choices:
+    - choiceText: Evde kim hasta oldu?
+      doctorLine: Evde kim hasta oldu?
+      patientReply: "Babam da \xF6ks\xFCr\xFCyordu, annem de biraz k\u0131rg\u0131n
+        gibiydi."
+      assistantReply: 
+      nextNodeId: 
+      returnToHub: 0
+      opensDiagnosisPanel: 0
+      reusable: 0
+      hideAfterUse: 0
+      gainedTags:
+      - sick_contact_yes
+      requiredTags: []
+      blockedTags: []
+    - choiceText: "Baban\u0131z\u0131n \u015Fikayetleri nelerdi?"
+      doctorLine: "Baban\u0131z\u0131n \u015Fikayetleri nelerdi?"
+      patientReply: "O da \xF6ks\xFCr\xFCyordu ve birka\xE7 g\xFCn halsizdi."
+      assistantReply: 
+      nextNodeId: 
+      returnToHub: 0
+      opensDiagnosisPanel: 0
+      reusable: 0
+      hideAfterUse: 0
+      gainedTags:
+      - family_viral_contact
+      requiredTags: []
+      blockedTags: []
+    - choiceText: "Annenizin \u015Fikayetleri nelerdi?"
+      doctorLine: "Annenizin \u015Fikayetleri nelerdi?"
+      patientReply: "\xC7ok a\u011F\u0131r de\u011Fildi ama bo\u011Faz\u0131 a\u011Fr\u0131yordu
+        ve biraz halsizdi."
+      assistantReply: "Aile i\xE7i benzer yak\u0131nmalar bula\u015F\u0131c\u0131
+        bir \xFCst solunum yolu enfeksiyonu olas\u0131l\u0131\u011F\u0131n\u0131
+        destekliyor."
+      nextNodeId: 
+      returnToHub: 0
+      opensDiagnosisPanel: 0
+      reusable: 0
+      hideAfterUse: 0
+      gainedTags:
+      - household_spread
+      requiredTags: []
+      blockedTags: []
+    - choiceText: "Anlad\u0131m, te\u015Fekk\xFCr ederim. Devam edelim."
+      doctorLine: "Anlad\u0131m, te\u015Fekk\xFCr ederim."
+      patientReply: 
+      assistantReply: 
+      nextNodeId: 
+      returnToHub: 1
+      opensDiagnosisPanel: 0
+      reusable: 0
+      hideAfterUse: 0
+      gainedTags: []
+      requiredTags: []
+      blockedTags: []
+  - nodeId: branch_throat
+    isHubNode: 0
+    nodeIntroText: 
+    nodeAssistantText: 
+    choices:
+    - choiceText: "Yutkunurken daha m\u0131 \xE7ok a\u011Fr\u0131yor?"
+      doctorLine: "Yutkunurken daha m\u0131 \xE7ok a\u011Fr\u0131yor?"
+      patientReply: "Evet, \xF6zellikle yutkunurken hissediyorum."
+      assistantReply: 
+      nextNodeId: 
+      returnToHub: 0
+      opensDiagnosisPanel: 0
+      reusable: 0
+      hideAfterUse: 0
+      gainedTags:
+      - throat_pain
+      requiredTags: []
+      blockedTags: []
+    - choiceText: "Bo\u011Faz\u0131n\u0131zda yanma m\u0131 var?"
+      doctorLine: "Bo\u011Faz\u0131n\u0131zda yanma hissi var m\u0131?"
+      patientReply: Evet, hafif yanma da oluyor.
+      assistantReply: 
+      nextNodeId: 
+      returnToHub: 0
+      opensDiagnosisPanel: 0
+      reusable: 0
+      hideAfterUse: 0
+      gainedTags:
+      - throat_burning
+      requiredTags: []
+      blockedTags: []
+    - choiceText: "Burun ak\u0131nt\u0131n\u0131z da var m\u0131?"
+      doctorLine: "Burun ak\u0131nt\u0131n\u0131z da var m\u0131?"
+      patientReply: "Biraz var ama en rahats\u0131z eden \u015Fey o de\u011Fil."
+      assistantReply: 
+      nextNodeId: 
+      returnToHub: 0
+      opensDiagnosisPanel: 0
+      reusable: 0
+      hideAfterUse: 0
+      gainedTags:
+      - mild_runny_nose
+      requiredTags: []
+      blockedTags: []
+    - choiceText: Tamam, devam edelim.
+      doctorLine: Tamam, devam edelim.
+      patientReply: 
+      assistantReply: 
+      nextNodeId: 
+      returnToHub: 1
+      opensDiagnosisPanel: 0
+      reusable: 0
+      hideAfterUse: 0
+      gainedTags: []
+      requiredTags: []
+      blockedTags: []
+  - nodeId: branch_fatigue
+    isHubNode: 0
+    nodeIntroText: 
+    nodeAssistantText: 
+    choices:
+    - choiceText: "G\xFCnl\xFCk i\u015Flerinizi yapabiliyor musunuz?"
+      doctorLine: "G\xFCnl\xFCk i\u015Flerinizi yapabiliyor musunuz?"
+      patientReply: "Yap\u0131yorum ama \xE7ok zorlan\u0131yorum, enerjim yok."
+      assistantReply: 
+      nextNodeId: 
+      returnToHub: 0
+      opensDiagnosisPanel: 0
+      reusable: 0
+      hideAfterUse: 0
+      gainedTags:
+      - fatigue_present
+      requiredTags: []
+      blockedTags: []
+    - choiceText: "Ba\u015F a\u011Fr\u0131n\u0131z da oluyor mu?"
+      doctorLine: "Ba\u015F a\u011Fr\u0131n\u0131z da oluyor mu?"
+      patientReply: "Evet, arada ba\u015F\u0131m da a\u011Fr\u0131yor."
+      assistantReply: 
+      nextNodeId: 
+      returnToHub: 0
+      opensDiagnosisPanel: 0
+      reusable: 0
+      hideAfterUse: 0
+      gainedTags:
+      - headache_present
+      requiredTags: []
+      blockedTags: []
+    - choiceText: "Kaslar\u0131n\u0131zda k\u0131rg\u0131nl\u0131k var m\u0131?"
+      doctorLine: "Kaslar\u0131n\u0131zda k\u0131rg\u0131nl\u0131k var m\u0131?"
+      patientReply: "Evet, b\xFCt\xFCn v\xFCcudum k\u0131rg\u0131n gibi."
+      assistantReply: "Belirgin halsizlik ve yayg\u0131n v\xFCcut a\u011Fr\u0131s\u0131
+        grip ihtimalini art\u0131r\u0131yor."
+      nextNodeId: 
+      returnToHub: 0
+      opensDiagnosisPanel: 0
+      reusable: 0
+      hideAfterUse: 0
+      gainedTags:
+      - fatigue_present
+      - muscle_pain
+      requiredTags: []
+      blockedTags: []
+    - choiceText: "Te\u015Fekk\xFCr ederim, devam edelim."
+      doctorLine: "Te\u015Fekk\xFCr ederim, devam edelim."
+      patientReply: 
+      assistantReply: 
+      nextNodeId: 
+      returnToHub: 1
+      opensDiagnosisPanel: 0
+      reusable: 0
+      hideAfterUse: 0
+      gainedTags: []
+      requiredTags: []
+      blockedTags: []
+  diagnosisChoices:
+  - diagnosisName: Grip
+    resultText: "Do\u011Fru te\u015Fhis. Toplanan belirtiler grip ile uyumlu g\xF6r\xFCn\xFCyor."
+    isCorrectDiagnosis: 1
+    recommendedTags: []
+  - diagnosisName: Farenjit
+    resultText: "Bu tan\u0131 baz\u0131 bo\u011Faz \u015Fikayetlerini a\xE7\u0131klasa
+      da tabloyu tam kar\u015F\u0131lam\u0131yor."
+    isCorrectDiagnosis: 0
+    recommendedTags: []
+  - diagnosisName: "So\u011Fuk alg\u0131nl\u0131\u011F\u0131"
+    resultText: "Benzerlik var ancak y\xFCksek ate\u015F ve kas a\u011Fr\u0131s\u0131
+      grip lehine daha g\xFC\xE7l\xFC."
+    isCorrectDiagnosis: 0
+    recommendedTags: []
+  - diagnosisName: "Bron\u015Fit"
+    resultText: "\xD6ks\xFCr\xFCk mevcut ama mevcut veri bron\u015Fiti g\xFC\xE7l\xFC
+      \u015Fekilde desteklemiyor."
+    isCorrectDiagnosis: 0
+    recommendedTags: []
+  - diagnosisName: "Sin\xFCzit"
+    resultText: "Burun ve y\xFCz b\xF6lgesi bulgular\u0131 bask\u0131n olmad\u0131\u011F\u0131
+      i\xE7in bu tan\u0131 zay\u0131f kal\u0131yor."
+    isCorrectDiagnosis: 0
+    recommendedTags: []
+  - diagnosisName: Alerji
+    resultText: "Ate\u015F ve sistemik k\u0131rg\u0131nl\u0131k alerjiyle uyumlu
+      de\u011Fil."
+    isCorrectDiagnosis: 0
+    recommendedTags: []
