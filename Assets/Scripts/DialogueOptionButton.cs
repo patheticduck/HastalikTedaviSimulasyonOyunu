@@ -20,6 +20,8 @@ public class DialogueOptionButton : MonoBehaviour, IPointerEnterHandler, IPointe
 
     public void SetupChoice(DialogueChoiceData choice, DialogueManager manager)
     {
+        Debug.Log("SetupChoice çalıştı");
+
         choiceData = choice;
         diagnosisData = null;
         dialogueManager = manager;
@@ -31,19 +33,27 @@ public class DialogueOptionButton : MonoBehaviour, IPointerEnterHandler, IPointe
             buttonText.text = "- " + choice.choiceText;
             ApplyNormalColor();
         }
+        else
+        {
+            Debug.LogError("SetupChoice: buttonText veya choice null.");
+        }
 
         if (button != null)
         {
             button.onClick.RemoveAllListeners();
             button.onClick.AddListener(OnClickChoice);
-
-            // Hover rengini sadece script yönetsin
             button.transition = Selectable.Transition.None;
+        }
+        else
+        {
+            Debug.LogError("SetupChoice: Button component bulunamadı.");
         }
     }
 
     public void SetupDiagnosisChoice(DiagnosisChoiceData diagnosis, DialogueManager manager)
     {
+        Debug.Log("SetupDiagnosisChoice çalıştı");
+
         diagnosisData = diagnosis;
         choiceData = null;
         dialogueManager = manager;
@@ -55,27 +65,41 @@ public class DialogueOptionButton : MonoBehaviour, IPointerEnterHandler, IPointe
             buttonText.text = "- " + diagnosis.diagnosisName;
             ApplyNormalColor();
         }
+        else
+        {
+            Debug.LogError("SetupDiagnosisChoice: buttonText veya diagnosis null.");
+        }
 
         if (button != null)
         {
             button.onClick.RemoveAllListeners();
             button.onClick.AddListener(OnClickDiagnosisChoice);
-
-            // Hover rengini sadece script yönetsin
             button.transition = Selectable.Transition.None;
+        }
+        else
+        {
+            Debug.LogError("SetupDiagnosisChoice: Button component bulunamadı.");
         }
     }
 
     void OnClickChoice()
     {
+        Debug.Log("Choice butonuna tıklandı");
+
         if (dialogueManager != null && choiceData != null)
             dialogueManager.SelectChoice(choiceData);
+        else
+            Debug.LogError("Choice click: dialogueManager veya choiceData null");
     }
 
     void OnClickDiagnosisChoice()
     {
+        Debug.Log("Diagnosis butonuna tıklandı");
+
         if (dialogueManager != null && diagnosisData != null)
             dialogueManager.SelectDiagnosis(diagnosisData);
+        else
+            Debug.LogError("Diagnosis click: dialogueManager veya diagnosisData null");
     }
 
     public void OnPointerEnter(PointerEventData eventData)

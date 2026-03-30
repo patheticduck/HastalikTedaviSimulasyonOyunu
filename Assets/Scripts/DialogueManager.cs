@@ -14,6 +14,9 @@ public class DialogueManager : MonoBehaviour
     public GameObject optionButtonPrefab;
     public ScrollRect scrollRect;
 
+    [Header("Flow")]
+    public GameFlowManager gameFlowManager;
+
     [Header("Case")]
     public PatientCaseData currentCase;
 
@@ -28,6 +31,8 @@ public class DialogueManager : MonoBehaviour
 
     public void StartDialogue()
     {
+        Debug.Log("DialogueManager StartDialogue çalıştı");
+
         if (currentCase == null)
         {
             Debug.LogError("DialogueManager: Current Case atanmadı.");
@@ -37,6 +42,18 @@ public class DialogueManager : MonoBehaviour
         if (string.IsNullOrEmpty(currentCase.rootNodeId))
         {
             Debug.LogError("DialogueManager: rootNodeId boş.");
+            return;
+        }
+
+        if (dialoguePanel == null)
+        {
+            Debug.LogError("DialogueManager: dialoguePanel bağlı değil.");
+            return;
+        }
+
+        if (contentRoot == null)
+        {
+            Debug.LogError("DialogueManager: contentRoot bağlı değil.");
             return;
         }
 
@@ -60,8 +77,13 @@ public class DialogueManager : MonoBehaviour
 
     public void SelectChoice(DialogueChoiceData choice)
     {
+        Debug.Log("SelectChoice çalıştı");
+
         if (choice == null)
+        {
+            Debug.LogError("SelectChoice: choice null.");
             return;
+        }
 
         RemoveDoctorHeader();
         RemoveCurrentOptions();
@@ -114,23 +136,26 @@ public class DialogueManager : MonoBehaviour
     public void SelectDiagnosis(DiagnosisChoiceData diagnosis)
     {
         if (diagnosis == null)
+        {
+            Debug.LogError("SelectDiagnosis: diagnosis null.");
             return;
+        }
+
+        Debug.Log("SelectDiagnosis çalıştı: " + diagnosis.diagnosisName);
 
         RemoveDoctorHeader();
         RemoveCurrentOptions();
 
         AddDialogueLine(FormatLine("DOKTOR", "Sizin hastalığınızın " + diagnosis.diagnosisName + " olduğunu düşünüyorum."));
 
-        if (!string.IsNullOrEmpty(diagnosis.resultText))
+        if (gameFlowManager != null)
         {
-            AddDialogueLine(FormatLine("SİSTEM", diagnosis.resultText));
+            gameFlowManager.SubmitDiagnosis(diagnosis.diagnosisName);
         }
         else
         {
-            if (diagnosis.isCorrectDiagnosis)
-                AddDialogueLine(FormatLine("SİSTEM", "Doğru teşhis."));
-            else
-                AddDialogueLine(FormatLine("SİSTEM", "Yanlış teşhis."));
+            Debug.LogError("DialogueManager: gameFlowManager bağlı değil.");
+            AddDialogueLine(FormatLine("SİSTEM", "GameFlowManager bağlı değil."));
         }
 
         Canvas.ForceUpdateCanvases();
@@ -139,6 +164,14 @@ public class DialogueManager : MonoBehaviour
 
     void OpenDiagnosisPanel()
     {
+        Debug.Log("OpenDiagnosisPanel çalıştı");
+
+        if (currentCase == null)
+        {
+            Debug.LogError("OpenDiagnosisPanel: currentCase null.");
+            return;
+        }
+
         if (currentCase.diagnosisChoices == null || currentCase.diagnosisChoices.Count == 0)
         {
             AddDialogueLine(FormatLine("SİSTEM", "Teşhis seçenekleri tanımlanmamış."));
@@ -149,7 +182,6 @@ public class DialogueManager : MonoBehaviour
 
         RemoveDoctorHeader();
 
-        // Geçici doktor başlığı
         lastDoctorHeader = AddDialogueLineReturn(FormatLine("DOKTOR", ""), false);
 
         CreateOptionsGroup();
@@ -163,6 +195,10 @@ public class DialogueManager : MonoBehaviour
             {
                 optionScript.SetupDiagnosisChoice(diagnosis, this);
             }
+            else
+            {
+                Debug.LogError("OpenDiagnosisPanel: optionButtonPrefab içinde DialogueOptionButton yok.");
+            }
         }
 
         StartCoroutine(ScrollToBottom());
@@ -170,6 +206,8 @@ public class DialogueManager : MonoBehaviour
 
     void ShowNode(string nodeId, bool showNodeIntro)
     {
+        Debug.Log("ShowNode çalıştı: " + nodeId);
+
         DialogueNodeData node = GetNodeById(nodeId);
 
         if (node == null)
@@ -194,9 +232,10 @@ public class DialogueManager : MonoBehaviour
 
     void ShowChoices(DialogueNodeData node)
     {
+        Debug.Log("ShowChoices çalıştı");
+
         RemoveDoctorHeader();
 
-        // Geçici doktor başlığı
         lastDoctorHeader = AddDialogueLineReturn(FormatLine("DOKTOR", ""), false);
 
         CreateOptionsGroup();
@@ -209,6 +248,10 @@ public class DialogueManager : MonoBehaviour
             if (optionScript != null)
             {
                 optionScript.SetupChoice(choice, this);
+            }
+            else
+            {
+                Debug.LogError("ShowChoices: optionButtonPrefab içinde DialogueOptionButton yok.");
             }
         }
 
@@ -321,11 +364,19 @@ public class DialogueManager : MonoBehaviour
 
     void AddDialogueLine(string text, bool autoScroll = true)
     {
+        if (dialogueLinePrefab == null)
+        {
+            Debug.LogError("AddDialogueLine: dialogueLinePrefab bağlı değil.");
+            return;
+        }
+
         GameObject lineObj = Instantiate(dialogueLinePrefab, contentRoot);
         TextMeshProUGUI lineText = lineObj.GetComponentInChildren<TextMeshProUGUI>();
 
         if (lineText != null)
             lineText.text = text;
+        else
+            Debug.LogError("AddDialogueLine: prefab içinde TextMeshProUGUI bulunamadı.");
 
         if (autoScroll)
             StartCoroutine(ScrollToBottom());
@@ -333,11 +384,19 @@ public class DialogueManager : MonoBehaviour
 
     GameObject AddDialogueLineReturn(string text, bool autoScroll = true)
     {
+        if (dialogueLinePrefab == null)
+        {
+            Debug.LogError("AddDialogueLineReturn: dialogueLinePrefab bağlı değil.");
+            return null;
+        }
+
         GameObject lineObj = Instantiate(dialogueLinePrefab, contentRoot);
         TextMeshProUGUI lineText = lineObj.GetComponentInChildren<TextMeshProUGUI>();
 
         if (lineText != null)
             lineText.text = text;
+        else
+            Debug.LogError("AddDialogueLineReturn: prefab içinde TextMeshProUGUI bulunamadı.");
 
         if (autoScroll)
             StartCoroutine(ScrollToBottom());
