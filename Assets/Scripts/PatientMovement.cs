@@ -2,26 +2,21 @@ using UnityEngine;
 
 public class PatientMovement : MonoBehaviour
 {
+    [Header("Movement")]
+    public Transform startPoint;
     public Transform targetPoint;
     public float moveSpeed = 2f;
     public float stopDistance = 0.2f;
 
+    [Header("Flow")]
+    public GameFlowManager gameFlowManager;
+
     private bool hasArrived = false;
-    private DialogueManager dialogueManager;
-
-    void Start()
-    {
-        dialogueManager = FindObjectOfType<DialogueManager>();
-
-        if (dialogueManager == null)
-        {
-            Debug.LogWarning("DialogueManager bulunamadı.");
-        }
-    }
+    private bool canMove = false;
 
     void Update()
     {
-        if (hasArrived || targetPoint == null)
+        if (!canMove || hasArrived || targetPoint == null)
             return;
 
         Vector3 targetPosition = new Vector3(
@@ -47,13 +42,42 @@ public class PatientMovement : MonoBehaviour
         if (Vector3.Distance(transform.position, targetPosition) <= stopDistance)
         {
             hasArrived = true;
+            canMove = false;
+
             Debug.Log("Hasta hedef noktaya ulaştı.");
 
-            if (dialogueManager != null)
+            if (gameFlowManager != null)
             {
-                Debug.Log("Diyalog başlatılıyor.");
-                dialogueManager.StartDialogue();
+                Debug.Log("GameFlowManager'a haber veriliyor: hasta geldi.");
+                gameFlowManager.OnPatientArrived();
+            }
+            else
+            {
+                Debug.LogWarning("PatientMovement: gameFlowManager bağlı değil.");
             }
         }
+    }
+
+    public void BeginWalk()
+    {
+        if (startPoint != null)
+        {
+            transform.position = startPoint.position;
+            transform.rotation = startPoint.rotation;
+        }
+
+        hasArrived = false;
+        canMove = true;
+
+        gameObject.SetActive(true);
+
+        Debug.Log("Hasta yürümeye başladı.");
+    }
+
+    public void HidePatient()
+    {
+        canMove = false;
+        hasArrived = false;
+        gameObject.SetActive(false);
     }
 }

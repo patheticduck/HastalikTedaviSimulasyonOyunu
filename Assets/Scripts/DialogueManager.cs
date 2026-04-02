@@ -57,6 +57,15 @@ public class DialogueManager : MonoBehaviour
             return;
         }
 
+        // Eski içerikleri temizle
+        RemoveDoctorHeader();
+        RemoveCurrentOptions();
+
+        foreach (Transform child in contentRoot)
+        {
+            Destroy(child.gameObject);
+        }
+
         dialoguePanel.SetActive(true);
 
         discoveredTags.Clear();
@@ -73,6 +82,23 @@ public class DialogueManager : MonoBehaviour
         }
 
         ShowNode(rootNodeId, false);
+    }
+
+    public void CloseDialoguePanel()
+    {
+        RemoveDoctorHeader();
+        RemoveCurrentOptions();
+
+        if (contentRoot != null)
+        {
+            foreach (Transform child in contentRoot)
+            {
+                Destroy(child.gameObject);
+            }
+        }
+
+        if (dialoguePanel != null)
+            dialoguePanel.SetActive(false);
     }
 
     public void SelectChoice(DialogueChoiceData choice)

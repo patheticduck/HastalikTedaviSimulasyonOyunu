@@ -1,3 +1,4 @@
+using System.Collections.Generic;
 using UnityEngine;
 using TMPro;
 
@@ -5,9 +6,14 @@ public class GameFlowManager : MonoBehaviour
 {
     [Header("References")]
     public DialogueManager dialogueManager;
+    public GameObject patientObject;
+    public PatientMovement patientMovement;
 
-    [Header("Test Case")]
-    public PatientCaseData firstCase;
+    [Header("Day Cases")]
+    public List<PatientCaseData> dayCases = new List<PatientCaseData>();
+
+    [Header("Settings")]
+    public bool autoStartDayOnPlay = true;
 
     [Header("Game State")]
     public int currentDay = 1;
@@ -27,21 +33,84 @@ public class GameFlowManager : MonoBehaviour
 
     void Start()
     {
-        Debug.Log("GameFlowManager Start çalıştı");
-        StartGame();
-    }
+        Debug.Log("GameFlowManager hazır");
 
-    public void StartGame()
-    {
-        Debug.Log("StartGame çalıştı");
-
-        currentDay = 1;
-        currentPatientIndex = 1;
-        wrongDiagnosisCount = 0;
-        caseFinished = false;
+        if (endPanel != null)
+            endPanel.SetActive(false);
 
         UpdateHUD();
-        LoadCase(firstCase);
+
+        if (autoStartDayOnPlay)
+        {
+            StartDay();
+        }
+    }
+
+    public void StartDay()
+    {
+        Debug.Log("StartDay çalıştı");
+
+        if (dayCases == null || dayCases.Count == 0)
+        {
+            Debug.LogError("GameFlowManager: dayCases listesi boş.");
+            return;
+        }
+
+        currentPatientIndex = 0;
+        caseFinished = false;
+        currentCase = null;
+
+        if (endPanel != null)
+            endPanel.SetActive(false);
+
+        if (dialogueManager != null)
+            dialogueManager.CloseDialoguePanel();
+
+        UpdateHUD();
+        SendNextPatient();
+    }
+
+    void SendNextPatient()
+    {
+        if (currentPatientIndex < 0 || currentPatientIndex >= dayCases.Count)
+        {
+            EndDay();
+            return;
+        }
+
+        Debug.Log("Sıradaki hasta gönderiliyor. Index: " + currentPatientIndex);
+
+        if (patientMovement != null)
+        {
+            patientMovement.BeginWalk();
+        }
+        else if (patientObject != null)
+        {
+            patientObject.SetActive(true);
+            Debug.LogWarning("patientMovement bağlı değil. Hasta sadece aktif edildi.");
+        }
+        else
+        {
+            Debug.LogError("GameFlowManager: ne patientMovement ne patientObject bağlı.");
+        }
+    }
+
+    public void OnPatientArrived()
+    {
+        Debug.Log("GameFlowManager: hasta masaya ulaştı.");
+        StartCurrentPatientCase();
+    }
+
+    void StartCurrentPatientCase()
+    {
+        if (currentPatientIndex < 0 || currentPatientIndex >= dayCases.Count)
+        {
+            Debug.LogError("StartCurrentPatientCase: geçersiz currentPatientIndex.");
+            return;
+        }
+
+        PatientCaseData nextCase = dayCases[currentPatientIndex];
+        LoadCase(nextCase);
     }
 
     public void LoadCase(PatientCaseData newCase)
@@ -75,6 +144,12 @@ public class GameFlowManager : MonoBehaviour
     public void SubmitDiagnosis(string selectedDiagnosis)
     {
         Debug.Log("SubmitDiagnosis çağrıldı: " + selectedDiagnosis);
+
+        if (currentCase == null && dialogueManager != null)
+        {
+            currentCase = dialogueManager.currentCase;
+            Debug.LogWarning("GameFlowManager currentCase boştu, DialogueManager'dan alındı.");
+        }
 
         if (currentCase == null)
         {
@@ -115,12 +190,12 @@ public class GameFlowManager : MonoBehaviour
             return;
         }
 
-        EndDay(isCorrect, selectedDiagnosis);
+        ShowCaseResult(isCorrect, selectedDiagnosis);
     }
 
-    void EndDay(bool isCorrect, string selectedDiagnosis)
+    void ShowCaseResult(bool isCorrect, string selectedDiagnosis)
     {
-        Debug.Log("EndDay çalıştı");
+        Debug.Log("ShowCaseResult çalıştı");
 
         if (endPanel != null)
             endPanel.SetActive(true);
@@ -130,7 +205,7 @@ public class GameFlowManager : MonoBehaviour
             if (isCorrect)
             {
                 endPanelText.text =
-                    "Gün Sonu\n\n" +
+                    "Hasta Sonucu\n\n" +
                     "Hasta: " + currentCase.patientName + "\n" +
                     "Teşhis: " + selectedDiagnosis + "\n\n" +
                     "Doğru teşhis koydunuz.";
@@ -138,7 +213,7 @@ public class GameFlowManager : MonoBehaviour
             else
             {
                 endPanelText.text =
-                    "Gün Sonu\n\n" +
+                    "Hasta Sonucu\n\n" +
                     "Hasta: " + currentCase.patientName + "\n" +
                     "Teşhis: " + selectedDiagnosis + "\n" +
                     "Doğru Tanı: " + currentCase.correctDiagnosis + "\n\n" +
@@ -147,12 +222,88 @@ public class GameFlowManager : MonoBehaviour
             }
         }
 
-        Debug.Log("Gün bitti.");
+        Debug.Log("Hasta sonucu paneli gösterildi.");
+    }
+
+    public void ContinueToNextPatient()
+    {
+        Debug.Log("ContinueToNextPatient çalıştı");
+
+        if (endPanel != null)
+            endPanel.SetActive(false);
+
+        if (dialogueManager != null)
+            dialogueManager.CloseDialoguePanel();
+
+        if (patientMovement != null)
+        {
+            patientMovement.HidePatient();
+        }
+        else if (patientObject != null)
+        {
+            patientObject.SetActive(false);
+        }
+
+        currentCase = null;
+        caseFinished = false;
+        currentPatientIndex++;
+
+        UpdateHUD();
+
+        if (currentPatientIndex >= dayCases.Count)
+        {
+            EndDay();
+            return;
+        }
+
+        SendNextPatient();
+    }
+
+    void EndDay()
+    {
+        Debug.Log("EndDay çalıştı");
+
+        if (dialogueManager != null)
+            dialogueManager.CloseDialoguePanel();
+
+        if (patientMovement != null)
+        {
+            patientMovement.HidePatient();
+        }
+        else if (patientObject != null)
+        {
+            patientObject.SetActive(false);
+        }
+
+        if (endPanel != null)
+            endPanel.SetActive(true);
+
+        if (endPanelText != null)
+        {
+            endPanelText.text =
+                "Gün Tamamlandı\n\n" +
+                "Bugünkü tüm hastalar bitti.\n" +
+                "Toplam yanlış teşhis: " + wrongDiagnosisCount + "/" + maxWrongDiagnosis;
+        }
+
+        UpdateHUD();
     }
 
     public void GameOver()
     {
         Debug.Log("GameOver çalıştı");
+
+        if (dialogueManager != null)
+            dialogueManager.CloseDialoguePanel();
+
+        if (patientMovement != null)
+        {
+            patientMovement.HidePatient();
+        }
+        else if (patientObject != null)
+        {
+            patientObject.SetActive(false);
+        }
 
         if (endPanel != null)
             endPanel.SetActive(true);
@@ -173,7 +324,11 @@ public class GameFlowManager : MonoBehaviour
             dayText.text = "Gün: " + currentDay + "/7";
 
         if (patientText != null)
-            patientText.text = "Hasta: " + currentPatientIndex;
+        {
+            int totalPatients = Mathf.Max(dayCases.Count, 1);
+            int shownIndex = Mathf.Clamp(currentPatientIndex + 1, 1, totalPatients);
+            patientText.text = "Hasta: " + shownIndex + "/" + totalPatients;
+        }
 
         if (wrongCountText != null)
             wrongCountText.text = "Yanlış: " + wrongDiagnosisCount + "/" + maxWrongDiagnosis;
