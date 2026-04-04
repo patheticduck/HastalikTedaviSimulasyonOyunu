@@ -47,12 +47,14 @@ public class PatientMovement : MonoBehaviour
             if (walkingIn)
             {
                 Debug.Log("Hasta hedef noktaya ulaştı.");
+
                 if (gameFlowManager != null)
                     gameFlowManager.OnPatientArrived();
             }
             else
             {
                 Debug.Log("Hasta odadan çıktı.");
+
                 gameObject.SetActive(false);
 
                 if (gameFlowManager != null)
@@ -61,6 +63,7 @@ public class PatientMovement : MonoBehaviour
         }
     }
 
+    // 🔥 OYUN BAŞLARKEN ÇAĞRILACAK ANA FONKSİYON
     public void BeginWalk()
     {
         if (startPoint != null)
@@ -83,8 +86,10 @@ public class PatientMovement : MonoBehaviour
         if (startPoint == null)
         {
             HidePatient();
+
             if (gameFlowManager != null)
                 gameFlowManager.OnPatientExited();
+
             return;
         }
 

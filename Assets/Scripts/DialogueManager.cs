@@ -29,13 +29,19 @@ public class DialogueManager : MonoBehaviour
     private string currentNodeId;
     private string rootNodeId;
 
+    private void Awake()
+    {
+        if (dialoguePanel != null)
+            dialoguePanel.SetActive(false);
+    }
+
     public void StartDialogue()
     {
-        Debug.Log("DialogueManager StartDialogue çalıştı");
+        Debug.Log("DialogueManager -> StartDialogue çalıştı");
 
         if (currentCase == null)
         {
-            Debug.LogError("DialogueManager: Current Case atanmadı.");
+            Debug.LogError("DialogueManager: currentCase atanmadı.");
             return;
         }
 
@@ -57,14 +63,19 @@ public class DialogueManager : MonoBehaviour
             return;
         }
 
-        // Eski içerikleri temizle
-        RemoveDoctorHeader();
-        RemoveCurrentOptions();
-
-        foreach (Transform child in contentRoot)
+        if (dialogueLinePrefab == null)
         {
-            Destroy(child.gameObject);
+            Debug.LogError("DialogueManager: dialogueLinePrefab bağlı değil.");
+            return;
         }
+
+        if (optionButtonPrefab == null)
+        {
+            Debug.LogError("DialogueManager: optionButtonPrefab bağlı değil.");
+            return;
+        }
+
+        ClearDialogueContent();
 
         dialoguePanel.SetActive(true);
 
@@ -82,20 +93,14 @@ public class DialogueManager : MonoBehaviour
         }
 
         ShowNode(rootNodeId, false);
+
+        Canvas.ForceUpdateCanvases();
+        StartCoroutine(ScrollToBottom());
     }
 
     public void CloseDialoguePanel()
     {
-        RemoveDoctorHeader();
-        RemoveCurrentOptions();
-
-        if (contentRoot != null)
-        {
-            foreach (Transform child in contentRoot)
-            {
-                Destroy(child.gameObject);
-            }
-        }
+        ClearDialogueContent();
 
         if (dialoguePanel != null)
             dialoguePanel.SetActive(false);
@@ -103,7 +108,7 @@ public class DialogueManager : MonoBehaviour
 
     public void SelectChoice(DialogueChoiceData choice)
     {
-        Debug.Log("SelectChoice çalıştı");
+        Debug.Log("DialogueManager -> SelectChoice çalıştı");
 
         if (choice == null)
         {
@@ -167,7 +172,7 @@ public class DialogueManager : MonoBehaviour
             return;
         }
 
-        Debug.Log("SelectDiagnosis çalıştı: " + diagnosis.diagnosisName);
+        Debug.Log("DialogueManager -> SelectDiagnosis çalıştı: " + diagnosis.diagnosisName);
 
         RemoveDoctorHeader();
         RemoveCurrentOptions();
@@ -188,9 +193,9 @@ public class DialogueManager : MonoBehaviour
         StartCoroutine(ScrollToBottom());
     }
 
-    void OpenDiagnosisPanel()
+    private void OpenDiagnosisPanel()
     {
-        Debug.Log("OpenDiagnosisPanel çalıştı");
+        Debug.Log("DialogueManager -> OpenDiagnosisPanel çalıştı");
 
         if (currentCase == null)
         {
@@ -230,9 +235,9 @@ public class DialogueManager : MonoBehaviour
         StartCoroutine(ScrollToBottom());
     }
 
-    void ShowNode(string nodeId, bool showNodeIntro)
+    private void ShowNode(string nodeId, bool showNodeIntro)
     {
-        Debug.Log("ShowNode çalıştı: " + nodeId);
+        Debug.Log("DialogueManager -> ShowNode çalıştı: " + nodeId);
 
         DialogueNodeData node = GetNodeById(nodeId);
 
@@ -256,9 +261,9 @@ public class DialogueManager : MonoBehaviour
         ShowChoices(node);
     }
 
-    void ShowChoices(DialogueNodeData node)
+    private void ShowChoices(DialogueNodeData node)
     {
-        Debug.Log("ShowChoices çalıştı");
+        Debug.Log("DialogueManager -> ShowChoices çalıştı");
 
         RemoveDoctorHeader();
 
@@ -284,7 +289,7 @@ public class DialogueManager : MonoBehaviour
         StartCoroutine(ScrollToBottom());
     }
 
-    List<DialogueChoiceData> GetAvailableChoices(DialogueNodeData node)
+    private List<DialogueChoiceData> GetAvailableChoices(DialogueNodeData node)
     {
         List<DialogueChoiceData> result = new List<DialogueChoiceData>();
 
@@ -315,7 +320,7 @@ public class DialogueManager : MonoBehaviour
         return result;
     }
 
-    bool AreRequiredTagsMet(List<string> requiredTags)
+    private bool AreRequiredTagsMet(List<string> requiredTags)
     {
         if (requiredTags == null || requiredTags.Count == 0)
             return true;
@@ -329,7 +334,7 @@ public class DialogueManager : MonoBehaviour
         return true;
     }
 
-    bool HasAnyBlockedTag(List<string> blockedTags)
+    private bool HasAnyBlockedTag(List<string> blockedTags)
     {
         if (blockedTags == null || blockedTags.Count == 0)
             return false;
@@ -343,7 +348,7 @@ public class DialogueManager : MonoBehaviour
         return false;
     }
 
-    DialogueNodeData GetNodeById(string nodeId)
+    private DialogueNodeData GetNodeById(string nodeId)
     {
         if (currentCase == null || currentCase.allNodes == null)
             return null;
@@ -351,12 +356,12 @@ public class DialogueManager : MonoBehaviour
         return currentCase.allNodes.FirstOrDefault(n => n != null && n.nodeId == nodeId);
     }
 
-    string BuildChoiceKey(string nodeId, string choiceText)
+    private string BuildChoiceKey(string nodeId, string choiceText)
     {
         return nodeId + "::" + choiceText;
     }
 
-    void RemoveDoctorHeader()
+    private void RemoveDoctorHeader()
     {
         if (lastDoctorHeader != null)
         {
@@ -365,7 +370,7 @@ public class DialogueManager : MonoBehaviour
         }
     }
 
-    string FormatLine(string speaker, string text)
+    private string FormatLine(string speaker, string text)
     {
         switch (speaker)
         {
@@ -388,7 +393,7 @@ public class DialogueManager : MonoBehaviour
         }
     }
 
-    void AddDialogueLine(string text, bool autoScroll = true)
+    private void AddDialogueLine(string text, bool autoScroll = true)
     {
         if (dialogueLinePrefab == null)
         {
@@ -408,7 +413,7 @@ public class DialogueManager : MonoBehaviour
             StartCoroutine(ScrollToBottom());
     }
 
-    GameObject AddDialogueLineReturn(string text, bool autoScroll = true)
+    private GameObject AddDialogueLineReturn(string text, bool autoScroll = true)
     {
         if (dialogueLinePrefab == null)
         {
@@ -430,7 +435,7 @@ public class DialogueManager : MonoBehaviour
         return lineObj;
     }
 
-    void CreateOptionsGroup()
+    private void CreateOptionsGroup()
     {
         RemoveCurrentOptions();
 
@@ -438,7 +443,7 @@ public class DialogueManager : MonoBehaviour
         currentOptionsGroup.transform.SetParent(contentRoot, false);
 
         VerticalLayoutGroup layout = currentOptionsGroup.AddComponent<VerticalLayoutGroup>();
-        layout.spacing = 2;
+        layout.spacing = 8f;
         layout.padding.top = 0;
         layout.padding.bottom = 0;
         layout.padding.left = 0;
@@ -453,7 +458,7 @@ public class DialogueManager : MonoBehaviour
         fitter.horizontalFit = ContentSizeFitter.FitMode.Unconstrained;
     }
 
-    void RemoveCurrentOptions()
+    private void RemoveCurrentOptions()
     {
         if (currentOptionsGroup != null)
         {
@@ -462,7 +467,21 @@ public class DialogueManager : MonoBehaviour
         }
     }
 
-    IEnumerator ScrollToBottom()
+    private void ClearDialogueContent()
+    {
+        RemoveDoctorHeader();
+        RemoveCurrentOptions();
+
+        if (contentRoot != null)
+        {
+            foreach (Transform child in contentRoot)
+            {
+                Destroy(child.gameObject);
+            }
+        }
+    }
+
+    private IEnumerator ScrollToBottom()
     {
         yield return null;
         yield return null;
