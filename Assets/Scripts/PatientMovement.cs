@@ -13,16 +13,18 @@ public class PatientMovement : MonoBehaviour
 
     private bool hasArrived = false;
     private bool canMove = false;
+    private bool walkingIn = true;
+    private Vector3 currentTarget;
 
     void Update()
     {
-        if (!canMove || hasArrived || targetPoint == null)
+        if (!canMove)
             return;
 
         Vector3 targetPosition = new Vector3(
-            targetPoint.position.x,
+            currentTarget.x,
             transform.position.y,
-            targetPoint.position.z
+            currentTarget.z
         );
 
         transform.position = Vector3.MoveTowards(
@@ -35,25 +37,26 @@ public class PatientMovement : MonoBehaviour
         direction.y = 0f;
 
         if (direction != Vector3.zero)
-        {
             transform.forward = direction.normalized;
-        }
 
         if (Vector3.Distance(transform.position, targetPosition) <= stopDistance)
         {
-            hasArrived = true;
             canMove = false;
+            hasArrived = true;
 
-            Debug.Log("Hasta hedef noktaya ulaştı.");
-
-            if (gameFlowManager != null)
+            if (walkingIn)
             {
-                Debug.Log("GameFlowManager'a haber veriliyor: hasta geldi.");
-                gameFlowManager.OnPatientArrived();
+                Debug.Log("Hasta hedef noktaya ulaştı.");
+                if (gameFlowManager != null)
+                    gameFlowManager.OnPatientArrived();
             }
             else
             {
-                Debug.LogWarning("PatientMovement: gameFlowManager bağlı değil.");
+                Debug.Log("Hasta odadan çıktı.");
+                gameObject.SetActive(false);
+
+                if (gameFlowManager != null)
+                    gameFlowManager.OnPatientExited();
             }
         }
     }
@@ -64,14 +67,33 @@ public class PatientMovement : MonoBehaviour
         {
             transform.position = startPoint.position;
             transform.rotation = startPoint.rotation;
+            currentTarget = targetPoint.position;
         }
 
+        walkingIn = true;
         hasArrived = false;
         canMove = true;
-
         gameObject.SetActive(true);
 
-        Debug.Log("Hasta yürümeye başladı.");
+        Debug.Log("Hasta içeri yürümeye başladı.");
+    }
+
+    public void BeginExit()
+    {
+        if (startPoint == null)
+        {
+            HidePatient();
+            if (gameFlowManager != null)
+                gameFlowManager.OnPatientExited();
+            return;
+        }
+
+        walkingIn = false;
+        hasArrived = false;
+        canMove = true;
+        currentTarget = startPoint.position;
+
+        Debug.Log("Hasta dışarı çıkmaya başladı.");
     }
 
     public void HidePatient()

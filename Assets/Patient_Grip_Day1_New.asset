@@ -27,7 +27,8 @@ MonoBehaviour:
     choices:
     - choiceText: "Ka\xE7 g\xFCnd\xFCr \xF6ks\xFCr\xFCyorsunuz?"
       doctorLine: "Ka\xE7 g\xFCnd\xFCr \xF6ks\xFCr\xFCyorsunuz?"
-      patientReply: 
+      patientReply: "Yakla\u015F\u0131k 5 g\xFCnd\xFCr \xF6ks\xFCr\xFCyorum doktor
+        bey."
       assistantReply: 
       nextNodeId: branch_cough_duration
       returnToHub: 0
@@ -39,7 +40,7 @@ MonoBehaviour:
       blockedTags: []
     - choiceText: "Ate\u015Finiz oldu mu?"
       doctorLine: "Ate\u015Finiz oldu mu?"
-      patientReply: 
+      patientReply: "Evet doktor bey, ate\u015Fim vard\u0131. D\xFCn 38.5 civar\u0131ndayd\u0131."
       assistantReply: 
       nextNodeId: branch_fever
       returnToHub: 0
@@ -51,7 +52,8 @@ MonoBehaviour:
       blockedTags: []
     - choiceText: "Evde hasta biri var m\u0131?"
       doctorLine: "Evde hasta biri var m\u0131?"
-      patientReply: 
+      patientReply: "Evet, evde babam hasta. O da birka\xE7 g\xFCnd\xFCr \xF6ks\xFCr\xFCyor
+        ve ate\u015Fi vard\u0131."
       assistantReply: 
       nextNodeId: branch_contact
       returnToHub: 0
@@ -63,7 +65,8 @@ MonoBehaviour:
       blockedTags: []
     - choiceText: "Bo\u011Faz\u0131n\u0131z a\u011Fr\u0131yor mu?"
       doctorLine: "Bo\u011Faz\u0131n\u0131z a\u011Fr\u0131yor mu?"
-      patientReply: 
+      patientReply: "Evet doktor bey, bo\u011Faz\u0131m biraz a\u011Fr\u0131yor ama
+        \xE7ok \u015Fiddetli de\u011Fil."
       assistantReply: 
       nextNodeId: branch_throat
       returnToHub: 0
@@ -75,7 +78,7 @@ MonoBehaviour:
       blockedTags: []
     - choiceText: "Halsizlik ya da kas a\u011Fr\u0131n\u0131z var m\u0131?"
       doctorLine: "Halsizlik ya da kas a\u011Fr\u0131n\u0131z var m\u0131?"
-      patientReply: 
+      patientReply: "Evet doktor bey, kendimi \xE7ok halsiz hissediyorum."
       assistantReply: 
       nextNodeId: branch_fatigue
       returnToHub: 0
