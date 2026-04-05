@@ -18,100 +18,6 @@ public class DialogueOptionButton : MonoBehaviour, IPointerEnterHandler, IPointe
     private DialogueManager dialogueManager;
     private Button button;
 
-    public void SetupChoice(DialogueChoiceData choice, DialogueManager manager)
-    {
-        Debug.Log("SetupChoice çalıştı");
-
-        choiceData = choice;
-        diagnosisData = null;
-        dialogueManager = manager;
-
-        EnsureReferences();
-
-        if (buttonText != null && choice != null)
-        {
-            buttonText.text = "- " + choice.choiceText;
-            ApplyNormalColor();
-        }
-        else
-        {
-            Debug.LogError("SetupChoice: buttonText veya choice null.");
-        }
-
-        if (button != null)
-        {
-            button.onClick.RemoveAllListeners();
-            button.onClick.AddListener(OnClickChoice);
-            button.transition = Selectable.Transition.None;
-        }
-        else
-        {
-            Debug.LogError("SetupChoice: Button component bulunamadı.");
-        }
-    }
-
-    public void SetupDiagnosisChoice(DiagnosisChoiceData diagnosis, DialogueManager manager)
-    {
-        Debug.Log("SetupDiagnosisChoice çalıştı");
-
-        diagnosisData = diagnosis;
-        choiceData = null;
-        dialogueManager = manager;
-
-        EnsureReferences();
-
-        if (buttonText != null && diagnosis != null)
-        {
-            buttonText.text = "- " + diagnosis.diagnosisName;
-            ApplyNormalColor();
-        }
-        else
-        {
-            Debug.LogError("SetupDiagnosisChoice: buttonText veya diagnosis null.");
-        }
-
-        if (button != null)
-        {
-            button.onClick.RemoveAllListeners();
-            button.onClick.AddListener(OnClickDiagnosisChoice);
-            button.transition = Selectable.Transition.None;
-        }
-        else
-        {
-            Debug.LogError("SetupDiagnosisChoice: Button component bulunamadı.");
-        }
-    }
-
-    void OnClickChoice()
-    {
-        Debug.Log("Choice butonuna tıklandı");
-
-        if (dialogueManager != null && choiceData != null)
-            dialogueManager.SelectChoice(choiceData);
-        else
-            Debug.LogError("Choice click: dialogueManager veya choiceData null");
-    }
-
-    void OnClickDiagnosisChoice()
-    {
-        Debug.Log("Diagnosis butonuna tıklandı");
-
-        if (dialogueManager != null && diagnosisData != null)
-            dialogueManager.SelectDiagnosis(diagnosisData);
-        else
-            Debug.LogError("Diagnosis click: dialogueManager veya diagnosisData null");
-    }
-
-    public void OnPointerEnter(PointerEventData eventData)
-    {
-        ApplyHoverColor();
-    }
-
-    public void OnPointerExit(PointerEventData eventData)
-    {
-        ApplyNormalColor();
-    }
-
     private void Awake()
     {
         EnsureReferences();
@@ -132,6 +38,116 @@ public class DialogueOptionButton : MonoBehaviour, IPointerEnterHandler, IPointe
     private void Reset()
     {
         EnsureReferences();
+        ApplyNormalColor();
+    }
+
+    public void SetupChoice(DialogueChoiceData choice, DialogueManager manager)
+    {
+        Debug.Log("SetupChoice çalıştı");
+
+        choiceData = choice;
+        diagnosisData = null;
+        dialogueManager = manager;
+
+        EnsureReferences();
+
+        if (buttonText != null && choice != null)
+        {
+            buttonText.text = choice.choiceText;
+            ApplyNormalColor();
+        }
+        else
+        {
+            Debug.LogError("SetupChoice: buttonText veya choice null.");
+        }
+
+        if (button != null)
+        {
+            button.onClick.RemoveAllListeners();
+            button.onClick.AddListener(OnClickChoice);
+            button.transition = Selectable.Transition.None;
+            button.interactable = true;
+        }
+        else
+        {
+            Debug.LogError("SetupChoice: Button component bulunamadı.");
+        }
+    }
+
+    public void SetupDiagnosisChoice(DiagnosisChoiceData diagnosis, DialogueManager manager)
+    {
+        Debug.Log("SetupDiagnosisChoice çalıştı");
+
+        diagnosisData = diagnosis;
+        choiceData = null;
+        dialogueManager = manager;
+
+        EnsureReferences();
+
+        if (buttonText != null && diagnosis != null)
+        {
+            buttonText.text = diagnosis.diagnosisName;
+            ApplyNormalColor();
+        }
+        else
+        {
+            Debug.LogError("SetupDiagnosisChoice: buttonText veya diagnosis null.");
+        }
+
+        if (button != null)
+        {
+            button.onClick.RemoveAllListeners();
+            button.onClick.AddListener(OnClickDiagnosisChoice);
+            button.transition = Selectable.Transition.None;
+            button.interactable = true;
+        }
+        else
+        {
+            Debug.LogError("SetupDiagnosisChoice: Button component bulunamadı.");
+        }
+    }
+
+    private void OnClickChoice()
+    {
+        Debug.Log("Choice butonuna tıklandı");
+
+        if (button != null)
+            button.interactable = false;
+
+        if (dialogueManager != null && choiceData != null)
+        {
+            dialogueManager.SelectChoice(choiceData);
+        }
+        else
+        {
+            Debug.LogError("Choice click: dialogueManager veya choiceData null");
+        }
+    }
+
+    private void OnClickDiagnosisChoice()
+    {
+        Debug.Log("Diagnosis butonuna tıklandı");
+
+        if (button != null)
+            button.interactable = false;
+
+        if (dialogueManager != null && diagnosisData != null)
+        {
+            dialogueManager.SelectDiagnosis(diagnosisData);
+        }
+        else
+        {
+            Debug.LogError("Diagnosis click: dialogueManager veya diagnosisData null");
+        }
+    }
+
+    public void OnPointerEnter(PointerEventData eventData)
+    {
+        ApplyHoverColor();
+    }
+
+    public void OnPointerExit(PointerEventData eventData)
+    {
         ApplyNormalColor();
     }
 

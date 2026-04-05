@@ -543,9 +543,9 @@ public class GameFlowManager : MonoBehaviour
         FinishDiagnosisFlow(null);
     }
 
-    public void SubmitDiagnosis(string diagnosis)
+    public void SubmitDiagnosis(string diagnosisId)
     {
-        Debug.Log("Seçilen teşhis: " + diagnosis);
+        Debug.Log("Seçilen teşhis ID: " + diagnosisId);
 
         DialogueManager dialogueManager = FindFirstObjectByType<DialogueManager>();
         bool isCorrect = false;
@@ -555,7 +555,7 @@ public class GameFlowManager : MonoBehaviour
         if (dialogueManager != null && dialogueManager.currentCase != null)
         {
             DiagnosisChoiceData selectedDiagnosis = dialogueManager.currentCase.diagnosisChoices
-                .FirstOrDefault(d => d != null && d.diagnosisName == diagnosis);
+                .FirstOrDefault(d => d != null && d.diseaseId == diagnosisId);
 
             if (selectedDiagnosis != null)
             {
@@ -578,7 +578,7 @@ public class GameFlowManager : MonoBehaviour
 
         lastDiagnosisWasCorrect = isCorrect;
         lastDiagnosisResultText = diagnosisResultText;
-        lastCorrectDiagnosisName = correctDiagnosisName;
+        lastCorrectDiagnosisName = string.IsNullOrEmpty(correctDiagnosisName) ? "Bilinmiyor" : correctDiagnosisName;
 
         if (isCorrect)
         {

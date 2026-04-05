@@ -4,6 +4,10 @@ using UnityEngine;
 [System.Serializable]
 public class DiagnosisChoiceData
 {
+    [Header("Kimlik")]
+    public string diseaseId;
+
+    [Header("UI")]
     public string diagnosisName;
 
     [TextArea]

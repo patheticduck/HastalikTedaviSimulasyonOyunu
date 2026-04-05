@@ -4,6 +4,11 @@ using UnityEngine;
 [CreateAssetMenu(fileName = "NewPatientCase", menuName = "Game/Patient Case")]
 public class PatientCaseData : ScriptableObject
 {
+    [Header("Case Identity")]
+    public string caseId;
+    public string trueDiseaseId;
+
+    [Header("Start")]
     public string rootNodeId;
 
     [TextArea]
@@ -12,7 +17,12 @@ public class PatientCaseData : ScriptableObject
     [TextArea]
     public string startAssistantText;
 
-    public List<DialogueNodeData> allNodes;
+    [Header("Dialogue")]
+    public List<DialogueNodeData> allNodes = new List<DialogueNodeData>();
 
-    public List<DiagnosisChoiceData> diagnosisChoices;
+    [Header("Diagnosis")]
+    public List<DiagnosisChoiceData> diagnosisChoices = new List<DiagnosisChoiceData>();
+
+    [Header("Assistant Hints")]
+    public List<AssistantHintRuleData> assistantHints = new List<AssistantHintRuleData>();
 }
