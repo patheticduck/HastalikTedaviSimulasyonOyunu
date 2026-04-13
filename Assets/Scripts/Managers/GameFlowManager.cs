@@ -25,6 +25,7 @@ public class GameFlowManager : MonoBehaviour
     public Button patientResultContinueButton;
 
     [Header("End Screen UI")]
+    public TextMeshProUGUI titleText;
     public TextMeshProUGUI resultText;
     public Button continueButton;
 
@@ -204,6 +205,11 @@ public class GameFlowManager : MonoBehaviour
     {
         if (endDayPanel != null)
             endDayPanel.SetActive(true);
+
+        if (titleText != null)
+        {
+            titleText.text = "GÜN " + currentDay + " TAMAMLANDI";
+        }
 
         if (resultText != null)
         {
@@ -407,11 +413,15 @@ public class GameFlowManager : MonoBehaviour
         if (patientResultPanel != null) patientResultPanel.SetActive(false);
         if (endDayPanel != null) endDayPanel.SetActive(true);
 
+        if (titleText != null)
+        {
+            titleText.text = "OYUN TAMAMLANDI";
+        }
+
         if (resultText != null)
         {
             resultText.text =
-                "Oyun Tamamlandı\n\n" +
-                totalPatientsInRun + " hastanın tamamı değerlendirildi.\n\n" +
+                "Tüm hastalar değerlendirildi.\n\n" +
                 "Toplam Doğru: " + totalCorrect + "\n" +
                 "Toplam Yanlış: " + totalWrong;
         }
@@ -435,10 +445,14 @@ public class GameFlowManager : MonoBehaviour
         if (patientResultPanel != null) patientResultPanel.SetActive(false);
         if (endDayPanel != null) endDayPanel.SetActive(true);
 
+        if (titleText != null)
+        {
+            titleText.text = "OYUN BİTTİ";
+        }
+
         if (resultText != null)
         {
             resultText.text =
-                "Oyun Bitti\n\n" +
                 "5 yanlış teşhis hakkını doldurdun.\n\n" +
                 "Toplam Doğru: " + totalCorrect + "\n" +
                 "Toplam Yanlış: " + totalWrong;
