@@ -18,6 +18,12 @@ public class MainMenuManager : MonoBehaviour
     [Header("Manager")]
     public GameFlowManager gameFlowManager;
 
+    [Header("Player Look")]
+    public MouseLookLimited mouseLook;
+    public Transform doctorLookRoot;
+    public Transform menuCameraPoint;
+    public Transform gameplayCameraPoint;
+
     private bool hasPlayedGame = false;
     private string lastGameDate = "";
     private int lastCorrect = 0;
@@ -45,6 +51,11 @@ public class MainMenuManager : MonoBehaviour
         if (heartsPanel != null)
             heartsPanel.SetActive(false);
 
+        MoveCameraRootTo(menuCameraPoint);
+
+        if (mouseLook != null)
+            mouseLook.SetLookEnabled(false);
+
         UpdateLastGameUI();
     }
 
@@ -65,6 +76,11 @@ public class MainMenuManager : MonoBehaviour
         if (heartsPanel != null)
             heartsPanel.SetActive(true);
 
+        MoveCameraRootTo(gameplayCameraPoint);
+
+        if (mouseLook != null)
+            mouseLook.SetLookEnabled(true);
+
         if (gameFlowManager != null)
         {
             gameFlowManager.ResetGame();
@@ -84,6 +100,15 @@ public class MainMenuManager : MonoBehaviour
         lastWrong = wrong;
 
         ShowMainMenu();
+    }
+
+    private void MoveCameraRootTo(Transform targetPoint)
+    {
+        if (doctorLookRoot == null || targetPoint == null)
+            return;
+
+        doctorLookRoot.position = targetPoint.position;
+        doctorLookRoot.rotation = targetPoint.rotation;
     }
 
     private void UpdateLastGameUI()

@@ -29,6 +29,9 @@ public class DialogueManager : MonoBehaviour
     [Header("Flow")]
     public GameFlowManager gameFlowManager;
 
+    [Header("Notebook")]
+    public NotebookUIManager notebookUIManager;
+
     [Header("Case")]
     public PatientCaseData currentCase;
 
@@ -65,6 +68,12 @@ public class DialogueManager : MonoBehaviour
     {
         if (dialoguePanel != null)
             dialoguePanel.SetActive(false);
+    }
+
+    private void Start()
+    {
+        if (notebookUIManager == null)
+            notebookUIManager = FindFirstObjectByType<NotebookUIManager>();
     }
 
     private void Update()
@@ -109,6 +118,7 @@ public class DialogueManager : MonoBehaviour
         isBusy = true;
 
         Debug.Log("DialogueManager -> StartDialogue çalıştı");
+        Debug.Log("Current Case -> " + (currentCase != null ? currentCase.caseId : "NULL"));
 
         if (currentCase == null)
         {
@@ -170,6 +180,12 @@ public class DialogueManager : MonoBehaviour
         rootNodeId = currentCase.rootNodeId;
         currentNodeId = rootNodeId;
 
+        if (notebookUIManager != null)
+        {
+            notebookUIManager.SetDialogueManager(this);
+            notebookUIManager.RefreshNotebook();
+        }
+
         currentTurnFocusLine = CreateDialogueLineObject();
         yield return StartCoroutine(TypeDialogueIntoLine(currentTurnFocusLine, "HASTA", currentCase.startText, false));
 
@@ -213,6 +229,7 @@ public class DialogueManager : MonoBehaviour
         isBusy = true;
 
         Debug.Log("DialogueManager -> SelectChoice çalıştı");
+        Debug.Log("Selected Choice -> " + choice.choiceText);
 
         if (choice == null)
         {
@@ -282,6 +299,19 @@ public class DialogueManager : MonoBehaviour
         }
 
         ApplyDiseaseEffects(choice.diseaseEffects);
+
+        Debug.Log(
+            "Notebook Data After Choice -> " +
+            "Tags: [" + string.Join(", ", discoveredTags) + "] | " +
+            "Symptoms: [" + string.Join(", ", discoveredSymptoms) + "] | " +
+            "Tests: [" + string.Join(", ", performedTests) + "]"
+        );
+
+        if (notebookUIManager != null)
+        {
+            notebookUIManager.SetDialogueManager(this);
+            notebookUIManager.RefreshNotebook();
+        }
 
         if (choice.hideAfterUse)
         {

@@ -9,6 +9,9 @@ public class GameFlowManager : MonoBehaviour
     [Header("Main Managers")]
     public MainMenuManager mainMenuManager;
 
+    [Header("Interaction Mode")]
+    public PlayerInteractionModeManager interactionModeManager;
+
     [Header("Patient")]
     public PatientMovement patientMovement;
 
@@ -77,6 +80,9 @@ public class GameFlowManager : MonoBehaviour
         if (dayTransitionCanvasGroup != null)
             dayTransitionCanvasGroup.alpha = 0f;
 
+        if (interactionModeManager != null)
+            interactionModeManager.SetDialogueAvailable(false);
+
         UpdateHeartsUI();
     }
 
@@ -120,6 +126,12 @@ public class GameFlowManager : MonoBehaviour
             patientMovement.HidePatient();
         }
 
+        if (interactionModeManager != null)
+        {
+            interactionModeManager.SetDialogueAvailable(false);
+            interactionModeManager.ExitUIMode();
+        }
+
         Debug.Log("Yeni oyun başlatıldı.");
     }
 
@@ -140,6 +152,12 @@ public class GameFlowManager : MonoBehaviour
 
         if (patientResultPanel != null)
             patientResultPanel.SetActive(false);
+
+        if (interactionModeManager != null)
+        {
+            interactionModeManager.SetDialogueAvailable(false);
+            interactionModeManager.ExitUIMode();
+        }
 
         if (patientMovement != null)
         {
@@ -207,6 +225,11 @@ public class GameFlowManager : MonoBehaviour
 
     private void ShowEndOfDayPanel()
     {
+        if (interactionModeManager != null)
+        {
+            interactionModeManager.EnterUIMode();
+        }
+
         if (endDayPanel != null)
             endDayPanel.SetActive(true);
 
@@ -240,6 +263,11 @@ public class GameFlowManager : MonoBehaviour
     {
         if (endDayPanel != null)
             endDayPanel.SetActive(false);
+
+        if (interactionModeManager != null)
+        {
+            interactionModeManager.ExitUIMode();
+        }
     }
 
     public void OnContinueButtonPressed()
@@ -358,6 +386,11 @@ public class GameFlowManager : MonoBehaviour
 
     private void ShowPatientResultPanel()
     {
+        if (interactionModeManager != null)
+        {
+            interactionModeManager.EnterUIMode();
+        }
+
         if (patientResultPanel != null)
             patientResultPanel.SetActive(true);
 
@@ -408,6 +441,11 @@ public class GameFlowManager : MonoBehaviour
     {
         if (patientResultPanel != null)
             patientResultPanel.SetActive(false);
+
+        if (interactionModeManager != null)
+        {
+            interactionModeManager.ExitUIMode();
+        }
     }
 
     // -------------------------------------------------
@@ -417,6 +455,12 @@ public class GameFlowManager : MonoBehaviour
     public void ShowFinalCompletedPanel()
     {
         gameEnded = true;
+
+        if (interactionModeManager != null)
+        {
+            interactionModeManager.SetDialogueAvailable(false);
+            interactionModeManager.EnterUIMode();
+        }
 
         if (dialoguePanel != null) dialoguePanel.SetActive(false);
         if (dayTransitionPanel != null) dayTransitionPanel.SetActive(false);
@@ -450,6 +494,12 @@ public class GameFlowManager : MonoBehaviour
     {
         gameEnded = true;
 
+        if (interactionModeManager != null)
+        {
+            interactionModeManager.SetDialogueAvailable(false);
+            interactionModeManager.EnterUIMode();
+        }
+
         if (dialoguePanel != null) dialoguePanel.SetActive(false);
         if (dayTransitionPanel != null) dayTransitionPanel.SetActive(false);
         if (patientResultPanel != null) patientResultPanel.SetActive(false);
@@ -480,6 +530,11 @@ public class GameFlowManager : MonoBehaviour
 
     public void ReturnToMainMenuFromEndPanel()
     {
+        if (interactionModeManager != null)
+        {
+            interactionModeManager.ExitUIMode();
+        }
+
         if (mainMenuManager != null)
         {
             mainMenuManager.ReturnToMenu(totalCorrect, totalWrong);
@@ -510,8 +565,15 @@ public class GameFlowManager : MonoBehaviour
     {
         Debug.Log("Hasta geldi.");
 
-        if (dialoguePanel != null)
+        if (interactionModeManager != null)
+        {
+            interactionModeManager.SetDialogueAvailable(true);
+            interactionModeManager.OpenDialogueMode();
+        }
+        else if (dialoguePanel != null)
+        {
             dialoguePanel.SetActive(true);
+        }
 
         DialogueManager dialogueManager = FindFirstObjectByType<DialogueManager>();
 
@@ -529,8 +591,14 @@ public class GameFlowManager : MonoBehaviour
     {
         Debug.Log("Hasta çıktı.");
 
-        if (dialoguePanel != null)
+        if (interactionModeManager != null)
+        {
+            interactionModeManager.SetDialogueAvailable(false);
+        }
+        else if (dialoguePanel != null)
+        {
             dialoguePanel.SetActive(false);
+        }
 
         if (gameEnded)
             return;
@@ -621,6 +689,11 @@ public class GameFlowManager : MonoBehaviour
     private void FinishDiagnosisFlow(string diagnosisResultText)
     {
         DialogueManager dialogueManager = FindFirstObjectByType<DialogueManager>();
+
+        if (interactionModeManager != null)
+        {
+            interactionModeManager.SetDialogueAvailable(false);
+        }
 
         if (dialogueManager != null)
         {

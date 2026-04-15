@@ -3,7 +3,7 @@ using UnityEngine.UI;
 using TMPro;
 using UnityEngine.EventSystems;
 
-public class DialogueOptionButton : MonoBehaviour, IPointerEnterHandler, IPointerExitHandler
+public class DialogueOptionButton : MonoBehaviour, IPointerEnterHandler, IPointerExitHandler, IPointerClickHandler
 {
     [Header("UI")]
     public TextMeshProUGUI buttonText;
@@ -43,7 +43,7 @@ public class DialogueOptionButton : MonoBehaviour, IPointerEnterHandler, IPointe
 
     public void SetupChoice(DialogueChoiceData choice, DialogueManager manager)
     {
-        Debug.Log("SetupChoice çalıştı");
+        Debug.Log("SetupChoice çalıştı: " + (choice != null ? choice.choiceText : "NULL"));
 
         choiceData = choice;
         diagnosisData = null;
@@ -55,6 +55,7 @@ public class DialogueOptionButton : MonoBehaviour, IPointerEnterHandler, IPointe
         {
             buttonText.text = choice.choiceText;
             ApplyNormalColor();
+            buttonText.raycastTarget = false;
         }
         else
         {
@@ -76,7 +77,7 @@ public class DialogueOptionButton : MonoBehaviour, IPointerEnterHandler, IPointe
 
     public void SetupDiagnosisChoice(DiagnosisChoiceData diagnosis, DialogueManager manager)
     {
-        Debug.Log("SetupDiagnosisChoice çalıştı");
+        Debug.Log("SetupDiagnosisChoice çalıştı: " + (diagnosis != null ? diagnosis.diagnosisName : "NULL"));
 
         diagnosisData = diagnosis;
         choiceData = null;
@@ -88,6 +89,7 @@ public class DialogueOptionButton : MonoBehaviour, IPointerEnterHandler, IPointe
         {
             buttonText.text = diagnosis.diagnosisName;
             ApplyNormalColor();
+            buttonText.raycastTarget = false;
         }
         else
         {
@@ -109,7 +111,7 @@ public class DialogueOptionButton : MonoBehaviour, IPointerEnterHandler, IPointe
 
     private void OnClickChoice()
     {
-        Debug.Log("Choice butonuna tıklandı");
+        Debug.Log("Choice butonuna tıklandı: " + (choiceData != null ? choiceData.choiceText : "NULL"));
 
         if (button != null)
             button.interactable = false;
@@ -126,7 +128,7 @@ public class DialogueOptionButton : MonoBehaviour, IPointerEnterHandler, IPointe
 
     private void OnClickDiagnosisChoice()
     {
-        Debug.Log("Diagnosis butonuna tıklandı");
+        Debug.Log("Diagnosis butonuna tıklandı: " + (diagnosisData != null ? diagnosisData.diagnosisName : "NULL"));
 
         if (button != null)
             button.interactable = false;
@@ -139,6 +141,11 @@ public class DialogueOptionButton : MonoBehaviour, IPointerEnterHandler, IPointe
         {
             Debug.LogError("Diagnosis click: dialogueManager veya diagnosisData null");
         }
+    }
+
+    public void OnPointerClick(PointerEventData eventData)
+    {
+        Debug.Log("IPointerClick alındı: " + gameObject.name);
     }
 
     public void OnPointerEnter(PointerEventData eventData)
