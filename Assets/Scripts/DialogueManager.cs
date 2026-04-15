@@ -4,6 +4,7 @@ using System.Linq;
 using UnityEngine;
 using TMPro;
 using UnityEngine.UI;
+using UnityEngine.InputSystem;
 
 public class DialogueManager : MonoBehaviour
 {
@@ -13,6 +14,17 @@ public class DialogueManager : MonoBehaviour
     public GameObject dialogueLinePrefab;
     public GameObject optionButtonPrefab;
     public ScrollRect scrollRect;
+
+    [Header("Typewriter")]
+    [SerializeField] private float dialogueTypeSpeed = 0.02f;
+    [SerializeField] private float optionTypeSpeed = 0.015f;
+    [SerializeField] private float lineEndPause = 0.12f;
+
+    [Header("Smart Scroll")]
+    [SerializeField] private float bottomScrollThreshold = 0.08f;
+
+    [Header("Skip Input")]
+    [SerializeField] private bool allowMouseSkip = true;
 
     [Header("Flow")]
     public GameFlowManager gameFlowManager;
@@ -29,14 +41,14 @@ public class DialogueManager : MonoBehaviour
     private GameObject lastConversationLine;
     private GameObject currentTurnFocusLine;
 
-    private HashSet<string> discoveredTags = new HashSet<string>();
-    private HashSet<string> usedHiddenChoices = new HashSet<string>();
+    private readonly HashSet<string> discoveredTags = new HashSet<string>();
+    private readonly HashSet<string> usedHiddenChoices = new HashSet<string>();
 
-    private HashSet<string> discoveredSymptoms = new HashSet<string>();
-    private HashSet<string> performedTests = new HashSet<string>();
-    private HashSet<string> shownAssistantHints = new HashSet<string>();
+    private readonly HashSet<string> discoveredSymptoms = new HashSet<string>();
+    private readonly HashSet<string> performedTests = new HashSet<string>();
+    private readonly HashSet<string> shownAssistantHints = new HashSet<string>();
 
-    private Dictionary<string, int> diseaseScores = new Dictionary<string, int>();
+    private readonly Dictionary<string, int> diseaseScores = new Dictionary<string, int>();
 
     private int askedQuestionCount = 0;
     private int performedTestCount = 0;
@@ -45,50 +57,99 @@ public class DialogueManager : MonoBehaviour
     private string currentNodeId;
     private string rootNodeId;
 
+    private bool isBusy = false;
+    private bool isTyping = false;
+    private bool skipRequested = false;
+
     private void Awake()
     {
         if (dialoguePanel != null)
             dialoguePanel.SetActive(false);
     }
 
+    private void Update()
+    {
+        if (!isTyping)
+            return;
+
+        bool spacePressed = Keyboard.current != null &&
+                            Keyboard.current.spaceKey.wasPressedThisFrame;
+
+        bool mousePressed = allowMouseSkip &&
+                            Mouse.current != null &&
+                            Mouse.current.leftButton.wasPressedThisFrame;
+
+        bool touchPressed = Touchscreen.current != null &&
+                            Touchscreen.current.primaryTouch.press.wasPressedThisFrame;
+
+        if (spacePressed || mousePressed || touchPressed)
+        {
+            skipRequested = true;
+        }
+    }
+
+    public void RequestSkipTyping()
+    {
+        if (!isTyping)
+            return;
+
+        skipRequested = true;
+    }
+
     public void StartDialogue()
     {
+        if (isBusy)
+            return;
+
+        StartCoroutine(StartDialogueRoutine());
+    }
+
+    private IEnumerator StartDialogueRoutine()
+    {
+        isBusy = true;
+
         Debug.Log("DialogueManager -> StartDialogue çalıştı");
 
         if (currentCase == null)
         {
             Debug.LogError("DialogueManager: currentCase atanmadı.");
-            return;
+            isBusy = false;
+            yield break;
         }
 
         if (string.IsNullOrEmpty(currentCase.rootNodeId))
         {
             Debug.LogError("DialogueManager: rootNodeId boş.");
-            return;
+            isBusy = false;
+            yield break;
         }
 
         if (dialoguePanel == null)
         {
             Debug.LogError("DialogueManager: dialoguePanel bağlı değil.");
-            return;
+            isBusy = false;
+            yield break;
         }
 
         if (contentRoot == null)
         {
             Debug.LogError("DialogueManager: contentRoot bağlı değil.");
-            return;
+            isBusy = false;
+            yield break;
         }
 
         if (dialogueLinePrefab == null)
         {
             Debug.LogError("DialogueManager: dialogueLinePrefab bağlı değil.");
-            return;
+            isBusy = false;
+            yield break;
         }
 
         if (optionButtonPrefab == null)
         {
             Debug.LogError("DialogueManager: optionButtonPrefab bağlı değil.");
-            return;
+            isBusy = false;
+            yield break;
         }
 
         ClearDialogueContent();
@@ -109,21 +170,30 @@ public class DialogueManager : MonoBehaviour
         rootNodeId = currentCase.rootNodeId;
         currentNodeId = rootNodeId;
 
-        currentTurnFocusLine = AddDialogueLineReturn(FormatLine("HASTA", currentCase.startText), false);
+        currentTurnFocusLine = CreateDialogueLineObject();
+        yield return StartCoroutine(TypeDialogueIntoLine(currentTurnFocusLine, "HASTA", currentCase.startText, false));
 
         if (!string.IsNullOrEmpty(currentCase.startAssistantText))
         {
-            AddDialogueLine(FormatLine("ASİSTAN", currentCase.startAssistantText), false);
+            GameObject assistantLine = CreateDialogueLineObject();
+            yield return StartCoroutine(TypeDialogueIntoLine(assistantLine, "ASİSTAN", currentCase.startAssistantText, false));
         }
 
-        ShowNode(rootNodeId, false);
+        yield return StartCoroutine(ShowNodeRoutine(rootNodeId, false));
 
         Canvas.ForceUpdateCanvases();
-        StartCoroutine(ScrollToConversationFocus());
+        yield return StartCoroutine(ScrollToConversationFocus(true));
+
+        isBusy = false;
     }
 
     public void CloseDialoguePanel()
     {
+        StopAllCoroutines();
+        isBusy = false;
+        isTyping = false;
+        skipRequested = false;
+
         ClearDialogueContent();
 
         if (dialoguePanel != null)
@@ -132,12 +202,23 @@ public class DialogueManager : MonoBehaviour
 
     public void SelectChoice(DialogueChoiceData choice)
     {
+        if (isBusy)
+            return;
+
+        StartCoroutine(SelectChoiceRoutine(choice));
+    }
+
+    private IEnumerator SelectChoiceRoutine(DialogueChoiceData choice)
+    {
+        isBusy = true;
+
         Debug.Log("DialogueManager -> SelectChoice çalıştı");
 
         if (choice == null)
         {
             Debug.LogError("SelectChoice: choice null.");
-            return;
+            isBusy = false;
+            yield break;
         }
 
         totalStepCount++;
@@ -153,18 +234,25 @@ public class DialogueManager : MonoBehaviour
         currentTurnFocusLine = null;
 
         if (!string.IsNullOrEmpty(choice.doctorLine))
-            currentTurnFocusLine = AddDialogueLineReturn(FormatLine("DOKTOR", choice.doctorLine), false);
+        {
+            currentTurnFocusLine = CreateDialogueLineObject();
+            yield return StartCoroutine(TypeDialogueIntoLine(currentTurnFocusLine, "DOKTOR", choice.doctorLine, false));
+        }
 
         if (!string.IsNullOrEmpty(choice.patientReply))
         {
-            GameObject patientLine = AddDialogueLineReturn(FormatLine("HASTA", choice.patientReply), false);
+            GameObject patientLine = CreateDialogueLineObject();
+            yield return StartCoroutine(TypeDialogueIntoLine(patientLine, "HASTA", choice.patientReply, false));
 
             if (currentTurnFocusLine == null)
                 currentTurnFocusLine = patientLine;
         }
 
         if (!string.IsNullOrEmpty(choice.assistantReply))
-            AddDialogueLine(FormatLine("ASİSTAN", choice.assistantReply), false);
+        {
+            GameObject assistantLine = CreateDialogueLineObject();
+            yield return StartCoroutine(TypeDialogueIntoLine(assistantLine, "ASİSTAN", choice.assistantReply, false));
+        }
 
         if (choice.gainedTags != null)
         {
@@ -201,44 +289,65 @@ public class DialogueManager : MonoBehaviour
             usedHiddenChoices.Add(key);
         }
 
-        TryShowAssistantHints();
+        yield return StartCoroutine(TryShowAssistantHintsRoutine());
 
         if (choice.opensDiagnosisPanel)
         {
-            OpenDiagnosisPanel();
-            return;
+            yield return StartCoroutine(OpenDiagnosisPanelRoutine());
+            isBusy = false;
+            yield break;
         }
 
         if (choice.returnToHub)
         {
-            ShowNode(rootNodeId, false);
-            return;
+            yield return StartCoroutine(ShowNodeRoutine(rootNodeId, false));
+            isBusy = false;
+            yield break;
         }
 
         if (!string.IsNullOrEmpty(choice.nextNodeId))
         {
-            ShowNode(choice.nextNodeId, true);
-            return;
+            yield return StartCoroutine(ShowNodeRoutine(choice.nextNodeId, true));
+            isBusy = false;
+            yield break;
         }
 
-        ShowNode(rootNodeId, false);
+        yield return StartCoroutine(ShowNodeRoutine(rootNodeId, false));
+
+        isBusy = false;
     }
 
     public void SelectDiagnosis(DiagnosisChoiceData diagnosis)
     {
+        if (isBusy)
+            return;
+
+        StartCoroutine(SelectDiagnosisRoutine(diagnosis));
+    }
+
+    private IEnumerator SelectDiagnosisRoutine(DiagnosisChoiceData diagnosis)
+    {
+        isBusy = true;
+
         if (diagnosis == null)
         {
             Debug.LogError("SelectDiagnosis: diagnosis null.");
-            return;
+            isBusy = false;
+            yield break;
         }
 
         Debug.Log("DialogueManager -> SelectDiagnosis çalıştı: " + diagnosis.diagnosisName);
 
         RemoveCurrentOptions();
 
-        currentTurnFocusLine = AddDialogueLineReturn(
-            FormatLine("DOKTOR", "Sizin hastalığınızın " + diagnosis.diagnosisName + " olduğunu düşünüyorum."),
-            false
+        currentTurnFocusLine = CreateDialogueLineObject();
+        yield return StartCoroutine(
+            TypeDialogueIntoLine(
+                currentTurnFocusLine,
+                "DOKTOR",
+                "Sizin hastalığınızın " + diagnosis.diagnosisName + " olduğunu düşünüyorum.",
+                false
+            )
         );
 
         DebugTopDiseaseScores();
@@ -250,39 +359,43 @@ public class DialogueManager : MonoBehaviour
         else
         {
             Debug.LogError("DialogueManager: gameFlowManager bağlı değil.");
-            AddDialogueLine(FormatLine("SİSTEM", "GameFlowManager bağlı değil."), false);
+            GameObject systemLine = CreateDialogueLineObject();
+            yield return StartCoroutine(TypeDialogueIntoLine(systemLine, "SİSTEM", "GameFlowManager bağlı değil.", false));
         }
 
         Canvas.ForceUpdateCanvases();
-        StartCoroutine(ScrollToConversationFocus());
+        yield return StartCoroutine(ScrollToConversationFocus(true));
+
+        isBusy = false;
     }
 
-    private void OpenDiagnosisPanel()
+    private IEnumerator OpenDiagnosisPanelRoutine()
     {
         Debug.Log("DialogueManager -> OpenDiagnosisPanel çalıştı");
 
         if (currentCase == null)
         {
             Debug.LogError("OpenDiagnosisPanel: currentCase null.");
-            return;
+            yield break;
         }
 
         if (currentCase.diagnosisChoices == null || currentCase.diagnosisChoices.Count == 0)
         {
-            AddDialogueLine(FormatLine("SİSTEM", "Teşhis seçenekleri tanımlanmamış."));
-            Canvas.ForceUpdateCanvases();
-            StartCoroutine(ScrollToConversationFocus());
-            return;
+            GameObject systemLine = CreateDialogueLineObject();
+            yield return StartCoroutine(TypeDialogueIntoLine(systemLine, "SİSTEM", "Teşhis seçenekleri tanımlanmamış.", true));
+            yield break;
         }
 
         if (askedQuestionCount < 3)
         {
-            AddDialogueLine(FormatLine("SİSTEM", "Henüz yeterli anamnez toplanmamış olabilir."), false);
+            GameObject systemLine = CreateDialogueLineObject();
+            yield return StartCoroutine(TypeDialogueIntoLine(systemLine, "SİSTEM", "Henüz yeterli anamnez toplanmamış olabilir.", false));
         }
 
         if (performedTestCount == 0)
         {
-            AddDialogueLine(FormatLine("SİSTEM", "En az bir muayene veya test tanıyı netleştirebilir."), false);
+            GameObject systemLine = CreateDialogueLineObject();
+            yield return StartCoroutine(TypeDialogueIntoLine(systemLine, "SİSTEM", "En az bir muayene veya test tanıyı netleştirebilir.", false));
         }
 
         DebugTopDiseaseScores();
@@ -303,6 +416,7 @@ public class DialogueManager : MonoBehaviour
             if (optionScript != null)
             {
                 optionScript.SetupDiagnosisChoice(diagnosis, this);
+                yield return StartCoroutine(TypeOptionButtonText(optionScript, diagnosis.diagnosisName));
             }
             else
             {
@@ -310,10 +424,10 @@ public class DialogueManager : MonoBehaviour
             }
         }
 
-        StartCoroutine(ScrollToConversationFocus());
+        yield return StartCoroutine(ScrollToConversationFocus(false));
     }
 
-    private void ShowNode(string nodeId, bool showNodeIntro)
+    private IEnumerator ShowNodeRoutine(string nodeId, bool showNodeIntro)
     {
         Debug.Log("DialogueManager -> ShowNode çalıştı: " + nodeId);
 
@@ -322,7 +436,7 @@ public class DialogueManager : MonoBehaviour
         if (node == null)
         {
             Debug.LogError("Node bulunamadı: " + nodeId);
-            return;
+            yield break;
         }
 
         currentNodeId = nodeId;
@@ -330,16 +444,22 @@ public class DialogueManager : MonoBehaviour
         if (showNodeIntro)
         {
             if (!string.IsNullOrEmpty(node.nodeIntroText))
-                AddDialogueLine(FormatLine("SİSTEM", node.nodeIntroText), false);
+            {
+                GameObject systemLine = CreateDialogueLineObject();
+                yield return StartCoroutine(TypeDialogueIntoLine(systemLine, "SİSTEM", node.nodeIntroText, false));
+            }
 
             if (!string.IsNullOrEmpty(node.nodeAssistantText))
-                AddDialogueLine(FormatLine("ASİSTAN", node.nodeAssistantText), false);
+            {
+                GameObject assistantLine = CreateDialogueLineObject();
+                yield return StartCoroutine(TypeDialogueIntoLine(assistantLine, "ASİSTAN", node.nodeAssistantText, false));
+            }
         }
 
-        ShowChoices(node);
+        yield return StartCoroutine(ShowChoicesRoutine(node));
     }
 
-    private void ShowChoices(DialogueNodeData node)
+    private IEnumerator ShowChoicesRoutine(DialogueNodeData node)
     {
         Debug.Log("DialogueManager -> ShowChoices çalıştı");
 
@@ -349,9 +469,9 @@ public class DialogueManager : MonoBehaviour
 
         if (availableChoices.Count == 0)
         {
-            AddDialogueLine(FormatLine("SİSTEM", "Şu anda kullanılabilir seçenek yok."));
-            StartCoroutine(ScrollToConversationFocus());
-            return;
+            GameObject systemLine = CreateDialogueLineObject();
+            yield return StartCoroutine(TypeDialogueIntoLine(systemLine, "SİSTEM", "Şu anda kullanılabilir seçenek yok.", true));
+            yield break;
         }
 
         List<DialogueChoiceData> questionChoices = availableChoices
@@ -373,7 +493,9 @@ public class DialogueManager : MonoBehaviour
             CreateSectionHeaderAndContainer("Sorular", out questionsContainer);
 
             foreach (DialogueChoiceData choice in questionChoices)
-                CreateChoiceButton(choice, questionsContainer);
+            {
+                yield return StartCoroutine(CreateChoiceButtonRoutine(choice, questionsContainer));
+            }
         }
 
         if (testChoices.Count > 0)
@@ -381,7 +503,9 @@ public class DialogueManager : MonoBehaviour
             CreateSectionHeaderAndContainer("Testler", out testsContainer);
 
             foreach (DialogueChoiceData choice in testChoices)
-                CreateChoiceButton(choice, testsContainer);
+            {
+                yield return StartCoroutine(CreateChoiceButtonRoutine(choice, testsContainer));
+            }
         }
 
         if (diagnosisChoices.Count > 0)
@@ -389,13 +513,15 @@ public class DialogueManager : MonoBehaviour
             CreateSectionHeaderAndContainer("Tanı", out diagnosisContainer);
 
             foreach (DialogueChoiceData choice in diagnosisChoices)
-                CreateChoiceButton(choice, diagnosisContainer);
+            {
+                yield return StartCoroutine(CreateChoiceButtonRoutine(choice, diagnosisContainer));
+            }
         }
 
-        StartCoroutine(ScrollToConversationFocus());
+        yield return StartCoroutine(ScrollToConversationFocus(false));
     }
 
-    private void CreateChoiceButton(DialogueChoiceData choice, Transform parent)
+    private IEnumerator CreateChoiceButtonRoutine(DialogueChoiceData choice, Transform parent)
     {
         GameObject optionObj = Instantiate(optionButtonPrefab, parent);
         DialogueOptionButton optionScript = optionObj.GetComponent<DialogueOptionButton>();
@@ -403,6 +529,7 @@ public class DialogueManager : MonoBehaviour
         if (optionScript != null)
         {
             optionScript.SetupChoice(choice, this);
+            yield return StartCoroutine(TypeOptionButtonText(optionScript, choice.choiceText));
         }
         else
         {
@@ -460,10 +587,10 @@ public class DialogueManager : MonoBehaviour
         }
     }
 
-    private void TryShowAssistantHints()
+    private IEnumerator TryShowAssistantHintsRoutine()
     {
         if (currentCase == null || currentCase.assistantHints == null || currentCase.assistantHints.Count == 0)
-            return;
+            yield break;
 
         foreach (AssistantHintRuleData hint in currentCase.assistantHints)
         {
@@ -482,7 +609,8 @@ public class DialogueManager : MonoBehaviour
             if (HasAnyBlockedTag(hint.blockedTags))
                 continue;
 
-            AddDialogueLine(FormatLine("ASİSTAN", hint.hintText), false);
+            GameObject assistantLine = CreateDialogueLineObject();
+            yield return StartCoroutine(TypeDialogueIntoLine(assistantLine, "ASİSTAN", hint.hintText, false));
             shownAssistantHints.Add(hint.hintId);
 
             if (hint.showOnlyOnce)
@@ -601,71 +729,209 @@ public class DialogueManager : MonoBehaviour
         return totalStepCount;
     }
 
-    private string FormatLine(string speaker, string text)
+    private string GetSpeakerPrefix(string speaker)
     {
         switch (speaker)
         {
             case "HASTA":
-                return $"<size=26><color=#FFFFFF><b>HASTA —</b></color> {text}</size>";
+                return "<size=26><color=#FFFFFF><b>HASTA —</b></color> ";
 
             case "DOKTOR":
-                return $"<size=25><color=#FF8C42><b>DOKTOR —</b></color> {text}</size>";
+                return "<size=25><color=#FF8C42><b>DOKTOR —</b></color> ";
 
             case "ASİSTAN":
-                return $"<size=22><color=#CFCFCF><i>ASİSTAN — {text}</i></color></size>";
+                return "<size=22><color=#CFCFCF><i>ASİSTAN — ";
 
             case "SİSTEM":
-                return $"<size=21><color=#AAAAAA><i>SİSTEM — {text}</i></color></size>";
+                return "<size=21><color=#AAAAAA><i>SİSTEM — ";
 
             default:
-                return text;
+                return "";
         }
     }
 
-    private void AddDialogueLine(string text, bool autoScroll = true)
+    private string GetSpeakerSuffix(string speaker)
     {
-        if (dialogueLinePrefab == null)
+        switch (speaker)
         {
-            Debug.LogError("AddDialogueLine: dialogueLinePrefab bağlı değil.");
-            return;
+            case "HASTA":
+            case "DOKTOR":
+                return "</size>";
+
+            case "ASİSTAN":
+            case "SİSTEM":
+                return "</i></size>";
+
+            default:
+                return "";
         }
-
-        GameObject lineObj = Instantiate(dialogueLinePrefab, contentRoot);
-        TextMeshProUGUI lineText = lineObj.GetComponentInChildren<TextMeshProUGUI>();
-
-        if (lineText != null)
-            lineText.text = text;
-        else
-            Debug.LogError("AddDialogueLine: prefab içinde TextMeshProUGUI bulunamadı.");
-
-        lastConversationLine = lineObj;
-
-        if (autoScroll)
-            StartCoroutine(ScrollToConversationFocus());
     }
 
-    private GameObject AddDialogueLineReturn(string text, bool autoScroll = true)
+    private GameObject CreateDialogueLineObject()
     {
         if (dialogueLinePrefab == null)
         {
-            Debug.LogError("AddDialogueLineReturn: dialogueLinePrefab bağlı değil.");
+            Debug.LogError("CreateDialogueLineObject: dialogueLinePrefab bağlı değil.");
             return null;
         }
 
         GameObject lineObj = Instantiate(dialogueLinePrefab, contentRoot);
+        lastConversationLine = lineObj;
+        return lineObj;
+    }
+
+    private bool IsUserNearBottom()
+    {
+        if (scrollRect == null)
+            return true;
+
+        return scrollRect.verticalNormalizedPosition <= bottomScrollThreshold;
+    }
+
+    private IEnumerator WaitOrSkip(float seconds)
+    {
+        if (seconds <= 0f)
+            yield break;
+
+        float timer = 0f;
+
+        while (timer < seconds)
+        {
+            if (skipRequested)
+                yield break;
+
+            timer += Time.deltaTime;
+            yield return null;
+        }
+    }
+
+    private IEnumerator TypeDialogueIntoLine(GameObject lineObj, string speaker, string bodyText, bool autoScroll)
+    {
+        if (lineObj == null)
+            yield break;
+
         TextMeshProUGUI lineText = lineObj.GetComponentInChildren<TextMeshProUGUI>();
 
-        if (lineText != null)
-            lineText.text = text;
-        else
-            Debug.LogError("AddDialogueLineReturn: prefab içinde TextMeshProUGUI bulunamadı.");
+        if (lineText == null)
+        {
+            Debug.LogError("TypeDialogueIntoLine: prefab içinde TextMeshProUGUI bulunamadı.");
+            yield break;
+        }
 
-        lastConversationLine = lineObj;
+        string prefix = GetSpeakerPrefix(speaker);
+        string suffix = GetSpeakerSuffix(speaker);
+
+        lineText.text = prefix + suffix;
+
+        if (string.IsNullOrEmpty(bodyText))
+        {
+            if (autoScroll)
+                yield return StartCoroutine(ScrollToConversationFocus(false));
+
+            yield break;
+        }
+
+        isTyping = true;
+        skipRequested = false;
+
+        for (int i = 0; i <= bodyText.Length; i++)
+        {
+            if (skipRequested)
+            {
+                lineText.text = prefix + bodyText + suffix;
+                break;
+            }
+
+            string visibleText = bodyText.Substring(0, i);
+            lineText.text = prefix + visibleText + suffix;
+
+            Canvas.ForceUpdateCanvases();
+
+            if (autoScroll || lineObj == currentTurnFocusLine || lineObj == lastConversationLine)
+                yield return StartCoroutine(ScrollToConversationFocus(false));
+
+            if (i < bodyText.Length)
+                yield return StartCoroutine(WaitOrSkip(dialogueTypeSpeed));
+        }
+
+        isTyping = false;
+
+        if (skipRequested)
+        {
+            skipRequested = false;
+
+            if (autoScroll)
+                yield return StartCoroutine(ScrollToConversationFocus(false));
+
+            yield break;
+        }
+
+        yield return StartCoroutine(WaitOrSkip(lineEndPause));
+        skipRequested = false;
 
         if (autoScroll)
-            StartCoroutine(ScrollToConversationFocus());
+            yield return StartCoroutine(ScrollToConversationFocus(false));
+    }
 
-        return lineObj;
+    private IEnumerator TypePlainText(TextMeshProUGUI targetText, string fullText, float speed)
+    {
+        if (targetText == null)
+            yield break;
+
+        targetText.text = "";
+
+        if (string.IsNullOrEmpty(fullText))
+            yield break;
+
+        isTyping = true;
+        skipRequested = false;
+
+        for (int i = 0; i <= fullText.Length; i++)
+        {
+            if (skipRequested)
+            {
+                targetText.text = fullText;
+                break;
+            }
+
+            targetText.text = fullText.Substring(0, i);
+
+            Canvas.ForceUpdateCanvases();
+
+            if (i < fullText.Length)
+                yield return StartCoroutine(WaitOrSkip(speed));
+        }
+
+        isTyping = false;
+
+        if (skipRequested)
+        {
+            skipRequested = false;
+            yield break;
+        }
+
+        yield return StartCoroutine(WaitOrSkip(0.05f));
+        skipRequested = false;
+    }
+
+    private IEnumerator TypeOptionButtonText(DialogueOptionButton optionScript, string fullText)
+    {
+        if (optionScript == null)
+            yield break;
+
+        TextMeshProUGUI targetText = optionScript.buttonText;
+
+        if (targetText == null)
+            targetText = optionScript.GetComponentInChildren<TextMeshProUGUI>();
+
+        if (targetText == null)
+        {
+            Debug.LogError("TypeOptionButtonText: Option button içinde TextMeshProUGUI bulunamadı.");
+            yield break;
+        }
+
+        yield return StartCoroutine(TypePlainText(targetText, fullText, optionTypeSpeed));
+        yield return StartCoroutine(ScrollToConversationFocus(false));
     }
 
     private void CreateOptionsGroup()
@@ -789,7 +1055,7 @@ public class DialogueManager : MonoBehaviour
         }
     }
 
-    private IEnumerator ScrollToConversationFocus()
+    private IEnumerator ScrollToConversationFocus(bool forceScroll = false)
     {
         yield return null;
         yield return null;
@@ -808,6 +1074,9 @@ public class DialogueManager : MonoBehaviour
             : scrollRect.GetComponent<RectTransform>();
 
         if (viewport == null || contentRect == null)
+            yield break;
+
+        if (!forceScroll && !IsUserNearBottom())
             yield break;
 
         GameObject focusObj = currentTurnFocusLine != null ? currentTurnFocusLine : lastConversationLine;
@@ -829,7 +1098,6 @@ public class DialogueManager : MonoBehaviour
         }
 
         float focusTop = Mathf.Abs(focusRect.anchoredPosition.y);
-
         float topPadding = 50f;
 
         float scrollY = Mathf.Clamp(focusTop - topPadding, 0f, contentHeight - viewportHeight);

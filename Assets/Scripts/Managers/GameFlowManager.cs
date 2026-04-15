@@ -24,6 +24,10 @@ public class GameFlowManager : MonoBehaviour
     public TextMeshProUGUI patientResultBodyText;
     public Button patientResultContinueButton;
 
+    [Header("Patient Result Title Colors")]
+    [SerializeField] private Color correctTitleColor = new Color32(80, 200, 120, 255);
+    [SerializeField] private Color wrongTitleColor = new Color32(220, 70, 70, 255);
+
     [Header("End Screen UI")]
     public TextMeshProUGUI titleText;
     public TextMeshProUGUI resultText;
@@ -360,9 +364,15 @@ public class GameFlowManager : MonoBehaviour
         if (patientResultTitleText != null)
         {
             if (lastDiagnosisWasCorrect)
+            {
                 patientResultTitleText.text = "Doğru Teşhis";
+                patientResultTitleText.color = correctTitleColor;
+            }
             else
+            {
                 patientResultTitleText.text = "Yanlış Teşhis";
+                patientResultTitleText.color = wrongTitleColor;
+            }
         }
 
         if (patientResultBodyText != null)

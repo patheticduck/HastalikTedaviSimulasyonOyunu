@@ -237,6 +237,8 @@ MonoBehaviour:
   patientResultTitleText: {fileID: 2078294438}
   patientResultBodyText: {fileID: 191966403}
   patientResultContinueButton: {fileID: 1059314987}
+  correctTitleColor: {r: 0.3137255, g: 0.78431374, b: 0.47058824, a: 1}
+  wrongTitleColor: {r: 0.8627451, g: 0.27450982, b: 0.27450982, a: 1}
   titleText: {fileID: 1353130054}
   resultText: {fileID: 1109880025}
   continueButton: {fileID: 578880199}
@@ -1297,6 +1299,12 @@ MonoBehaviour:
   dialogueLinePrefab: {fileID: 134743692579444092, guid: 7bea1df21e4d7d842baec1703bac3f81, type: 3}
   optionButtonPrefab: {fileID: 6157852271878325829, guid: 0e77c1039c91cbe429a48e001b9de039, type: 3}
   scrollRect: {fileID: 1538992669}
+  dialogueTypeSpeed: 0.02
+  optionTypeSpeed: 0.015
+  lineEndPause: 0.12
+  bottomScrollThreshold: 0.08
+  skipAction: {fileID: 0}
+  allowMouseSkip: 1
   gameFlowManager: {fileID: 117399621}
   currentCase: {fileID: 11400000, guid: 65d78d7193546784a9a50f498fe3a8a9, type: 2}
 --- !u!1 &266363220
@@ -6107,6 +6115,12 @@ MonoBehaviour:
   dialogueLinePrefab: {fileID: 134743692579444092, guid: 7bea1df21e4d7d842baec1703bac3f81, type: 3}
   optionButtonPrefab: {fileID: 6157852271878325829, guid: 0e77c1039c91cbe429a48e001b9de039, type: 3}
   scrollRect: {fileID: 1538992669}
+  dialogueTypeSpeed: 0.02
+  optionTypeSpeed: 0.015
+  lineEndPause: 0.12
+  bottomScrollThreshold: 0.08
+  skipAction: {fileID: -6570376141416703743, guid: 1ed1b75dfa4b97f4da0c78b8e777443e, type: 3}
+  allowMouseSkip: 1
   gameFlowManager: {fileID: 117399621}
   currentCase: {fileID: 11400000, guid: 65d78d7193546784a9a50f498fe3a8a9, type: 2}
 --- !u!4 &1217361534
