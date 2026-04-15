@@ -446,7 +446,7 @@ public class DialogueManager : MonoBehaviour
             if (optionScript != null)
             {
                 optionScript.SetupDiagnosisChoice(diagnosis, this);
-                yield return StartCoroutine(TypeOptionButtonText(optionScript, diagnosis.diagnosisName));
+                SetOptionButtonTextInstant(optionScript, diagnosis.diagnosisName);
             }
             else
             {
@@ -559,12 +559,33 @@ public class DialogueManager : MonoBehaviour
         if (optionScript != null)
         {
             optionScript.SetupChoice(choice, this);
-            yield return StartCoroutine(TypeOptionButtonText(optionScript, choice.choiceText));
+            SetOptionButtonTextInstant(optionScript, choice.choiceText);
         }
         else
         {
             Debug.LogError("CreateChoiceButton: optionButtonPrefab içinde DialogueOptionButton yok.");
         }
+
+        yield return null;
+    }
+
+    private void SetOptionButtonTextInstant(DialogueOptionButton optionScript, string fullText)
+    {
+        if (optionScript == null)
+            return;
+
+        TextMeshProUGUI targetText = optionScript.buttonText;
+
+        if (targetText == null)
+            targetText = optionScript.GetComponentInChildren<TextMeshProUGUI>();
+
+        if (targetText == null)
+        {
+            Debug.LogError("SetOptionButtonTextInstant: Option button içinde TextMeshProUGUI bulunamadı.");
+            return;
+        }
+
+        targetText.text = fullText;
     }
 
     private List<DialogueChoiceData> GetAvailableChoices(DialogueNodeData node)

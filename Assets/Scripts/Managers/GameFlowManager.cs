@@ -18,6 +18,7 @@ public class GameFlowManager : MonoBehaviour
     [Header("Panels")]
     public GameObject dialoguePanel;
     public GameObject endDayPanel;
+    public GameObject gameOverPanel;
     public GameObject dayTransitionPanel;
     public GameObject heartsPanel;
 
@@ -31,10 +32,19 @@ public class GameFlowManager : MonoBehaviour
     [SerializeField] private Color correctTitleColor = new Color32(80, 200, 120, 255);
     [SerializeField] private Color wrongTitleColor = new Color32(220, 70, 70, 255);
 
-    [Header("End Screen UI")]
+    [Header("End Day UI")]
     public TextMeshProUGUI titleText;
     public TextMeshProUGUI resultText;
     public Button continueButton;
+
+    [Header("Game Over UI")]
+    public TextMeshProUGUI gameOverTitleText;
+    public TextMeshProUGUI gameOverResultText;
+    public Button gameOverContinueButton;
+
+    [Header("Game Over Title Colors")]
+    [SerializeField] private Color gameWinTitleColor = new Color32(90, 220, 120, 255);
+    [SerializeField] private Color gameLoseTitleColor = new Color32(255, 60, 60, 255);
 
     [Header("Day Transition UI")]
     public TextMeshProUGUI dayTransitionText;
@@ -60,6 +70,10 @@ public class GameFlowManager : MonoBehaviour
     private bool waitingForDayContinue = false;
     private bool waitingForPatientResultContinue = false;
 
+    // Sadece kaybetme durumu için gerekli:
+    // 5. yanlışta hasta önce çıksın, panel sonra gelsin.
+    private bool pendingLoseGameOver = false;
+
     // Günlük sayaçlar
     private int dayCorrect = 0;
     private int dayWrong = 0;
@@ -73,6 +87,7 @@ public class GameFlowManager : MonoBehaviour
     {
         if (dialoguePanel != null) dialoguePanel.SetActive(false);
         if (endDayPanel != null) endDayPanel.SetActive(false);
+        if (gameOverPanel != null) gameOverPanel.SetActive(false);
         if (dayTransitionPanel != null) dayTransitionPanel.SetActive(false);
         if (heartsPanel != null) heartsPanel.SetActive(false);
         if (patientResultPanel != null) patientResultPanel.SetActive(false);
@@ -108,10 +123,13 @@ public class GameFlowManager : MonoBehaviour
 
         waitingForDayContinue = false;
         waitingForPatientResultContinue = false;
+
+        pendingLoseGameOver = false;
         gameEnded = false;
 
         if (dialoguePanel != null) dialoguePanel.SetActive(false);
         if (endDayPanel != null) endDayPanel.SetActive(false);
+        if (gameOverPanel != null) gameOverPanel.SetActive(false);
         if (dayTransitionPanel != null) dayTransitionPanel.SetActive(false);
         if (heartsPanel != null) heartsPanel.SetActive(true);
         if (patientResultPanel != null) patientResultPanel.SetActive(false);
@@ -122,9 +140,7 @@ public class GameFlowManager : MonoBehaviour
         UpdateHeartsUI();
 
         if (patientMovement != null)
-        {
             patientMovement.HidePatient();
-        }
 
         if (interactionModeManager != null)
         {
@@ -141,17 +157,11 @@ public class GameFlowManager : MonoBehaviour
 
         Debug.Log("Oyun akışı başlatıldı. Hasta No: " + currentPatientNumber);
 
-        if (dialoguePanel != null)
-            dialoguePanel.SetActive(false);
-
-        if (endDayPanel != null)
-            endDayPanel.SetActive(false);
-
-        if (dayTransitionPanel != null)
-            dayTransitionPanel.SetActive(false);
-
-        if (patientResultPanel != null)
-            patientResultPanel.SetActive(false);
+        if (dialoguePanel != null) dialoguePanel.SetActive(false);
+        if (endDayPanel != null) endDayPanel.SetActive(false);
+        if (gameOverPanel != null) gameOverPanel.SetActive(false);
+        if (dayTransitionPanel != null) dayTransitionPanel.SetActive(false);
+        if (patientResultPanel != null) patientResultPanel.SetActive(false);
 
         if (interactionModeManager != null)
         {
@@ -198,9 +208,10 @@ public class GameFlowManager : MonoBehaviour
 
         Debug.Log("Yanlış eklendi. Toplam yanlış: " + totalWrong);
 
+        // 5. yanlışta hasta önce çıksın, panel sonra gelsin
         if (remainingHearts <= 0)
         {
-            ShowGameOverPanel();
+            pendingLoseGameOver = true;
         }
     }
 
@@ -226,17 +237,16 @@ public class GameFlowManager : MonoBehaviour
     private void ShowEndOfDayPanel()
     {
         if (interactionModeManager != null)
-        {
             interactionModeManager.EnterUIMode();
-        }
+
+        if (gameOverPanel != null)
+            gameOverPanel.SetActive(false);
 
         if (endDayPanel != null)
             endDayPanel.SetActive(true);
 
         if (titleText != null)
-        {
             titleText.text = "GÜN " + currentDay + " TAMAMLANDI";
-        }
 
         if (resultText != null)
         {
@@ -265,10 +275,74 @@ public class GameFlowManager : MonoBehaviour
             endDayPanel.SetActive(false);
 
         if (interactionModeManager != null)
-        {
             interactionModeManager.ExitUIMode();
+    }
+
+    // -------------------------------------------------
+    // GAME OVER / FINAL PANEL
+    // -------------------------------------------------
+
+    private void ShowGameOverPanel(bool isVictory)
+    {
+        gameEnded = true;
+
+        if (interactionModeManager != null)
+        {
+            interactionModeManager.SetDialogueAvailable(false);
+            interactionModeManager.EnterUIMode();
+        }
+
+        if (dialoguePanel != null) dialoguePanel.SetActive(false);
+        if (dayTransitionPanel != null) dayTransitionPanel.SetActive(false);
+        if (patientResultPanel != null) patientResultPanel.SetActive(false);
+        if (endDayPanel != null) endDayPanel.SetActive(false);
+        if (gameOverPanel != null) gameOverPanel.SetActive(true);
+
+        if (gameOverTitleText != null)
+        {
+            if (isVictory)
+            {
+                gameOverTitleText.text = "OYUN TAMAMLANDI";
+                gameOverTitleText.color = gameWinTitleColor;
+            }
+            else
+            {
+                gameOverTitleText.text = "OYUN BİTTİ";
+                gameOverTitleText.color = gameLoseTitleColor;
+            }
+        }
+
+        if (gameOverResultText != null)
+        {
+            if (isVictory)
+            {
+                gameOverResultText.text =
+                    "7 günü başarıyla tamamladın.\n\n" +
+                    "Toplam Doğru: " + totalCorrect + "\n" +
+                    "Toplam Yanlış: " + totalWrong;
+            }
+            else
+            {
+                gameOverResultText.text =
+                    "5 yanlış teşhis hakkını doldurdun.\n\n" +
+                    "Toplam Doğru: " + totalCorrect + "\n" +
+                    "Toplam Yanlış: " + totalWrong;
+            }
+        }
+
+        if (gameOverContinueButton != null)
+        {
+            gameOverContinueButton.gameObject.SetActive(true);
+
+            TextMeshProUGUI btnText = gameOverContinueButton.GetComponentInChildren<TextMeshProUGUI>();
+            if (btnText != null)
+                btnText.text = "Ana Menüye Dön";
         }
     }
+
+    // -------------------------------------------------
+    // BUTONLAR
+    // -------------------------------------------------
 
     public void OnContinueButtonPressed()
     {
@@ -296,9 +370,12 @@ public class GameFlowManager : MonoBehaviour
         waitingForPatientResultContinue = false;
         HidePatientResultPanel();
 
+        // 21. hasta için istenen akış:
+        // Hasta zaten çıktı -> sonuç paneli açıldı -> Devam Et basıldı
+        // => direkt başarı paneli gelsin
         if (currentPatientNumber >= totalPatientsInRun)
         {
-            ShowFinalCompletedPanel();
+            ShowGameOverPanel(true);
             return;
         }
 
@@ -387,9 +464,7 @@ public class GameFlowManager : MonoBehaviour
     private void ShowPatientResultPanel()
     {
         if (interactionModeManager != null)
-        {
             interactionModeManager.EnterUIMode();
-        }
 
         if (patientResultPanel != null)
             patientResultPanel.SetActive(true);
@@ -443,102 +518,26 @@ public class GameFlowManager : MonoBehaviour
             patientResultPanel.SetActive(false);
 
         if (interactionModeManager != null)
-        {
             interactionModeManager.ExitUIMode();
-        }
     }
 
     // -------------------------------------------------
-    // FİNAL / OYUN BİTİŞİ
+    // MENÜYE DÖNÜŞ
     // -------------------------------------------------
-
-    public void ShowFinalCompletedPanel()
-    {
-        gameEnded = true;
-
-        if (interactionModeManager != null)
-        {
-            interactionModeManager.SetDialogueAvailable(false);
-            interactionModeManager.EnterUIMode();
-        }
-
-        if (dialoguePanel != null) dialoguePanel.SetActive(false);
-        if (dayTransitionPanel != null) dayTransitionPanel.SetActive(false);
-        if (patientResultPanel != null) patientResultPanel.SetActive(false);
-        if (endDayPanel != null) endDayPanel.SetActive(true);
-
-        if (titleText != null)
-        {
-            titleText.text = "OYUN TAMAMLANDI";
-        }
-
-        if (resultText != null)
-        {
-            resultText.text =
-                "Tüm hastalar değerlendirildi.\n\n" +
-                "Toplam Doğru: " + totalCorrect + "\n" +
-                "Toplam Yanlış: " + totalWrong;
-        }
-
-        if (continueButton != null)
-        {
-            continueButton.gameObject.SetActive(true);
-
-            TextMeshProUGUI btnText = continueButton.GetComponentInChildren<TextMeshProUGUI>();
-            if (btnText != null)
-                btnText.text = "Ana Menüye Dön";
-        }
-    }
-
-    public void ShowGameOverPanel()
-    {
-        gameEnded = true;
-
-        if (interactionModeManager != null)
-        {
-            interactionModeManager.SetDialogueAvailable(false);
-            interactionModeManager.EnterUIMode();
-        }
-
-        if (dialoguePanel != null) dialoguePanel.SetActive(false);
-        if (dayTransitionPanel != null) dayTransitionPanel.SetActive(false);
-        if (patientResultPanel != null) patientResultPanel.SetActive(false);
-        if (endDayPanel != null) endDayPanel.SetActive(true);
-
-        if (titleText != null)
-        {
-            titleText.text = "OYUN BİTTİ";
-        }
-
-        if (resultText != null)
-        {
-            resultText.text =
-                "5 yanlış teşhis hakkını doldurdun.\n\n" +
-                "Toplam Doğru: " + totalCorrect + "\n" +
-                "Toplam Yanlış: " + totalWrong;
-        }
-
-        if (continueButton != null)
-        {
-            continueButton.gameObject.SetActive(true);
-
-            TextMeshProUGUI btnText = continueButton.GetComponentInChildren<TextMeshProUGUI>();
-            if (btnText != null)
-                btnText.text = "Ana Menüye Dön";
-        }
-    }
 
     public void ReturnToMainMenuFromEndPanel()
     {
         if (interactionModeManager != null)
-        {
             interactionModeManager.ExitUIMode();
-        }
+
+        if (endDayPanel != null) endDayPanel.SetActive(false);
+        if (gameOverPanel != null) gameOverPanel.SetActive(false);
+        if (patientResultPanel != null) patientResultPanel.SetActive(false);
+        if (dayTransitionPanel != null) dayTransitionPanel.SetActive(false);
+        if (dialoguePanel != null) dialoguePanel.SetActive(false);
 
         if (mainMenuManager != null)
-        {
             mainMenuManager.ReturnToMenu(totalCorrect, totalWrong);
-        }
     }
 
     // -------------------------------------------------
@@ -592,12 +591,17 @@ public class GameFlowManager : MonoBehaviour
         Debug.Log("Hasta çıktı.");
 
         if (interactionModeManager != null)
-        {
             interactionModeManager.SetDialogueAvailable(false);
-        }
         else if (dialoguePanel != null)
-        {
             dialoguePanel.SetActive(false);
+
+        // Kaybetme durumu:
+        // Hasta çıktıktan sonra panel açılsın
+        if (pendingLoseGameOver)
+        {
+            pendingLoseGameOver = false;
+            ShowGameOverPanel(false);
+            return;
         }
 
         if (gameEnded)
@@ -691,23 +695,16 @@ public class GameFlowManager : MonoBehaviour
         DialogueManager dialogueManager = FindFirstObjectByType<DialogueManager>();
 
         if (interactionModeManager != null)
-        {
             interactionModeManager.SetDialogueAvailable(false);
-        }
 
         if (dialogueManager != null)
-        {
             dialogueManager.CloseDialoguePanel();
-        }
 
         if (!string.IsNullOrEmpty(diagnosisResultText))
-        {
             Debug.Log("Teşhis sonuç metni: " + diagnosisResultText);
-        }
 
-        if (!gameEnded && patientMovement != null)
-        {
+        // Hasta her durumda önce çıksın
+        if (patientMovement != null)
             patientMovement.BeginExit();
-        }
     }
 }
