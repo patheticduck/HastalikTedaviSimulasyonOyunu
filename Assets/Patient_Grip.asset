@@ -251,7 +251,7 @@ MonoBehaviour:
       diseaseEffects:
       - diseaseId: GRIP
         score: 2
-      - diseaseId: PHARYNGITIS
+      - diseaseId: e
         score: -1
     - choiceText: "\xD6ks\xFCr\xFCk g\xF6\u011Fs\xFCn\xFCzden mi geliyor?"
       choiceType: 0

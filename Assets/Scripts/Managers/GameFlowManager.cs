@@ -1,8 +1,21 @@
 using System.Collections;
+using System.Collections.Generic;
 using System.Linq;
+using System.Text;
 using UnityEngine;
 using TMPro;
 using UnityEngine.UI;
+
+[System.Serializable]
+public class PatientAnalysisEntry
+{
+    public int dayNumber;
+    public int patientNumberInDay;
+    public int globalPatientNumber;
+    public bool isCorrect;
+    public string correctDiagnosisName;
+    public string playerDiagnosisName;
+}
 
 public class GameFlowManager : MonoBehaviour
 {
@@ -70,8 +83,7 @@ public class GameFlowManager : MonoBehaviour
     private bool waitingForDayContinue = false;
     private bool waitingForPatientResultContinue = false;
 
-    // Sadece kaybetme durumu için gerekli:
-    // 5. yanlışta hasta önce çıksın, panel sonra gelsin.
+    // 5. yanlışta hasta önce çıksın, panel sonra gelsin
     private bool pendingLoseGameOver = false;
 
     // Günlük sayaçlar
@@ -82,6 +94,9 @@ public class GameFlowManager : MonoBehaviour
     private bool lastDiagnosisWasCorrect = false;
     private string lastDiagnosisResultText = "";
     private string lastCorrectDiagnosisName = "";
+
+    // Analiz kayıtları
+    private readonly List<PatientAnalysisEntry> patientAnalysisHistory = new List<PatientAnalysisEntry>();
 
     private void Start()
     {
@@ -126,6 +141,8 @@ public class GameFlowManager : MonoBehaviour
 
         pendingLoseGameOver = false;
         gameEnded = false;
+
+        patientAnalysisHistory.Clear();
 
         if (dialoguePanel != null) dialoguePanel.SetActive(false);
         if (endDayPanel != null) endDayPanel.SetActive(false);
@@ -208,7 +225,6 @@ public class GameFlowManager : MonoBehaviour
 
         Debug.Log("Yanlış eklendi. Toplam yanlış: " + totalWrong);
 
-        // 5. yanlışta hasta önce çıksın, panel sonra gelsin
         if (remainingHearts <= 0)
         {
             pendingLoseGameOver = true;
@@ -314,20 +330,7 @@ public class GameFlowManager : MonoBehaviour
 
         if (gameOverResultText != null)
         {
-            if (isVictory)
-            {
-                gameOverResultText.text =
-                    "7 günü başarıyla tamamladın.\n\n" +
-                    "Toplam Doğru: " + totalCorrect + "\n" +
-                    "Toplam Yanlış: " + totalWrong;
-            }
-            else
-            {
-                gameOverResultText.text =
-                    "5 yanlış teşhis hakkını doldurdun.\n\n" +
-                    "Toplam Doğru: " + totalCorrect + "\n" +
-                    "Toplam Yanlış: " + totalWrong;
-            }
+            gameOverResultText.text = BuildDetailedGameOverText(isVictory);
         }
 
         if (gameOverContinueButton != null)
@@ -338,6 +341,74 @@ public class GameFlowManager : MonoBehaviour
             if (btnText != null)
                 btnText.text = "Ana Menüye Dön";
         }
+    }
+
+    private string BuildDetailedGameOverText(bool isVictory)
+    {
+        StringBuilder sb = new StringBuilder();
+
+        if (isVictory)
+        {
+            sb.AppendLine("7 günü başarıyla tamamladın.");
+        }
+        else
+        {
+            sb.AppendLine("5 yanlış teşhis hakkını doldurdun.");
+        }
+
+        sb.AppendLine();
+        sb.AppendLine("Toplam Doğru: " + totalCorrect);
+        sb.AppendLine("Toplam Yanlış: " + totalWrong);
+        sb.AppendLine();
+
+        if (patientAnalysisHistory.Count == 0)
+        {
+            sb.AppendLine("Henüz analiz kaydı bulunamadı.");
+            return sb.ToString();
+        }
+
+        int maxPlayedDay = patientAnalysisHistory.Max(x => x.dayNumber);
+
+        for (int day = 1; day <= maxPlayedDay; day++)
+        {
+            List<PatientAnalysisEntry> dayEntries = patientAnalysisHistory
+                .Where(x => x.dayNumber == day)
+                .OrderBy(x => x.patientNumberInDay)
+                .ToList();
+
+            if (dayEntries.Count == 0)
+                continue;
+
+            int dailyCorrectCount = dayEntries.Count(x => x.isCorrect);
+            int dailyWrongCount = dayEntries.Count(x => !x.isCorrect);
+
+            sb.AppendLine(day + ". Gün");
+
+            foreach (PatientAnalysisEntry entry in dayEntries)
+            {
+                if (entry.isCorrect)
+                {
+                    sb.AppendLine(entry.patientNumberInDay + ". hasta: Doğru");
+                    sb.AppendLine("Senin Teşhisin: " + entry.playerDiagnosisName);
+                }
+                else
+                {
+                    sb.AppendLine(entry.patientNumberInDay + ". hasta: Yanlış");
+                    sb.AppendLine("Senin Teşhisin: " + entry.playerDiagnosisName);
+                    sb.AppendLine("Doğrusu: " + entry.correctDiagnosisName);
+                }
+
+                sb.AppendLine();
+            }
+
+            sb.AppendLine("Gün " + day + " Doğru: " + dailyCorrectCount);
+            sb.AppendLine("Gün " + day + " Yanlış: " + dailyWrongCount);
+
+            if (day < maxPlayedDay)
+                sb.AppendLine();
+        }
+
+        return sb.ToString();
     }
 
     // -------------------------------------------------
@@ -370,9 +441,6 @@ public class GameFlowManager : MonoBehaviour
         waitingForPatientResultContinue = false;
         HidePatientResultPanel();
 
-        // 21. hasta için istenen akış:
-        // Hasta zaten çıktı -> sonuç paneli açıldı -> Devam Et basıldı
-        // => direkt başarı paneli gelsin
         if (currentPatientNumber >= totalPatientsInRun)
         {
             ShowGameOverPanel(true);
@@ -595,8 +663,6 @@ public class GameFlowManager : MonoBehaviour
         else if (dialoguePanel != null)
             dialoguePanel.SetActive(false);
 
-        // Kaybetme durumu:
-        // Hasta çıktıktan sonra panel açılsın
         if (pendingLoseGameOver)
         {
             pendingLoseGameOver = false;
@@ -622,6 +688,27 @@ public class GameFlowManager : MonoBehaviour
     }
 
     // -------------------------------------------------
+    // TEŞHİS KAYDI
+    // -------------------------------------------------
+
+    private void RegisterPatientAnalysis(bool isCorrect, string correctDiagnosisName, string playerDiagnosisName)
+    {
+        int patientNumberInDay = ((currentPatientNumber - 1) % patientsPerDay) + 1;
+
+        PatientAnalysisEntry entry = new PatientAnalysisEntry
+        {
+            dayNumber = currentDay,
+            patientNumberInDay = patientNumberInDay,
+            globalPatientNumber = currentPatientNumber,
+            isCorrect = isCorrect,
+            correctDiagnosisName = string.IsNullOrEmpty(correctDiagnosisName) ? "Bilinmiyor" : correctDiagnosisName,
+            playerDiagnosisName = string.IsNullOrEmpty(playerDiagnosisName) ? "Bilinmiyor" : playerDiagnosisName
+        };
+
+        patientAnalysisHistory.Add(entry);
+    }
+
+    // -------------------------------------------------
     // TEŞHİS GÖNDERİMİ
     // -------------------------------------------------
 
@@ -630,6 +717,8 @@ public class GameFlowManager : MonoBehaviour
         lastDiagnosisWasCorrect = isCorrect;
         lastDiagnosisResultText = "";
         lastCorrectDiagnosisName = "Doğru teşhis";
+
+        RegisterPatientAnalysis(isCorrect, lastCorrectDiagnosisName, lastCorrectDiagnosisName);
 
         if (isCorrect)
             AddCorrectAnswer();
@@ -647,6 +736,7 @@ public class GameFlowManager : MonoBehaviour
         bool isCorrect = false;
         string diagnosisResultText = "";
         string correctDiagnosisName = "";
+        string playerDiagnosisName = "";
 
         if (dialogueManager != null && dialogueManager.currentCase != null)
         {
@@ -657,6 +747,7 @@ public class GameFlowManager : MonoBehaviour
             {
                 isCorrect = selectedDiagnosis.isCorrectDiagnosis;
                 diagnosisResultText = selectedDiagnosis.resultText;
+                playerDiagnosisName = selectedDiagnosis.diagnosisName;
             }
 
             DiagnosisChoiceData correctDiagnosis = dialogueManager.currentCase.diagnosisChoices
@@ -675,6 +766,8 @@ public class GameFlowManager : MonoBehaviour
         lastDiagnosisWasCorrect = isCorrect;
         lastDiagnosisResultText = diagnosisResultText;
         lastCorrectDiagnosisName = string.IsNullOrEmpty(correctDiagnosisName) ? "Bilinmiyor" : correctDiagnosisName;
+
+        RegisterPatientAnalysis(isCorrect, lastCorrectDiagnosisName, playerDiagnosisName);
 
         if (isCorrect)
         {
@@ -703,7 +796,6 @@ public class GameFlowManager : MonoBehaviour
         if (!string.IsNullOrEmpty(diagnosisResultText))
             Debug.Log("Teşhis sonuç metni: " + diagnosisResultText);
 
-        // Hasta her durumda önce çıksın
         if (patientMovement != null)
             patientMovement.BeginExit();
     }
