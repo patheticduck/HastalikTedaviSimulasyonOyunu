@@ -1,13 +1,15 @@
 using UnityEngine;
-using TMPro;
+using Transform = UnityEngine.Transform;
 
 public class MainMenuManager : MonoBehaviour
 {
     [Header("Main Menu")]
     public GameObject mainMenuPanel;
-    public GameObject lastGameInfoPanel;
-    public TextMeshProUGUI lastGameDateText;
-    public TextMeshProUGUI lastGameStatsText;
+    public GameObject historySection;
+
+    [Header("History UI")]
+    public Transform historyContent;
+    public HistoryItemUI historyItemPrefab;
 
     [Header("Game Panels")]
     public GameObject dialoguePanel;
@@ -17,6 +19,7 @@ public class MainMenuManager : MonoBehaviour
 
     [Header("Manager")]
     public GameFlowManager gameFlowManager;
+    public RunHistoryManager runHistoryManager;
 
     [Header("Player Look")]
     public MouseLookLimited mouseLook;
@@ -25,9 +28,6 @@ public class MainMenuManager : MonoBehaviour
     public Transform gameplayCameraPoint;
 
     private bool hasPlayedGame = false;
-    private string lastGameDate = "";
-    private int lastCorrect = 0;
-    private int lastWrong = 0;
 
     private void Start()
     {
@@ -56,7 +56,7 @@ public class MainMenuManager : MonoBehaviour
         if (mouseLook != null)
             mouseLook.SetLookEnabled(false);
 
-        UpdateLastGameUI();
+        UpdateHistorySection();
     }
 
     public void StartGameFromMenu()
@@ -95,9 +95,12 @@ public class MainMenuManager : MonoBehaviour
     public void ReturnToMenu(int correct, int wrong)
     {
         hasPlayedGame = true;
-        lastGameDate = System.DateTime.Now.ToString("dd.MM.yyyy HH:mm");
-        lastCorrect = correct;
-        lastWrong = wrong;
+
+        if (runHistoryManager != null && gameFlowManager != null)
+        {
+            SessionHistoryData session = gameFlowManager.BuildSessionHistoryData();
+            runHistoryManager.AddSession(session);
+        }
 
         ShowMainMenu();
     }
@@ -111,24 +114,31 @@ public class MainMenuManager : MonoBehaviour
         doctorLookRoot.rotation = targetPoint.rotation;
     }
 
-    private void UpdateLastGameUI()
+    private void UpdateHistorySection()
     {
-        if (lastGameInfoPanel == null || lastGameDateText == null || lastGameStatsText == null)
+        if (historySection == null)
             return;
 
-        if (!hasPlayedGame)
-        {
-            lastGameInfoPanel.SetActive(false);
-            lastGameDateText.text = "";
-            lastGameStatsText.text = "";
+        historySection.SetActive(hasPlayedGame);
+
+        if (hasPlayedGame)
+            RebuildHistoryUI();
+    }
+
+    private void RebuildHistoryUI()
+    {
+        if (historyContent == null || historyItemPrefab == null || runHistoryManager == null)
             return;
+
+        for (int i = historyContent.childCount - 1; i >= 0; i--)
+        {
+            Destroy(historyContent.GetChild(i).gameObject);
         }
 
-        lastGameInfoPanel.SetActive(true);
-
-        lastGameDateText.text = "Son oyun: " + lastGameDate;
-        lastGameStatsText.text =
-            "Toplam Doğru: " + lastCorrect + "\n" +
-            "Toplam Yanlış: " + lastWrong;
+        foreach (var session in runHistoryManager.SessionHistoryList)
+        {
+            HistoryItemUI item = Instantiate(historyItemPrefab, historyContent);
+            item.Setup(session);
+        }
     }
 }

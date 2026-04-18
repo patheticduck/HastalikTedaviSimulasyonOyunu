@@ -412,6 +412,54 @@ public class GameFlowManager : MonoBehaviour
     }
 
     // -------------------------------------------------
+    // HISTORY DATA ÜRETİMİ
+    // -------------------------------------------------
+
+    public SessionHistoryData BuildSessionHistoryData()
+{
+    SessionHistoryData session = new SessionHistoryData();
+
+    System.DateTime now = System.DateTime.Now;
+    session.completedDateText = now.ToString("dd.MM.yyyy HH:mm");
+    session.completedAtTicks = now.Ticks;
+    session.relativeTimeText = "";
+
+    if (patientAnalysisHistory == null || patientAnalysisHistory.Count == 0)
+        return session;
+
+    int maxPlayedDay = patientAnalysisHistory.Max(x => x.dayNumber);
+
+    for (int day = 1; day <= maxPlayedDay; day++)
+    {
+        List<PatientAnalysisEntry> dayEntries = patientAnalysisHistory
+            .Where(x => x.dayNumber == day)
+            .OrderBy(x => x.patientNumberInDay)
+            .ToList();
+
+        if (dayEntries.Count == 0)
+            continue;
+
+        DayHistoryData dayData = new DayHistoryData();
+        dayData.dayNumber = day;
+
+        foreach (PatientAnalysisEntry entry in dayEntries)
+        {
+            PatientHistoryData patientData = new PatientHistoryData();
+            patientData.patientLabel = "Hasta " + entry.patientNumberInDay;
+            patientData.playerAnswer = entry.playerDiagnosisName;
+            patientData.isCorrect = entry.isCorrect;
+            patientData.correctAnswer = entry.correctDiagnosisName;
+
+            dayData.patients.Add(patientData);
+        }
+
+        session.days.Add(dayData);
+    }
+
+    return session;
+}
+
+    // -------------------------------------------------
     // BUTONLAR
     // -------------------------------------------------
 
