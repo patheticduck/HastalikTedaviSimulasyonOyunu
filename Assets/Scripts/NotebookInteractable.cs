@@ -9,6 +9,11 @@ public class NotebookInteractable : MonoBehaviour
     public PlayerInteractionModeManager interactionManager;
     public NotebookUIManager notebookUIManager;
 
+    [Header("Interaction")]
+    public GameObject highlightObject;
+    public GameObject interactText;
+    public float interactDistance = 3f;
+
     [Header("Animation")]
     public float moveSpeed = 5f;
     public Vector3 cameraOffset = new Vector3(0f, -0.05f, 0.6f);
@@ -21,6 +26,7 @@ public class NotebookInteractable : MonoBehaviour
 
     private bool isOpen = false;
     private bool isAnimating = false;
+    private bool isLookingAt = false;
 
     private void Start()
     {
@@ -38,6 +44,12 @@ public class NotebookInteractable : MonoBehaviour
 
         if (notebookUIManager != null && notebookUIManager.notebookPanel != null)
             notebookUIManager.notebookPanel.SetActive(false);
+
+        if (highlightObject != null)
+            highlightObject.SetActive(false);
+
+        if (interactText != null)
+            interactText.SetActive(false);
     }
 
     private void Update()
@@ -45,7 +57,9 @@ public class NotebookInteractable : MonoBehaviour
         if (Keyboard.current == null)
             return;
 
-        if (Keyboard.current.eKey.wasPressedThisFrame)
+        CheckLookAt();
+
+        if (isLookingAt && Keyboard.current.eKey.wasPressedThisFrame)
         {
             TryToggleNotebook();
         }
@@ -53,6 +67,36 @@ public class NotebookInteractable : MonoBehaviour
         if (isOpen && Keyboard.current.escapeKey.wasPressedThisFrame)
         {
             StartCoroutine(CloseNotebook());
+        }
+    }
+
+    private void CheckLookAt()
+    {
+        if (playerCamera == null || isAnimating)
+            return;
+
+        Ray ray = new Ray(playerCamera.transform.position, playerCamera.transform.forward);
+        RaycastHit hit;
+
+        bool hitNotebook = false;
+
+        if (Physics.Raycast(ray, out hit, interactDistance))
+        {
+            if (hit.collider != null && hit.collider.GetComponentInParent<NotebookInteractable>() == this)
+            {
+                hitNotebook = true;
+            }
+        }
+
+        if (hitNotebook != isLookingAt)
+        {
+            isLookingAt = hitNotebook;
+
+            if (highlightObject != null)
+                highlightObject.SetActive(isLookingAt && !isOpen);
+
+            if (interactText != null)
+                interactText.SetActive(isLookingAt && !isOpen);
         }
     }
 
@@ -86,6 +130,12 @@ public class NotebookInteractable : MonoBehaviour
     {
         isAnimating = true;
         isOpen = true;
+
+        if (highlightObject != null)
+            highlightObject.SetActive(false);
+
+        if (interactText != null)
+            interactText.SetActive(false);
 
         interactionManager.EnterUIMode();
 
@@ -141,6 +191,12 @@ public class NotebookInteractable : MonoBehaviour
         transform.rotation = originalRotation;
 
         interactionManager.ExitUIMode();
+
+        if (highlightObject != null)
+            highlightObject.SetActive(isLookingAt);
+
+        if (interactText != null)
+            interactText.SetActive(isLookingAt);
 
         isAnimating = false;
     }
