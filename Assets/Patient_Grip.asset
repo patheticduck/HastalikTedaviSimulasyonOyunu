@@ -26,7 +26,7 @@ MonoBehaviour:
     - choiceText: "Ate\u015Finiz oldu mu?"
       choiceType: 0
       doctorLine: "Ate\u015Finiz oldu mu?"
-      patientReply: "Evet doktor, \xF6zellikle ilk g\xFCnlerde ate\u015Fim vard\u0131."
+      patientReply: "Evde \xF6l\xE7t\xFC\u011F\xFCmde {fever_value} dereceydi doktor."
       assistantReply: "Ate\u015Fin d\xFCzeyi ve \xF6l\xE7\xFCm sonucu tan\u0131y\u0131
         belirginle\u015Ftirebilir."
       nextNodeId: 
@@ -54,8 +54,7 @@ MonoBehaviour:
     - choiceText: "\u015Eikayetleriniz ne zaman ba\u015Flad\u0131?"
       choiceType: 0
       doctorLine: "\u015Eikayetleriniz ne zaman ba\u015Flad\u0131?"
-      patientReply: "\u0130ki g\xFCn \xF6nce birden ba\u015Flad\u0131 doktor. Sabah
-        iyiydim, ak\u015Fama do\u011Fru k\xF6t\xFCle\u015Ftim."
+      patientReply: "\u015Eikayetlerim {symptom_start} ba\u015Flad\u0131 doktor. "
       assistantReply: "Ani ba\u015Flang\u0131\xE7 grip lehine de\u011Ferli bir bilgi
         olabilir."
       nextNodeId: 
@@ -270,7 +269,7 @@ MonoBehaviour:
     - choiceText: "\xD6ks\xFCr\xFC\u011F\xFCn\xFCz kuru mu, balgaml\u0131 m\u0131?"
       choiceType: 0
       doctorLine: "\xD6ks\xFCr\xFC\u011F\xFCn\xFCz kuru mu, balgaml\u0131 m\u0131?"
-      patientReply: "Daha \xE7ok kuru \xF6ks\xFCr\xFCk gibi doktor, balgam pek gelmiyor."
+      patientReply: "\xD6ks\xFCr\xFC\u011F\xFCm daha \xE7ok {cough_style}. \u015Feklinde."
       assistantReply: "Kuru \xF6ks\xFCr\xFCk gripte s\u0131k, balgams\u0131z olmas\u0131
         da bunu destekler."
       nextNodeId: 
@@ -288,7 +287,7 @@ MonoBehaviour:
       - dry_cough
       performedTests: []
       notebookSymptoms:
-      - "Kuru \xF6ks\xFCr\xFCk"
+      - "{cough_style} \xF6ks\xFCr\xFCk"
       notebookTests: []
       notebookNotes: []
       diseaseEffects:
@@ -401,7 +400,7 @@ MonoBehaviour:
       notebookTests:
       - "Ate\u015F \xF6l\xE7\xFCm\xFC yap\u0131ld\u0131"
       notebookNotes:
-      - "Anl\u0131k 38.6 ate\u015F g\xF6r\xFCl\xFCyor"
+      - "Anl\u0131k ate\u015F {fever_value}\xB0C "
       diseaseEffects:
       - diseaseId: GRIP
         score: 3
@@ -617,3 +616,4 @@ MonoBehaviour:
     - pain_swallowing
     - throat_redness
   assistantHints: []
+  variationProfile: {fileID: 11400000, guid: 2fcb7aecba23e9848a9238593bb8760e, type: 2}

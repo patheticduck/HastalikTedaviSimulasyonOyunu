@@ -8527,6 +8527,17 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: a05cc41f8989f1d4fae1aedd95f3338a, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::RuntimeSaveManager
+  currentSave:
+    currentDay: 0
+    currentPatientNumber: 0
+    totalCorrect: 0
+    totalWrong: 0
+    remainingHearts: 0
+    dayCorrect: 0
+    dayWrong: 0
+    diagnosisSubmittedForCurrentPatient: 0
+    hasSave: 0
+    patientAnalysisHistory: []
 --- !u!1001 &989150315
 PrefabInstance:
   m_ObjectHideFlags: 0
@@ -8940,6 +8951,7 @@ MonoBehaviour:
   playerCamera: {fileID: 330585545}
   interactionManager: {fileID: 333407512}
   notebookUIManager: {fileID: 1104260901}
+  dialogueManager: {fileID: 1217361533}
   highlightObject: {fileID: 1938141802}
   interactText: {fileID: 1720413435}
   interactDistance: 3

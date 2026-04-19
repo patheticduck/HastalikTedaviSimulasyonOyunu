@@ -25,4 +25,7 @@ public class PatientCaseData : ScriptableObject
 
     [Header("Assistant Hints")]
     public List<AssistantHintRuleData> assistantHints = new List<AssistantHintRuleData>();
+
+    [Header("Random Variation")]
+    public CaseVariationProfile variationProfile;
 }

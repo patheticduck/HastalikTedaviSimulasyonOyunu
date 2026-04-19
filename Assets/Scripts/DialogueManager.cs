@@ -1,6 +1,7 @@
 using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
+using System.Text.RegularExpressions;
 using UnityEngine;
 using TMPro;
 using UnityEngine.UI;
@@ -55,6 +56,9 @@ public class DialogueManager : MonoBehaviour
     private readonly HashSet<string> notebookSymptoms = new HashSet<string>();
     private readonly HashSet<string> notebookTests = new HashSet<string>();
     private readonly HashSet<string> notebookNotes = new HashSet<string>();
+
+    // Runtime random değerler
+    private readonly Dictionary<string, string> runtimeTextValues = new Dictionary<string, string>();
 
     private readonly Dictionary<string, int> diseaseScores = new Dictionary<string, int>();
 
@@ -178,10 +182,11 @@ public class DialogueManager : MonoBehaviour
         shownAssistantHints.Clear();
         diseaseScores.Clear();
 
-        // Notebook kayıtlarını da sıfırla
         notebookSymptoms.Clear();
         notebookTests.Clear();
         notebookNotes.Clear();
+
+        runtimeTextValues.Clear();
 
         askedQuestionCount = 0;
         performedTestCount = 0;
@@ -190,6 +195,8 @@ public class DialogueManager : MonoBehaviour
         rootNodeId = currentCase.rootNodeId;
         currentNodeId = rootNodeId;
 
+        GenerateRuntimeVariationData();
+
         if (notebookUIManager != null)
         {
             notebookUIManager.SetDialogueManager(this);
@@ -197,12 +204,22 @@ public class DialogueManager : MonoBehaviour
         }
 
         currentTurnFocusLine = CreateDialogueLineObject();
-        yield return StartCoroutine(TypeDialogueIntoLine(currentTurnFocusLine, "HASTA", currentCase.startText, false));
+        yield return StartCoroutine(TypeDialogueIntoLine(
+            currentTurnFocusLine,
+            "HASTA",
+            ResolveDynamicText(currentCase.startText),
+            false
+        ));
 
         if (!string.IsNullOrEmpty(currentCase.startAssistantText))
         {
             GameObject assistantLine = CreateDialogueLineObject();
-            yield return StartCoroutine(TypeDialogueIntoLine(assistantLine, "ASİSTAN", currentCase.startAssistantText, false));
+            yield return StartCoroutine(TypeDialogueIntoLine(
+                assistantLine,
+                "ASİSTAN",
+                ResolveDynamicText(currentCase.startAssistantText),
+                false
+            ));
         }
 
         yield return StartCoroutine(ShowNodeRoutine(rootNodeId, false));
@@ -239,7 +256,7 @@ public class DialogueManager : MonoBehaviour
         isBusy = true;
 
         Debug.Log("DialogueManager -> SelectChoice çalıştı");
-        Debug.Log("Selected Choice -> " + choice.choiceText);
+        Debug.Log("Selected Choice -> " + (choice != null ? ResolveDynamicText(choice.choiceText) : "NULL"));
 
         if (choice == null)
         {
@@ -263,13 +280,23 @@ public class DialogueManager : MonoBehaviour
         if (!string.IsNullOrEmpty(choice.doctorLine))
         {
             currentTurnFocusLine = CreateDialogueLineObject();
-            yield return StartCoroutine(TypeDialogueIntoLine(currentTurnFocusLine, "DOKTOR", choice.doctorLine, false));
+            yield return StartCoroutine(TypeDialogueIntoLine(
+                currentTurnFocusLine,
+                "DOKTOR",
+                ResolveDynamicText(choice.doctorLine),
+                false
+            ));
         }
 
         if (!string.IsNullOrEmpty(choice.patientReply))
         {
             GameObject patientLine = CreateDialogueLineObject();
-            yield return StartCoroutine(TypeDialogueIntoLine(patientLine, "HASTA", choice.patientReply, false));
+            yield return StartCoroutine(TypeDialogueIntoLine(
+                patientLine,
+                "HASTA",
+                ResolveDynamicText(choice.patientReply),
+                false
+            ));
 
             if (currentTurnFocusLine == null)
                 currentTurnFocusLine = patientLine;
@@ -278,7 +305,12 @@ public class DialogueManager : MonoBehaviour
         if (!string.IsNullOrEmpty(choice.assistantReply))
         {
             GameObject assistantLine = CreateDialogueLineObject();
-            yield return StartCoroutine(TypeDialogueIntoLine(assistantLine, "ASİSTAN", choice.assistantReply, false));
+            yield return StartCoroutine(TypeDialogueIntoLine(
+                assistantLine,
+                "ASİSTAN",
+                ResolveDynamicText(choice.assistantReply),
+                false
+            ));
         }
 
         if (choice.gainedTags != null)
@@ -313,8 +345,9 @@ public class DialogueManager : MonoBehaviour
         {
             foreach (string item in choice.notebookSymptoms)
             {
-                if (!string.IsNullOrWhiteSpace(item))
-                    notebookSymptoms.Add(item);
+                string resolved = ResolveDynamicText(item);
+                if (!string.IsNullOrWhiteSpace(resolved))
+                    notebookSymptoms.Add(resolved);
             }
         }
 
@@ -322,8 +355,9 @@ public class DialogueManager : MonoBehaviour
         {
             foreach (string item in choice.notebookTests)
             {
-                if (!string.IsNullOrWhiteSpace(item))
-                    notebookTests.Add(item);
+                string resolved = ResolveDynamicText(item);
+                if (!string.IsNullOrWhiteSpace(resolved))
+                    notebookTests.Add(resolved);
             }
         }
 
@@ -331,8 +365,9 @@ public class DialogueManager : MonoBehaviour
         {
             foreach (string item in choice.notebookNotes)
             {
-                if (!string.IsNullOrWhiteSpace(item))
-                    notebookNotes.Add(item);
+                string resolved = ResolveDynamicText(item);
+                if (!string.IsNullOrWhiteSpace(resolved))
+                    notebookNotes.Add(resolved);
             }
         }
 
@@ -517,13 +552,23 @@ public class DialogueManager : MonoBehaviour
             if (!string.IsNullOrEmpty(node.nodeIntroText))
             {
                 GameObject systemLine = CreateDialogueLineObject();
-                yield return StartCoroutine(TypeDialogueIntoLine(systemLine, "SİSTEM", node.nodeIntroText, false));
+                yield return StartCoroutine(TypeDialogueIntoLine(
+                    systemLine,
+                    "SİSTEM",
+                    ResolveDynamicText(node.nodeIntroText),
+                    false
+                ));
             }
 
             if (!string.IsNullOrEmpty(node.nodeAssistantText))
             {
                 GameObject assistantLine = CreateDialogueLineObject();
-                yield return StartCoroutine(TypeDialogueIntoLine(assistantLine, "ASİSTAN", node.nodeAssistantText, false));
+                yield return StartCoroutine(TypeDialogueIntoLine(
+                    assistantLine,
+                    "ASİSTAN",
+                    ResolveDynamicText(node.nodeAssistantText),
+                    false
+                ));
             }
         }
 
@@ -600,7 +645,7 @@ public class DialogueManager : MonoBehaviour
         if (optionScript != null)
         {
             optionScript.SetupChoice(choice, this);
-            SetOptionButtonTextInstant(optionScript, choice.choiceText);
+            SetOptionButtonTextInstant(optionScript, ResolveDynamicText(choice.choiceText));
         }
         else
         {
@@ -702,7 +747,12 @@ public class DialogueManager : MonoBehaviour
                 continue;
 
             GameObject assistantLine = CreateDialogueLineObject();
-            yield return StartCoroutine(TypeDialogueIntoLine(assistantLine, "ASİSTAN", hint.hintText, false));
+            yield return StartCoroutine(TypeDialogueIntoLine(
+                assistantLine,
+                "ASİSTAN",
+                ResolveDynamicText(hint.hintText),
+                false
+            ));
             shownAssistantHints.Add(hint.hintId);
 
             if (hint.showOnlyOnce)
@@ -773,6 +823,93 @@ public class DialogueManager : MonoBehaviour
         }
 
         Debug.Log(debugText);
+    }
+
+    private void GenerateRuntimeVariationData()
+    {
+        runtimeTextValues.Clear();
+
+        if (currentCase == null || currentCase.variationProfile == null)
+            return;
+
+        CaseVariationProfile profile = currentCase.variationProfile;
+
+        if (profile.floatVariables != null)
+        {
+            foreach (FloatVariableRange variable in profile.floatVariables)
+            {
+                if (variable == null || string.IsNullOrWhiteSpace(variable.key))
+                    continue;
+
+                float min = Mathf.Min(variable.minValue, variable.maxValue);
+                float max = Mathf.Max(variable.minValue, variable.maxValue);
+
+                float value = Random.Range(min, max);
+
+                int decimals = Mathf.Clamp(variable.decimalPlaces, 0, 3);
+                float roundedValue = (float)System.Math.Round(value, decimals);
+
+                string format = "F" + decimals;
+                runtimeTextValues[variable.key] = roundedValue.ToString(format);
+            }
+        }
+
+        if (profile.stringVariables != null)
+        {
+            foreach (StringVariableOptions variable in profile.stringVariables)
+            {
+                if (variable == null || string.IsNullOrWhiteSpace(variable.key))
+                    continue;
+
+                if (variable.options == null || variable.options.Count == 0)
+                    continue;
+
+                List<string> validOptions = variable.options
+                    .Where(x => !string.IsNullOrWhiteSpace(x))
+                    .ToList();
+
+                if (validOptions.Count == 0)
+                    continue;
+
+                int index = Random.Range(0, validOptions.Count);
+                runtimeTextValues[variable.key] = validOptions[index];
+            }
+        }
+
+        Debug.Log("Runtime Variation Data -> " +
+                  string.Join(" | ", runtimeTextValues.Select(x => x.Key + "=" + x.Value)));
+    }
+
+    private string ResolveDynamicText(string rawText)
+    {
+        if (string.IsNullOrEmpty(rawText))
+            return rawText;
+
+        return Regex.Replace(rawText, @"\{([a-zA-Z0-9_]+)\}", match =>
+        {
+            string key = match.Groups[1].Value;
+
+            if (runtimeTextValues.TryGetValue(key, out string value))
+                return value;
+
+            return match.Value;
+        });
+    }
+
+    public Dictionary<string, string> GetRuntimeVariationValues()
+    {
+        return new Dictionary<string, string>(runtimeTextValues);
+    }
+
+    public string GetRuntimeValue(string key)
+    {
+        if (string.IsNullOrWhiteSpace(key))
+            return "";
+
+        if (runtimeTextValues.TryGetValue(key, out string value))
+            return value;
+
+        return "";
     }
 
     public int GetDiseaseScore(string diseaseId)
