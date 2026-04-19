@@ -41,6 +41,11 @@ MonoBehaviour:
       discoveredSymptoms:
       - fever
       performedTests: []
+      notebookSymptoms:
+      - "Ate\u015F mevcut"
+      notebookTests: []
+      notebookNotes:
+      - "Hastada ate\u015Fli enfeksiyon tablosu olabilir"
       diseaseEffects:
       - diseaseId: GRIP
         score: 2
@@ -64,6 +69,9 @@ MonoBehaviour:
       blockedTags: []
       discoveredSymptoms: []
       performedTests: []
+      notebookSymptoms: []
+      notebookTests: []
+      notebookNotes: []
       diseaseEffects:
       - diseaseId: GRIP
         score: 2
@@ -86,6 +94,10 @@ MonoBehaviour:
       discoveredSymptoms:
       - fatigue
       performedTests: []
+      notebookSymptoms:
+      - Halsizlik belirtisi var
+      notebookTests: []
+      notebookNotes: []
       diseaseEffects:
       - diseaseId: GRIP
         score: 2
@@ -108,6 +120,10 @@ MonoBehaviour:
       discoveredSymptoms:
       - muscle_pain
       performedTests: []
+      notebookSymptoms: []
+      notebookTests: []
+      notebookNotes:
+      - "Kas a\u011Fr\u0131lar\u0131 grip ihtimalini y\xFCkseltir"
       diseaseEffects:
       - diseaseId: GRIP
         score: 3
@@ -132,6 +148,11 @@ MonoBehaviour:
       discoveredSymptoms:
       - throat_pain
       performedTests: []
+      notebookSymptoms:
+      - "Bo\u011Faz a\u011Fr\u0131s\u0131"
+      notebookTests: []
+      notebookNotes:
+      - 
       diseaseEffects:
       - diseaseId: GRIP
         score: 1
@@ -155,6 +176,11 @@ MonoBehaviour:
       discoveredSymptoms:
       - cough
       performedTests: []
+      notebookSymptoms:
+      - "\xD6ks\xFCr\xFCk mevcut"
+      notebookTests: []
+      notebookNotes:
+      - "Birka\xE7 g\xFCn \xF6ks\xFCr\xFCk mevcut"
       diseaseEffects:
       - diseaseId: GRIP
         score: 1
@@ -177,6 +203,10 @@ MonoBehaviour:
       discoveredSymptoms:
       - runny_nose
       performedTests: []
+      notebookSymptoms: []
+      notebookTests: []
+      notebookNotes:
+      - "Orta derece burun ak\u0131nt\u0131s\u0131 "
       diseaseEffects:
       - diseaseId: COLD
         score: 1
@@ -201,6 +231,10 @@ MonoBehaviour:
       discoveredSymptoms:
       - high_fever
       performedTests: []
+      notebookSymptoms: []
+      notebookTests: []
+      notebookNotes:
+      - "Y\xFCksek Ate\u015F g\xF6r\xFClm\xFC\u015F"
       diseaseEffects:
       - diseaseId: COLD
         score: -1
@@ -225,6 +259,11 @@ MonoBehaviour:
       discoveredSymptoms:
       - chills
       performedTests: []
+      notebookSymptoms:
+      - Titreme
+      notebookTests: []
+      notebookNotes:
+      - "Ak\u015Famlar\u0131 titreme mevcut"
       diseaseEffects:
       - diseaseId: GRIP
         score: 2
@@ -248,6 +287,10 @@ MonoBehaviour:
       discoveredSymptoms:
       - dry_cough
       performedTests: []
+      notebookSymptoms:
+      - "Kuru \xF6ks\xFCr\xFCk"
+      notebookTests: []
+      notebookNotes: []
       diseaseEffects:
       - diseaseId: GRIP
         score: 2
@@ -274,6 +317,10 @@ MonoBehaviour:
       discoveredSymptoms:
       - dry_cough
       performedTests: []
+      notebookSymptoms: []
+      notebookTests: []
+      notebookNotes:
+      - "\xDCst solunumdan gelen \xF6ks\xFCr\xFCk"
       diseaseEffects:
       - diseaseId: GRIP
         score: 1
@@ -295,6 +342,10 @@ MonoBehaviour:
       blockedTags: []
       discoveredSymptoms: []
       performedTests: []
+      notebookSymptoms: []
+      notebookTests: []
+      notebookNotes:
+      - "Yutkunurken bo\u011Fazda a\u011Fr\u0131"
       diseaseEffects:
       - diseaseId: GRIP
         score: 1
@@ -320,6 +371,9 @@ MonoBehaviour:
       blockedTags: []
       discoveredSymptoms: []
       performedTests: []
+      notebookSymptoms: []
+      notebookTests: []
+      notebookNotes: []
       diseaseEffects:
       - diseaseId: GRIP
         score: 1
@@ -343,6 +397,11 @@ MonoBehaviour:
       - high_fever_confirmed
       performedTests:
       - temperature_measurement
+      notebookSymptoms: []
+      notebookTests:
+      - "Ate\u015F \xF6l\xE7\xFCm\xFC yap\u0131ld\u0131"
+      notebookNotes:
+      - "Anl\u0131k 38.6 ate\u015F g\xF6r\xFCl\xFCyor"
       diseaseEffects:
       - diseaseId: GRIP
         score: 3
@@ -371,6 +430,10 @@ MonoBehaviour:
       - throat_redness
       performedTests:
       - throat_exam
+      notebookSymptoms: []
+      notebookTests:
+      - "Bo\u011Faz muayenesi yap\u0131ld\u0131"
+      notebookNotes: []
       diseaseEffects:
       - diseaseId: GRIP
         score: 1
@@ -395,6 +458,10 @@ MonoBehaviour:
       blockedTags: []
       discoveredSymptoms: []
       performedTests: []
+      notebookSymptoms: []
+      notebookTests: []
+      notebookNotes:
+      - "Bo\u011Fazda belir\u011Fin p\xFCr\xFClan yok"
       diseaseEffects:
       - diseaseId: GRIP
         score: 1
@@ -422,6 +489,11 @@ MonoBehaviour:
       discoveredSymptoms: []
       performedTests:
       - lung_auscultation
+      notebookSymptoms: []
+      notebookTests:
+      - "Solunum testi yap\u0131ld\u0131"
+      notebookNotes:
+      - Alt solunum bulgusu yok
       diseaseEffects:
       - diseaseId: GRIP
         score: 1
@@ -447,6 +519,9 @@ MonoBehaviour:
       blockedTags: []
       discoveredSymptoms: []
       performedTests: []
+      notebookSymptoms: []
+      notebookTests: []
+      notebookNotes: []
       diseaseEffects:
       - diseaseId: GRIP
         score: 2
@@ -470,6 +545,10 @@ MonoBehaviour:
       blockedTags: []
       discoveredSymptoms: []
       performedTests: []
+      notebookSymptoms: []
+      notebookTests: []
+      notebookNotes:
+      - "Geceleri kuru \xF6ks\xFCr\xFCk"
       diseaseEffects:
       - diseaseId: GRIP
         score: 1
@@ -493,6 +572,9 @@ MonoBehaviour:
       blockedTags: []
       discoveredSymptoms: []
       performedTests: []
+      notebookSymptoms: []
+      notebookTests: []
+      notebookNotes: []
       diseaseEffects:
       - diseaseId: GRIP
         score: 1

@@ -38,6 +38,11 @@ public class DialogueChoiceData
     public List<string> discoveredSymptoms = new List<string>();
     public List<string> performedTests = new List<string>();
 
+    [Header("Notebook Kayıtları (Türkçe)")]
+    public List<string> notebookSymptoms = new List<string>();
+    public List<string> notebookTests = new List<string>();
+    public List<string> notebookNotes = new List<string>();
+
     [Header("Disease Scoring")]
     public List<DiseaseScoreEffect> diseaseEffects = new List<DiseaseScoreEffect>();
 }

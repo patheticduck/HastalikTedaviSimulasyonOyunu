@@ -46,19 +46,19 @@ public class NotebookUIManager : MonoBehaviour
             return;
         }
 
-        HashSet<string> symptoms = currentDialogueManager.GetDiscoveredSymptoms();
-        HashSet<string> tags = currentDialogueManager.GetDiscoveredTags();
-        HashSet<string> tests = currentDialogueManager.GetPerformedTests();
+        HashSet<string> symptoms = currentDialogueManager.GetNotebookSymptoms();
+        HashSet<string> notes = currentDialogueManager.GetNotebookNotes();
+        HashSet<string> tests = currentDialogueManager.GetNotebookTests();
 
         Debug.Log(
-            $"Notebook Refresh -> Symptoms: {symptoms.Count}, Tags: {tags.Count}, Tests: {tests.Count}"
+            $"Notebook Refresh -> Symptoms: {symptoms.Count}, Notes: {notes.Count}, Tests: {tests.Count}"
         );
 
         if (symptomsText != null)
             symptomsText.text = BuildSectionText(symptoms, "Henüz belirti kaydı yok.");
 
         if (tagsText != null)
-            tagsText.text = BuildSectionText(tags, "Henüz ipucu kaydı yok.");
+            tagsText.text = BuildSectionText(notes, "Henüz ipucu kaydı yok.");
 
         if (testsText != null)
             testsText.text = BuildSectionText(tests, "Henüz test yapılmadı.");
@@ -84,7 +84,7 @@ public class NotebookUIManager : MonoBehaviour
         if (string.IsNullOrWhiteSpace(raw))
             return "-";
 
-        string formatted = raw.Replace("_", " ");
+        string formatted = raw.Trim();
 
         if (formatted.Length == 1)
             return formatted.ToUpper();

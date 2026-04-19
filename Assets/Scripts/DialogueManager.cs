@@ -51,6 +51,11 @@ public class DialogueManager : MonoBehaviour
     private readonly HashSet<string> performedTests = new HashSet<string>();
     private readonly HashSet<string> shownAssistantHints = new HashSet<string>();
 
+    // Notebook için oyuncuya gösterilecek TÜRKÇE kayıtlar
+    private readonly HashSet<string> notebookSymptoms = new HashSet<string>();
+    private readonly HashSet<string> notebookTests = new HashSet<string>();
+    private readonly HashSet<string> notebookNotes = new HashSet<string>();
+
     private readonly Dictionary<string, int> diseaseScores = new Dictionary<string, int>();
 
     private int askedQuestionCount = 0;
@@ -172,6 +177,11 @@ public class DialogueManager : MonoBehaviour
         performedTests.Clear();
         shownAssistantHints.Clear();
         diseaseScores.Clear();
+
+        // Notebook kayıtlarını da sıfırla
+        notebookSymptoms.Clear();
+        notebookTests.Clear();
+        notebookNotes.Clear();
 
         askedQuestionCount = 0;
         performedTestCount = 0;
@@ -298,13 +308,44 @@ public class DialogueManager : MonoBehaviour
             }
         }
 
+        // Notebook için Türkçe kayıtları ekle
+        if (choice.notebookSymptoms != null)
+        {
+            foreach (string item in choice.notebookSymptoms)
+            {
+                if (!string.IsNullOrWhiteSpace(item))
+                    notebookSymptoms.Add(item);
+            }
+        }
+
+        if (choice.notebookTests != null)
+        {
+            foreach (string item in choice.notebookTests)
+            {
+                if (!string.IsNullOrWhiteSpace(item))
+                    notebookTests.Add(item);
+            }
+        }
+
+        if (choice.notebookNotes != null)
+        {
+            foreach (string item in choice.notebookNotes)
+            {
+                if (!string.IsNullOrWhiteSpace(item))
+                    notebookNotes.Add(item);
+            }
+        }
+
         ApplyDiseaseEffects(choice.diseaseEffects);
 
         Debug.Log(
             "Notebook Data After Choice -> " +
             "Tags: [" + string.Join(", ", discoveredTags) + "] | " +
             "Symptoms: [" + string.Join(", ", discoveredSymptoms) + "] | " +
-            "Tests: [" + string.Join(", ", performedTests) + "]"
+            "Tests: [" + string.Join(", ", performedTests) + "] | " +
+            "NotebookSymptoms: [" + string.Join(", ", notebookSymptoms) + "] | " +
+            "NotebookTests: [" + string.Join(", ", notebookTests) + "] | " +
+            "NotebookNotes: [" + string.Join(", ", notebookNotes) + "]"
         );
 
         if (notebookUIManager != null)
@@ -763,6 +804,21 @@ public class DialogueManager : MonoBehaviour
     public HashSet<string> GetPerformedTests()
     {
         return new HashSet<string>(performedTests);
+    }
+
+    public HashSet<string> GetNotebookSymptoms()
+    {
+        return new HashSet<string>(notebookSymptoms);
+    }
+
+    public HashSet<string> GetNotebookTests()
+    {
+        return new HashSet<string>(notebookTests);
+    }
+
+    public HashSet<string> GetNotebookNotes()
+    {
+        return new HashSet<string>(notebookNotes);
     }
 
     public int GetAskedQuestionCount()
