@@ -83,19 +83,18 @@ public class GameFlowManager : MonoBehaviour
     private bool waitingForDayContinue = false;
     private bool waitingForPatientResultContinue = false;
 
-    // 5. yanlışta hasta önce çıksın, panel sonra gelsin
     private bool pendingLoseGameOver = false;
 
-    // Günlük sayaçlar
+    // YENİ: Bu hasta için teşhis verildi mi?
+    private bool diagnosisSubmittedForCurrentPatient = false;
+
     private int dayCorrect = 0;
     private int dayWrong = 0;
 
-    // Son hastanın sonucu
     private bool lastDiagnosisWasCorrect = false;
     private string lastDiagnosisResultText = "";
     private string lastCorrectDiagnosisName = "";
 
-    // Analiz kayıtları
     private readonly List<PatientAnalysisEntry> patientAnalysisHistory = new List<PatientAnalysisEntry>();
 
     private void Start()
@@ -140,6 +139,7 @@ public class GameFlowManager : MonoBehaviour
         waitingForPatientResultContinue = false;
 
         pendingLoseGameOver = false;
+        diagnosisSubmittedForCurrentPatient = false;
         gameEnded = false;
 
         patientAnalysisHistory.Clear();
@@ -172,6 +172,8 @@ public class GameFlowManager : MonoBehaviour
     {
         if (gameEnded) return;
 
+        diagnosisSubmittedForCurrentPatient = false;
+
         Debug.Log("Oyun akışı başlatıldı. Hasta No: " + currentPatientNumber);
 
         if (dialoguePanel != null) dialoguePanel.SetActive(false);
@@ -187,13 +189,145 @@ public class GameFlowManager : MonoBehaviour
         }
 
         if (patientMovement != null)
-        {
             patientMovement.BeginWalk();
+        else
+            Debug.LogWarning("PatientMovement bağlı değil!");
+    }
+
+    // -------------------------------------------------
+    // SAVE / LOAD
+    // -------------------------------------------------
+
+    public RuntimeSaveData BuildRuntimeSaveData()
+    {
+        RuntimeSaveData save = new RuntimeSaveData();
+
+        save.currentDay = currentDay;
+        save.currentPatientNumber = currentPatientNumber;
+        save.totalCorrect = totalCorrect;
+        save.totalWrong = totalWrong;
+        save.remainingHearts = remainingHearts;
+        save.dayCorrect = dayCorrect;
+        save.dayWrong = dayWrong;
+        save.diagnosisSubmittedForCurrentPatient = diagnosisSubmittedForCurrentPatient;
+        save.hasSave = true;
+
+        save.patientAnalysisHistory = ClonePatientAnalysisHistory();
+
+        return save;
+    }
+
+    public void ApplyRuntimeSaveData(RuntimeSaveData save)
+    {
+        if (save == null)
+            return;
+
+        currentDay = save.currentDay;
+        currentPatientNumber = save.currentPatientNumber;
+        totalCorrect = save.totalCorrect;
+        totalWrong = save.totalWrong;
+        remainingHearts = save.remainingHearts;
+        dayCorrect = save.dayCorrect;
+        dayWrong = save.dayWrong;
+        diagnosisSubmittedForCurrentPatient = save.diagnosisSubmittedForCurrentPatient;
+
+        waitingForDayContinue = false;
+        waitingForPatientResultContinue = false;
+        pendingLoseGameOver = false;
+        gameEnded = false;
+
+        lastDiagnosisWasCorrect = false;
+        lastDiagnosisResultText = "";
+        lastCorrectDiagnosisName = "";
+
+        patientAnalysisHistory.Clear();
+
+        if (save.patientAnalysisHistory != null)
+        {
+            foreach (PatientAnalysisEntry entry in save.patientAnalysisHistory)
+            {
+                if (entry == null)
+                    continue;
+
+                patientAnalysisHistory.Add(new PatientAnalysisEntry
+                {
+                    dayNumber = entry.dayNumber,
+                    patientNumberInDay = entry.patientNumberInDay,
+                    globalPatientNumber = entry.globalPatientNumber,
+                    isCorrect = entry.isCorrect,
+                    correctDiagnosisName = entry.correctDiagnosisName,
+                    playerDiagnosisName = entry.playerDiagnosisName
+                });
+            }
+        }
+
+        if (dialoguePanel != null) dialoguePanel.SetActive(false);
+        if (endDayPanel != null) endDayPanel.SetActive(false);
+        if (gameOverPanel != null) gameOverPanel.SetActive(false);
+        if (dayTransitionPanel != null) dayTransitionPanel.SetActive(false);
+        if (patientResultPanel != null) patientResultPanel.SetActive(false);
+
+        if (patientMovement != null)
+            patientMovement.HidePatient();
+
+        if (interactionModeManager != null)
+        {
+            interactionModeManager.SetDialogueAvailable(false);
+            interactionModeManager.ExitUIMode();
+        }
+    }
+
+    public void ContinueAfterLoadedSave()
+    {
+        // Eğer save alınırken teşhis zaten verildiyse, bu hasta tamamlanmış kabul edilir.
+
+        if (remainingHearts <= 0)
+        {
+            ShowGameOverPanel(false);
+            return;
+        }
+
+        if (currentPatientNumber >= totalPatientsInRun)
+        {
+            ShowGameOverPanel(true);
+            return;
+        }
+
+        bool isEndOfDay = (currentPatientNumber % patientsPerDay == 0);
+
+        if (isEndOfDay)
+        {
+            waitingForDayContinue = true;
+            ShowEndOfDayPanel();
         }
         else
         {
-            Debug.LogWarning("PatientMovement bağlı değil!");
+            currentPatientNumber++;
+            StartCoroutine(StartNextPatientAfterDelay(0.2f));
         }
+    }
+
+    private List<PatientAnalysisEntry> ClonePatientAnalysisHistory()
+    {
+        List<PatientAnalysisEntry> clone = new List<PatientAnalysisEntry>();
+
+        foreach (PatientAnalysisEntry entry in patientAnalysisHistory)
+        {
+            if (entry == null)
+                continue;
+
+            clone.Add(new PatientAnalysisEntry
+            {
+                dayNumber = entry.dayNumber,
+                patientNumberInDay = entry.patientNumberInDay,
+                globalPatientNumber = entry.globalPatientNumber,
+                isCorrect = entry.isCorrect,
+                correctDiagnosisName = entry.correctDiagnosisName,
+                playerDiagnosisName = entry.playerDiagnosisName
+            });
+        }
+
+        return clone;
     }
 
     // -------------------------------------------------
@@ -226,9 +360,7 @@ public class GameFlowManager : MonoBehaviour
         Debug.Log("Yanlış eklendi. Toplam yanlış: " + totalWrong);
 
         if (remainingHearts <= 0)
-        {
             pendingLoseGameOver = true;
-        }
     }
 
     // -------------------------------------------------
@@ -329,9 +461,7 @@ public class GameFlowManager : MonoBehaviour
         }
 
         if (gameOverResultText != null)
-        {
             gameOverResultText.text = BuildDetailedGameOverText(isVictory);
-        }
 
         if (gameOverContinueButton != null)
         {
@@ -348,13 +478,9 @@ public class GameFlowManager : MonoBehaviour
         StringBuilder sb = new StringBuilder();
 
         if (isVictory)
-        {
             sb.AppendLine("7 günü başarıyla tamamladın.");
-        }
         else
-        {
             sb.AppendLine("5 yanlış teşhis hakkını doldurdun.");
-        }
 
         sb.AppendLine();
         sb.AppendLine("Toplam Doğru: " + totalCorrect);
@@ -416,48 +542,48 @@ public class GameFlowManager : MonoBehaviour
     // -------------------------------------------------
 
     public SessionHistoryData BuildSessionHistoryData()
-{
-    SessionHistoryData session = new SessionHistoryData();
-
-    System.DateTime now = System.DateTime.Now;
-    session.completedDateText = now.ToString("dd.MM.yyyy HH:mm");
-    session.completedAtTicks = now.Ticks;
-    session.relativeTimeText = "";
-
-    if (patientAnalysisHistory == null || patientAnalysisHistory.Count == 0)
-        return session;
-
-    int maxPlayedDay = patientAnalysisHistory.Max(x => x.dayNumber);
-
-    for (int day = 1; day <= maxPlayedDay; day++)
     {
-        List<PatientAnalysisEntry> dayEntries = patientAnalysisHistory
-            .Where(x => x.dayNumber == day)
-            .OrderBy(x => x.patientNumberInDay)
-            .ToList();
+        SessionHistoryData session = new SessionHistoryData();
 
-        if (dayEntries.Count == 0)
-            continue;
+        System.DateTime now = System.DateTime.Now;
+        session.completedDateText = now.ToString("dd.MM.yyyy HH:mm");
+        session.completedAtTicks = now.Ticks;
+        session.relativeTimeText = "";
 
-        DayHistoryData dayData = new DayHistoryData();
-        dayData.dayNumber = day;
+        if (patientAnalysisHistory == null || patientAnalysisHistory.Count == 0)
+            return session;
 
-        foreach (PatientAnalysisEntry entry in dayEntries)
+        int maxPlayedDay = patientAnalysisHistory.Max(x => x.dayNumber);
+
+        for (int day = 1; day <= maxPlayedDay; day++)
         {
-            PatientHistoryData patientData = new PatientHistoryData();
-            patientData.patientLabel = "Hasta " + entry.patientNumberInDay;
-            patientData.playerAnswer = entry.playerDiagnosisName;
-            patientData.isCorrect = entry.isCorrect;
-            patientData.correctAnswer = entry.correctDiagnosisName;
+            List<PatientAnalysisEntry> dayEntries = patientAnalysisHistory
+                .Where(x => x.dayNumber == day)
+                .OrderBy(x => x.patientNumberInDay)
+                .ToList();
 
-            dayData.patients.Add(patientData);
+            if (dayEntries.Count == 0)
+                continue;
+
+            DayHistoryData dayData = new DayHistoryData();
+            dayData.dayNumber = day;
+
+            foreach (PatientAnalysisEntry entry in dayEntries)
+            {
+                PatientHistoryData patientData = new PatientHistoryData();
+                patientData.patientLabel = "Hasta " + entry.patientNumberInDay;
+                patientData.playerAnswer = entry.playerDiagnosisName;
+                patientData.isCorrect = entry.isCorrect;
+                patientData.correctAnswer = entry.correctDiagnosisName;
+
+                dayData.patients.Add(patientData);
+            }
+
+            session.days.Add(dayData);
         }
 
-        session.days.Add(dayData);
+        return session;
     }
-
-    return session;
-}
 
     // -------------------------------------------------
     // BUTONLAR
@@ -487,6 +613,7 @@ public class GameFlowManager : MonoBehaviour
             return;
 
         waitingForPatientResultContinue = false;
+        diagnosisSubmittedForCurrentPatient = false;
         HidePatientResultPanel();
 
         if (currentPatientNumber >= totalPatientsInRun)
@@ -613,9 +740,7 @@ public class GameFlowManager : MonoBehaviour
             }
 
             if (!string.IsNullOrEmpty(lastDiagnosisResultText))
-            {
                 patientResultBodyText.text += "\n\n" + lastDiagnosisResultText;
-            }
         }
 
         if (patientResultContinueButton != null)
@@ -672,6 +797,11 @@ public class GameFlowManager : MonoBehaviour
         }
     }
 
+    public void RefreshGameUIAfterLoad()
+    {
+        UpdateHeartsUI();
+    }
+
     // -------------------------------------------------
     // HASTA AKIŞI
     // -------------------------------------------------
@@ -693,13 +823,9 @@ public class GameFlowManager : MonoBehaviour
         DialogueManager dialogueManager = FindFirstObjectByType<DialogueManager>();
 
         if (dialogueManager != null)
-        {
             dialogueManager.StartDialogue();
-        }
         else
-        {
             Debug.LogError("DialogueManager bulunamadı!");
-        }
     }
 
     public void OnPatientExited()
@@ -773,6 +899,8 @@ public class GameFlowManager : MonoBehaviour
         else
             AddWrongAnswer();
 
+        diagnosisSubmittedForCurrentPatient = true;
+
         FinishDiagnosisFlow(null);
     }
 
@@ -802,9 +930,7 @@ public class GameFlowManager : MonoBehaviour
                 .FirstOrDefault(d => d != null && d.isCorrectDiagnosis);
 
             if (correctDiagnosis != null)
-            {
                 correctDiagnosisName = correctDiagnosis.diagnosisName;
-            }
         }
         else
         {
@@ -827,6 +953,8 @@ public class GameFlowManager : MonoBehaviour
             AddWrongAnswer();
             Debug.Log("Yanlış teşhis yapıldı.");
         }
+
+        diagnosisSubmittedForCurrentPatient = true;
 
         FinishDiagnosisFlow(diagnosisResultText);
     }

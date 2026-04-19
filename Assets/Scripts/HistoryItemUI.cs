@@ -4,7 +4,12 @@ using UnityEngine.UI;
 using System.Text;
 using UnityEngine.EventSystems;
 
-public class HistoryItemUI : MonoBehaviour, IPointerClickHandler
+public class HistoryItemUI : MonoBehaviour,
+    IPointerClickHandler,
+    IScrollHandler,
+    IBeginDragHandler,
+    IDragHandler,
+    IEndDragHandler
 {
     [Header("UI")]
     public Button headerButton;
@@ -12,6 +17,9 @@ public class HistoryItemUI : MonoBehaviour, IPointerClickHandler
     public GameObject detailPanel;
     public TextMeshProUGUI detailText;
     public LayoutElement detailLayoutElement;
+
+    [Header("History Scroll Root")]
+    public RectTransform historyContentRect;
 
     [Header("Mode")]
     public bool useDynamicHeight = true;
@@ -29,33 +37,40 @@ public class HistoryItemUI : MonoBehaviour, IPointerClickHandler
 
     private bool isOpen = false;
     private RectTransform rootRect;
+    private LayoutElement rootLayoutElement;
+    private ScrollRect parentScrollRect;
 
     private void Awake()
     {
         rootRect = GetComponent<RectTransform>();
+
+        rootLayoutElement = GetComponent<LayoutElement>();
+        if (rootLayoutElement == null)
+            rootLayoutElement = gameObject.AddComponent<LayoutElement>();
+
         AutoAssignReferences();
+
+        if (parentScrollRect == null)
+            parentScrollRect = GetComponentInParent<ScrollRect>();
     }
 
     private void OnEnable()
     {
         AutoAssignReferences();
 
-        if (headerButton != null)
-        {
-            headerButton.onClick.RemoveAllListeners();
-            headerButton.onClick.AddListener(OnHeaderButtonClicked);
-            Debug.Log("[HistoryItemUI] Listener bağlandı: " + gameObject.name);
-        }
-        else
-        {
-            Debug.LogError("[HistoryItemUI] HeaderButton NULL: " + gameObject.name);
-        }
+        if (parentScrollRect == null)
+            parentScrollRect = GetComponentInParent<ScrollRect>();
+
+        ForceHeaderVisible();
+        BindButton();
 
         isOpen = startOpen;
 
         if (detailPanel != null)
             detailPanel.SetActive(isOpen);
 
+        RefreshDetailHeight();
+        RefreshRootHeight();
         RefreshAllLayouts();
     }
 
@@ -64,29 +79,49 @@ public class HistoryItemUI : MonoBehaviour, IPointerClickHandler
         Debug.Log("[HistoryItemUI] Root click aldı: " + gameObject.name);
     }
 
+    public void SetHistoryContentRect(RectTransform contentRect)
+    {
+        historyContentRect = contentRect;
+        RefreshAllLayouts();
+    }
+
+    private void BindButton()
+    {
+        if (headerButton != null)
+        {
+            headerButton.onClick.RemoveListener(OnHeaderButtonClicked);
+            headerButton.onClick.AddListener(OnHeaderButtonClicked);
+        }
+        else
+        {
+            Debug.LogError("[HistoryItemUI] HeaderButton NULL: " + gameObject.name);
+        }
+    }
+
     private void OnHeaderButtonClicked()
     {
-        Debug.Log("[HistoryItemUI] Header button click aldı: " + gameObject.name);
         ToggleDetail();
     }
 
     private void AutoAssignReferences()
     {
         if (headerButton == null)
-        {
-            Transform buttonTransform = transform.Find("HeaderButton");
-            if (buttonTransform != null)
-                headerButton = buttonTransform.GetComponent<Button>();
-        }
+            headerButton = GetComponentInChildren<Button>(true);
 
         if (headerText == null && headerButton != null)
             headerText = headerButton.GetComponentInChildren<TextMeshProUGUI>(true);
 
         if (detailPanel == null)
         {
-            Transform t = transform.Find("DetailPanel");
-            if (t != null)
-                detailPanel = t.gameObject;
+            Transform[] children = GetComponentsInChildren<Transform>(true);
+            foreach (Transform t in children)
+            {
+                if (t.name == "DetailPanel")
+                {
+                    detailPanel = t.gameObject;
+                    break;
+                }
+            }
         }
 
         if (detailText == null && detailPanel != null)
@@ -96,16 +131,52 @@ public class HistoryItemUI : MonoBehaviour, IPointerClickHandler
             detailLayoutElement = detailPanel.GetComponent<LayoutElement>();
     }
 
+    private void ForceHeaderVisible()
+    {
+        if (headerButton != null)
+        {
+            headerButton.gameObject.SetActive(true);
+
+            RectTransform headerRect = headerButton.GetComponent<RectTransform>();
+            if (headerRect != null && headerRect.sizeDelta.y < 60f)
+                headerRect.sizeDelta = new Vector2(headerRect.sizeDelta.x, 60f);
+
+            LayoutElement headerLayout = headerButton.GetComponent<LayoutElement>();
+            if (headerLayout == null)
+                headerLayout = headerButton.gameObject.AddComponent<LayoutElement>();
+
+            headerLayout.minHeight = 60f;
+            headerLayout.preferredHeight = 60f;
+            headerLayout.flexibleHeight = 0f;
+
+            Image img = headerButton.GetComponent<Image>();
+            if (img != null)
+            {
+                Color c = img.color;
+                if (c.a <= 0.05f)
+                    img.color = new Color(c.r, c.g, c.b, 1f);
+            }
+        }
+
+        if (headerText != null)
+        {
+            headerText.gameObject.SetActive(true);
+
+            Color tc = headerText.color;
+            if (tc.a <= 0.05f)
+                headerText.color = new Color(tc.r, tc.g, tc.b, 1f);
+        }
+    }
+
     public void ToggleDetail()
     {
         isOpen = !isOpen;
-
-        Debug.Log("[HistoryItemUI] ToggleDetail çalıştı. isOpen = " + isOpen);
 
         if (detailPanel != null)
             detailPanel.SetActive(isOpen);
 
         RefreshDetailHeight();
+        RefreshRootHeight();
         RefreshAllLayouts();
     }
 
@@ -115,6 +186,8 @@ public class HistoryItemUI : MonoBehaviour, IPointerClickHandler
             return;
 
         AutoAssignReferences();
+        ForceHeaderVisible();
+        BindButton();
 
         if (headerText != null)
         {
@@ -123,11 +196,15 @@ public class HistoryItemUI : MonoBehaviour, IPointerClickHandler
         }
 
         if (detailText != null)
-        {
             detailText.text = BuildDetailText(sessionData);
-        }
+
+        isOpen = startOpen;
+
+        if (detailPanel != null)
+            detailPanel.SetActive(isOpen);
 
         RefreshDetailHeight();
+        RefreshRootHeight();
         RefreshAllLayouts();
     }
 
@@ -206,12 +283,16 @@ public class HistoryItemUI : MonoBehaviour, IPointerClickHandler
         if (!useDynamicHeight)
         {
             detailLayoutElement.preferredHeight = isOpen ? fixedDetailHeight : 0f;
+            detailLayoutElement.minHeight = 0f;
+            detailLayoutElement.flexibleHeight = 0f;
             return;
         }
 
         if (!isOpen)
         {
             detailLayoutElement.preferredHeight = 0f;
+            detailLayoutElement.minHeight = 0f;
+            detailLayoutElement.flexibleHeight = 0f;
             return;
         }
 
@@ -226,6 +307,33 @@ public class HistoryItemUI : MonoBehaviour, IPointerClickHandler
         finalHeight = Mathf.Clamp(finalHeight, minDetailHeight, maxDetailHeight);
 
         detailLayoutElement.preferredHeight = finalHeight;
+        detailLayoutElement.minHeight = 0f;
+        detailLayoutElement.flexibleHeight = 0f;
+    }
+
+    private void RefreshRootHeight()
+    {
+        if (rootLayoutElement == null)
+            return;
+
+        float headerHeight = 60f;
+
+        if (headerButton != null)
+        {
+            RectTransform headerRect = headerButton.GetComponent<RectTransform>();
+            if (headerRect != null && headerRect.rect.height > 0f)
+                headerHeight = Mathf.Max(60f, headerRect.rect.height);
+        }
+
+        float detailHeight = 0f;
+        if (isOpen && detailLayoutElement != null)
+            detailHeight = detailLayoutElement.preferredHeight;
+
+        float totalHeight = headerHeight + detailHeight + 16f;
+
+        rootLayoutElement.preferredHeight = totalHeight;
+        rootLayoutElement.minHeight = headerHeight + 16f;
+        rootLayoutElement.flexibleHeight = 0f;
     }
 
     private void RefreshAllLayouts()
@@ -239,7 +347,36 @@ public class HistoryItemUI : MonoBehaviour, IPointerClickHandler
         if (parentRect != null)
             LayoutRebuilder.ForceRebuildLayoutImmediate(parentRect);
 
+        if (historyContentRect != null)
+            LayoutRebuilder.ForceRebuildLayoutImmediate(historyContentRect);
+
         if (parentRect != null && parentRect.parent is RectTransform grandParentRect)
             LayoutRebuilder.ForceRebuildLayoutImmediate(grandParentRect);
+
+        Canvas.ForceUpdateCanvases();
+    }
+
+    public void OnScroll(PointerEventData eventData)
+    {
+        if (parentScrollRect != null)
+            parentScrollRect.OnScroll(eventData);
+    }
+
+    public void OnBeginDrag(PointerEventData eventData)
+    {
+        if (parentScrollRect != null)
+            parentScrollRect.OnBeginDrag(eventData);
+    }
+
+    public void OnDrag(PointerEventData eventData)
+    {
+        if (parentScrollRect != null)
+            parentScrollRect.OnDrag(eventData);
+    }
+
+    public void OnEndDrag(PointerEventData eventData)
+    {
+        if (parentScrollRect != null)
+            parentScrollRect.OnEndDrag(eventData);
     }
 }
