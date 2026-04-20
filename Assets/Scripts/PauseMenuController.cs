@@ -9,6 +9,10 @@ public class PauseMenuController : MonoBehaviour
     public GameObject crosshair;
     public TextMeshProUGUI resultText;
 
+    [Header("Blocking Panels")]
+    public GameObject mainMenuPanel;
+    public GameObject notebookPanel;
+
     [Header("References")]
     public MouseLookLimited mouseLook;
     public GameFlowManager gameFlowManager;
@@ -48,10 +52,44 @@ public class PauseMenuController : MonoBehaviour
         if (pausePressed)
         {
             if (isPaused)
+            {
                 ResumeGame();
+            }
             else
-                PauseGame();
+            {
+                if (CanOpenPause())
+                    PauseGame();
+            }
         }
+    }
+
+    private bool CanOpenPause()
+    {
+        if (pauseMenuPanel != null && pauseMenuPanel.activeSelf)
+            return false;
+
+        if (mainMenuPanel != null && mainMenuPanel.activeSelf)
+            return false;
+
+        if (notebookPanel != null && notebookPanel.activeSelf)
+            return false;
+
+        if (gameFlowManager != null)
+        {
+            if (gameFlowManager.patientResultPanel != null && gameFlowManager.patientResultPanel.activeSelf)
+                return false;
+
+            if (gameFlowManager.endDayPanel != null && gameFlowManager.endDayPanel.activeSelf)
+                return false;
+
+            if (gameFlowManager.gameOverPanel != null && gameFlowManager.gameOverPanel.activeSelf)
+                return false;
+
+            if (gameFlowManager.dayTransitionPanel != null && gameFlowManager.dayTransitionPanel.activeSelf)
+                return false;
+        }
+
+        return true;
     }
 
     public void PauseGame()

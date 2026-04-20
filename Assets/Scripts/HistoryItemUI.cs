@@ -1,11 +1,10 @@
-using UnityEngine;
-using TMPro;
-using UnityEngine.UI;
 using System.Text;
+using TMPro;
+using UnityEngine;
 using UnityEngine.EventSystems;
+using UnityEngine.UI;
 
 public class HistoryItemUI : MonoBehaviour,
-    IPointerClickHandler,
     IScrollHandler,
     IBeginDragHandler,
     IDragHandler,
@@ -28,17 +27,22 @@ public class HistoryItemUI : MonoBehaviour,
     public float fixedDetailHeight = 270f;
 
     [Header("Dynamic Settings")]
-    public float topBottomPadding = 30f;
+    public float topBottomPadding = 32f;
     public float minDetailHeight = 80f;
-    public float maxDetailHeight = 1200f;
+    public float maxDetailHeight = 5000f;
 
     [Header("Start State")]
     public bool startOpen = false;
 
     private bool isOpen = false;
-    private RectTransform rootRect;
-    private LayoutElement rootLayoutElement;
     private ScrollRect parentScrollRect;
+    private LayoutElement rootLayoutElement;
+    private RectTransform rootRect;
+    private RectTransform detailPanelRect;
+
+    private const float HeaderHeight = 60f;
+    private const float ClosedExtraPadding = 4f;
+    private const float OpenExtraPadding = 8f;
 
     private void Awake()
     {
@@ -48,124 +52,100 @@ public class HistoryItemUI : MonoBehaviour,
         if (rootLayoutElement == null)
             rootLayoutElement = gameObject.AddComponent<LayoutElement>();
 
-        AutoAssignReferences();
-
         if (parentScrollRect == null)
             parentScrollRect = GetComponentInParent<ScrollRect>();
+
+        AutoAssignReferences();
     }
 
-    private void OnEnable()
+    private void AutoAssignReferences()
     {
+        if (headerButton == null)
+        {
+            Transform t = transform.Find("HeaderButton");
+            if (t != null)
+                headerButton = t.GetComponent<Button>();
+        }
+
+        if (headerText == null)
+        {
+            Transform t = transform.Find("HeaderButton/Text (TMP)");
+            if (t != null)
+                headerText = t.GetComponent<TextMeshProUGUI>();
+        }
+
+        if (detailPanel == null)
+        {
+            Transform t = transform.Find("DetailPanel");
+            if (t != null)
+                detailPanel = t.gameObject;
+        }
+
+        if (detailText == null)
+        {
+            Transform t = transform.Find("DetailPanel/DetailText");
+            if (t != null)
+                detailText = t.GetComponent<TextMeshProUGUI>();
+        }
+
+        if (detailPanel != null)
+        {
+            detailPanelRect = detailPanel.GetComponent<RectTransform>();
+
+            if (detailLayoutElement == null)
+                detailLayoutElement = detailPanel.GetComponent<LayoutElement>();
+
+            if (detailLayoutElement == null)
+                detailLayoutElement = detailPanel.AddComponent<LayoutElement>();
+        }
+    }
+
+    public void SetHistoryContentRect(RectTransform contentRect)
+    {
+        historyContentRect = contentRect;
+    }
+
+    public void Setup(SessionHistoryData sessionData)
+    {
+        if (sessionData == null)
+            return;
+
         AutoAssignReferences();
 
-        if (parentScrollRect == null)
-            parentScrollRect = GetComponentInParent<ScrollRect>();
+        if (headerButton != null)
+        {
+            headerButton.gameObject.SetActive(true);
+            headerButton.interactable = true;
+            headerButton.onClick.RemoveAllListeners();
+            headerButton.onClick.AddListener(ToggleDetail);
 
-        ForceHeaderVisible();
-        BindButton();
+            LayoutElement headerLayout = headerButton.GetComponent<LayoutElement>();
+            if (headerLayout == null)
+                headerLayout = headerButton.gameObject.AddComponent<LayoutElement>();
+
+            headerLayout.minHeight = HeaderHeight;
+            headerLayout.preferredHeight = HeaderHeight;
+            headerLayout.flexibleHeight = 0f;
+        }
+
+        if (headerText != null)
+        {
+            headerText.gameObject.SetActive(true);
+            headerText.text = sessionData.completedDateText + " • " + BuildRelativeTimeText(sessionData);
+        }
+
+        if (detailText != null)
+        {
+            detailText.gameObject.SetActive(true);
+            detailText.text = BuildDetailText(sessionData);
+        }
 
         isOpen = startOpen;
 
         if (detailPanel != null)
             detailPanel.SetActive(isOpen);
 
-        RefreshDetailHeight();
-        RefreshRootHeight();
-        RefreshAllLayouts();
-    }
-
-    public void OnPointerClick(PointerEventData eventData)
-    {
-        Debug.Log("[HistoryItemUI] Root click aldı: " + gameObject.name);
-    }
-
-    public void SetHistoryContentRect(RectTransform contentRect)
-    {
-        historyContentRect = contentRect;
-        RefreshAllLayouts();
-    }
-
-    private void BindButton()
-    {
-        if (headerButton != null)
-        {
-            headerButton.onClick.RemoveListener(OnHeaderButtonClicked);
-            headerButton.onClick.AddListener(OnHeaderButtonClicked);
-        }
-        else
-        {
-            Debug.LogError("[HistoryItemUI] HeaderButton NULL: " + gameObject.name);
-        }
-    }
-
-    private void OnHeaderButtonClicked()
-    {
-        ToggleDetail();
-    }
-
-    private void AutoAssignReferences()
-    {
-        if (headerButton == null)
-            headerButton = GetComponentInChildren<Button>(true);
-
-        if (headerText == null && headerButton != null)
-            headerText = headerButton.GetComponentInChildren<TextMeshProUGUI>(true);
-
-        if (detailPanel == null)
-        {
-            Transform[] children = GetComponentsInChildren<Transform>(true);
-            foreach (Transform t in children)
-            {
-                if (t.name == "DetailPanel")
-                {
-                    detailPanel = t.gameObject;
-                    break;
-                }
-            }
-        }
-
-        if (detailText == null && detailPanel != null)
-            detailText = detailPanel.GetComponentInChildren<TextMeshProUGUI>(true);
-
-        if (detailLayoutElement == null && detailPanel != null)
-            detailLayoutElement = detailPanel.GetComponent<LayoutElement>();
-    }
-
-    private void ForceHeaderVisible()
-    {
-        if (headerButton != null)
-        {
-            headerButton.gameObject.SetActive(true);
-
-            RectTransform headerRect = headerButton.GetComponent<RectTransform>();
-            if (headerRect != null && headerRect.sizeDelta.y < 60f)
-                headerRect.sizeDelta = new Vector2(headerRect.sizeDelta.x, 60f);
-
-            LayoutElement headerLayout = headerButton.GetComponent<LayoutElement>();
-            if (headerLayout == null)
-                headerLayout = headerButton.gameObject.AddComponent<LayoutElement>();
-
-            headerLayout.minHeight = 60f;
-            headerLayout.preferredHeight = 60f;
-            headerLayout.flexibleHeight = 0f;
-
-            Image img = headerButton.GetComponent<Image>();
-            if (img != null)
-            {
-                Color c = img.color;
-                if (c.a <= 0.05f)
-                    img.color = new Color(c.r, c.g, c.b, 1f);
-            }
-        }
-
-        if (headerText != null)
-        {
-            headerText.gameObject.SetActive(true);
-
-            Color tc = headerText.color;
-            if (tc.a <= 0.05f)
-                headerText.color = new Color(tc.r, tc.g, tc.b, 1f);
-        }
+        RefreshLayout();
     }
 
     public void ToggleDetail()
@@ -175,37 +155,112 @@ public class HistoryItemUI : MonoBehaviour,
         if (detailPanel != null)
             detailPanel.SetActive(isOpen);
 
-        RefreshDetailHeight();
-        RefreshRootHeight();
-        RefreshAllLayouts();
+        RefreshLayout();
     }
 
-    public void Setup(SessionHistoryData sessionData)
+    private void RefreshLayout()
     {
-        if (sessionData == null)
-            return;
+        float detailHeight = 0f;
 
-        AutoAssignReferences();
-        ForceHeaderVisible();
-        BindButton();
-
-        if (headerText != null)
+        if (isOpen && detailPanel != null && detailText != null && detailLayoutElement != null)
         {
-            string relative = BuildRelativeTimeText(sessionData);
-            headerText.text = sessionData.completedDateText + " • " + relative;
+            if (useDynamicHeight)
+                detailHeight = CalculateRealDetailHeight();
+            else
+                detailHeight = fixedDetailHeight;
+
+            // Layout Element'i runtime'da zorla
+            detailLayoutElement.minHeight = detailHeight;
+            detailLayoutElement.preferredHeight = detailHeight;
+            detailLayoutElement.flexibleHeight = 0f;
+
+            // RectTransform'u da runtime'da zorla
+            if (detailPanelRect != null)
+                detailPanelRect.SetSizeWithCurrentAnchors(RectTransform.Axis.Vertical, detailHeight);
+        }
+        else if (detailLayoutElement != null)
+        {
+            detailLayoutElement.minHeight = 0f;
+            detailLayoutElement.preferredHeight = 0f;
+            detailLayoutElement.flexibleHeight = 0f;
+
+            if (detailPanelRect != null)
+                detailPanelRect.SetSizeWithCurrentAnchors(RectTransform.Axis.Vertical, 0f);
         }
 
-        if (detailText != null)
-            detailText.text = BuildDetailText(sessionData);
+        if (rootLayoutElement != null)
+        {
+            if (isOpen)
+            {
+                float totalHeight = HeaderHeight + detailHeight + OpenExtraPadding;
+                rootLayoutElement.minHeight = totalHeight;
+                rootLayoutElement.preferredHeight = totalHeight;
+            }
+            else
+            {
+                float closedHeight = HeaderHeight + ClosedExtraPadding;
+                rootLayoutElement.minHeight = closedHeight;
+                rootLayoutElement.preferredHeight = closedHeight;
+            }
 
-        isOpen = startOpen;
+            rootLayoutElement.flexibleHeight = 0f;
+        }
 
-        if (detailPanel != null)
-            detailPanel.SetActive(isOpen);
+        Canvas.ForceUpdateCanvases();
 
-        RefreshDetailHeight();
-        RefreshRootHeight();
-        RefreshAllLayouts();
+        if (detailPanelRect != null)
+            LayoutRebuilder.ForceRebuildLayoutImmediate(detailPanelRect);
+
+        if (rootRect != null)
+            LayoutRebuilder.ForceRebuildLayoutImmediate(rootRect);
+
+        RectTransform parentRect = transform.parent as RectTransform;
+        if (parentRect != null)
+            LayoutRebuilder.ForceRebuildLayoutImmediate(parentRect);
+
+        if (historyContentRect != null)
+            LayoutRebuilder.ForceRebuildLayoutImmediate(historyContentRect);
+
+        Canvas.ForceUpdateCanvases();
+    }
+
+    private float CalculateRealDetailHeight()
+    {
+        if (detailPanel == null || detailText == null)
+            return fixedDetailHeight;
+
+        RectTransform detailTextRect = detailText.GetComponent<RectTransform>();
+
+        bool oldActive = detailPanel.activeSelf;
+        detailPanel.SetActive(true);
+
+        Canvas.ForceUpdateCanvases();
+
+        if (detailPanelRect != null)
+            LayoutRebuilder.ForceRebuildLayoutImmediate(detailPanelRect);
+
+        if (detailTextRect != null)
+            LayoutRebuilder.ForceRebuildLayoutImmediate(detailTextRect);
+
+        Canvas.ForceUpdateCanvases();
+        detailText.ForceMeshUpdate();
+
+        float availableWidth = 600f;
+
+        if (detailTextRect != null && detailTextRect.rect.width > 0f)
+            availableWidth = detailTextRect.rect.width;
+        else if (detailPanelRect != null && detailPanelRect.rect.width > 0f)
+            availableWidth = detailPanelRect.rect.width - 30f;
+
+        Vector2 preferred = detailText.GetPreferredValues(detailText.text, availableWidth, 0f);
+        float textHeight = Mathf.Max(detailText.preferredHeight, preferred.y);
+
+        float finalHeight = textHeight + topBottomPadding + 12f;
+
+        if (!oldActive && !isOpen)
+            detailPanel.SetActive(false);
+
+        return Mathf.Clamp(finalHeight, minDetailHeight, maxDetailHeight);
     }
 
     private string BuildRelativeTimeText(SessionHistoryData sessionData)
@@ -259,7 +314,6 @@ public class HistoryItemUI : MonoBehaviour,
                 {
                     sb.Append(" | Yanlış");
                     sb.AppendLine();
-
                     sb.Append("Doğru cevap: ");
                     sb.Append(patient.correctAnswer);
                     sb.AppendLine();
@@ -273,87 +327,6 @@ public class HistoryItemUI : MonoBehaviour,
         sb.AppendLine("Toplam Yanlış: " + sessionData.TotalWrong());
 
         return sb.ToString();
-    }
-
-    public void RefreshDetailHeight()
-    {
-        if (detailLayoutElement == null)
-            return;
-
-        if (!useDynamicHeight)
-        {
-            detailLayoutElement.preferredHeight = isOpen ? fixedDetailHeight : 0f;
-            detailLayoutElement.minHeight = 0f;
-            detailLayoutElement.flexibleHeight = 0f;
-            return;
-        }
-
-        if (!isOpen)
-        {
-            detailLayoutElement.preferredHeight = 0f;
-            detailLayoutElement.minHeight = 0f;
-            detailLayoutElement.flexibleHeight = 0f;
-            return;
-        }
-
-        if (detailText == null || detailPanel == null)
-            return;
-
-        Canvas.ForceUpdateCanvases();
-        detailText.ForceMeshUpdate();
-
-        float textHeight = detailText.preferredHeight;
-        float finalHeight = textHeight + topBottomPadding + 24f;
-        finalHeight = Mathf.Clamp(finalHeight, minDetailHeight, maxDetailHeight);
-
-        detailLayoutElement.preferredHeight = finalHeight;
-        detailLayoutElement.minHeight = 0f;
-        detailLayoutElement.flexibleHeight = 0f;
-    }
-
-    private void RefreshRootHeight()
-    {
-        if (rootLayoutElement == null)
-            return;
-
-        float headerHeight = 60f;
-
-        if (headerButton != null)
-        {
-            RectTransform headerRect = headerButton.GetComponent<RectTransform>();
-            if (headerRect != null && headerRect.rect.height > 0f)
-                headerHeight = Mathf.Max(60f, headerRect.rect.height);
-        }
-
-        float detailHeight = 0f;
-        if (isOpen && detailLayoutElement != null)
-            detailHeight = detailLayoutElement.preferredHeight;
-
-        float totalHeight = headerHeight + detailHeight + 16f;
-
-        rootLayoutElement.preferredHeight = totalHeight;
-        rootLayoutElement.minHeight = headerHeight + 16f;
-        rootLayoutElement.flexibleHeight = 0f;
-    }
-
-    private void RefreshAllLayouts()
-    {
-        Canvas.ForceUpdateCanvases();
-
-        if (rootRect != null)
-            LayoutRebuilder.ForceRebuildLayoutImmediate(rootRect);
-
-        RectTransform parentRect = transform.parent as RectTransform;
-        if (parentRect != null)
-            LayoutRebuilder.ForceRebuildLayoutImmediate(parentRect);
-
-        if (historyContentRect != null)
-            LayoutRebuilder.ForceRebuildLayoutImmediate(historyContentRect);
-
-        if (parentRect != null && parentRect.parent is RectTransform grandParentRect)
-            LayoutRebuilder.ForceRebuildLayoutImmediate(grandParentRect);
-
-        Canvas.ForceUpdateCanvases();
     }
 
     public void OnScroll(PointerEventData eventData)

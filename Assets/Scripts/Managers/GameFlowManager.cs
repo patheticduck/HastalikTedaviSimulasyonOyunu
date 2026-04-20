@@ -82,11 +82,14 @@ public class GameFlowManager : MonoBehaviour
     private bool gameEnded = false;
     private bool waitingForDayContinue = false;
     private bool waitingForPatientResultContinue = false;
-
     private bool pendingLoseGameOver = false;
 
-    // YENİ: Bu hasta için teşhis verildi mi?
+    // Pause / Continue için:
     private bool diagnosisSubmittedForCurrentPatient = false;
+
+    // Bu hasta için teşhis süreci çözüldü mü?
+    // Hasta gerçekten "tamamlandı" sayılması için yine çıkış beklenir.
+    private bool currentPatientDiagnosisResolved = false;
 
     private int dayCorrect = 0;
     private int dayWrong = 0;
@@ -115,10 +118,6 @@ public class GameFlowManager : MonoBehaviour
         UpdateHeartsUI();
     }
 
-    // -------------------------------------------------
-    // OYUN BAŞLATMA / RESET
-    // -------------------------------------------------
-
     public void ResetGame()
     {
         currentDay = 1;
@@ -140,6 +139,7 @@ public class GameFlowManager : MonoBehaviour
 
         pendingLoseGameOver = false;
         diagnosisSubmittedForCurrentPatient = false;
+        currentPatientDiagnosisResolved = false;
         gameEnded = false;
 
         patientAnalysisHistory.Clear();
@@ -173,6 +173,7 @@ public class GameFlowManager : MonoBehaviour
         if (gameEnded) return;
 
         diagnosisSubmittedForCurrentPatient = false;
+        currentPatientDiagnosisResolved = false;
 
         Debug.Log("Oyun akışı başlatıldı. Hasta No: " + currentPatientNumber);
 
@@ -194,10 +195,6 @@ public class GameFlowManager : MonoBehaviour
             Debug.LogWarning("PatientMovement bağlı değil!");
     }
 
-    // -------------------------------------------------
-    // SAVE / LOAD
-    // -------------------------------------------------
-
     public RuntimeSaveData BuildRuntimeSaveData()
     {
         RuntimeSaveData save = new RuntimeSaveData();
@@ -211,7 +208,6 @@ public class GameFlowManager : MonoBehaviour
         save.dayWrong = dayWrong;
         save.diagnosisSubmittedForCurrentPatient = diagnosisSubmittedForCurrentPatient;
         save.hasSave = true;
-
         save.patientAnalysisHistory = ClonePatientAnalysisHistory();
 
         return save;
@@ -230,6 +226,11 @@ public class GameFlowManager : MonoBehaviour
         dayCorrect = save.dayCorrect;
         dayWrong = save.dayWrong;
         diagnosisSubmittedForCurrentPatient = save.diagnosisSubmittedForCurrentPatient;
+
+        // Save'den dönüldüğünde bu hasta teşhis verilmiş haldeyse,
+        // gameplay devamında "çözülmüş ama fiziksel çıkış sonrası tamamlanacak"
+        // hasta gibi kabul edeceğiz.
+        currentPatientDiagnosisResolved = save.diagnosisSubmittedForCurrentPatient;
 
         waitingForDayContinue = false;
         waitingForPatientResultContinue = false;
@@ -279,32 +280,39 @@ public class GameFlowManager : MonoBehaviour
 
     public void ContinueAfterLoadedSave()
     {
-        // Eğer save alınırken teşhis zaten verildiyse, bu hasta tamamlanmış kabul edilir.
-
         if (remainingHearts <= 0)
         {
             ShowGameOverPanel(false);
             return;
         }
 
-        if (currentPatientNumber >= totalPatientsInRun)
+        // Save alınırken teşhis verilmişse bu hasta pratikte bitmiş kabul edilir.
+        // Eski akışa benzer şekilde bir sonraki hasta / gün akışına geç.
+        if (diagnosisSubmittedForCurrentPatient)
         {
-            ShowGameOverPanel(true);
+            if (currentPatientNumber >= totalPatientsInRun)
+            {
+                ShowGameOverPanel(true);
+                return;
+            }
+
+            bool isEndOfDay = (currentPatientNumber % patientsPerDay == 0);
+
+            if (isEndOfDay)
+            {
+                waitingForDayContinue = true;
+                ShowEndOfDayPanel();
+            }
+            else
+            {
+                currentPatientNumber++;
+                StartCoroutine(StartNextPatientAfterDelay(0.2f));
+            }
+
             return;
         }
 
-        bool isEndOfDay = (currentPatientNumber % patientsPerDay == 0);
-
-        if (isEndOfDay)
-        {
-            waitingForDayContinue = true;
-            ShowEndOfDayPanel();
-        }
-        else
-        {
-            currentPatientNumber++;
-            StartCoroutine(StartNextPatientAfterDelay(0.2f));
-        }
+        StartGameplayFlow();
     }
 
     private List<PatientAnalysisEntry> ClonePatientAnalysisHistory()
@@ -329,10 +337,6 @@ public class GameFlowManager : MonoBehaviour
 
         return clone;
     }
-
-    // -------------------------------------------------
-    // DOĞRU / YANLIŞ
-    // -------------------------------------------------
 
     public void AddCorrectAnswer()
     {
@@ -362,10 +366,6 @@ public class GameFlowManager : MonoBehaviour
         if (remainingHearts <= 0)
             pendingLoseGameOver = true;
     }
-
-    // -------------------------------------------------
-    // GÜN / GEÇİŞ
-    // -------------------------------------------------
 
     public void ShowDayTransitionPanel(string message)
     {
@@ -425,10 +425,6 @@ public class GameFlowManager : MonoBehaviour
         if (interactionModeManager != null)
             interactionModeManager.ExitUIMode();
     }
-
-    // -------------------------------------------------
-    // GAME OVER / FINAL PANEL
-    // -------------------------------------------------
 
     private void ShowGameOverPanel(bool isVictory)
     {
@@ -537,10 +533,6 @@ public class GameFlowManager : MonoBehaviour
         return sb.ToString();
     }
 
-    // -------------------------------------------------
-    // HISTORY DATA ÜRETİMİ
-    // -------------------------------------------------
-
     public SessionHistoryData BuildSessionHistoryData()
     {
         SessionHistoryData session = new SessionHistoryData();
@@ -585,10 +577,6 @@ public class GameFlowManager : MonoBehaviour
         return session;
     }
 
-    // -------------------------------------------------
-    // BUTONLAR
-    // -------------------------------------------------
-
     public void OnContinueButtonPressed()
     {
         if (gameEnded)
@@ -614,6 +602,8 @@ public class GameFlowManager : MonoBehaviour
 
         waitingForPatientResultContinue = false;
         diagnosisSubmittedForCurrentPatient = false;
+        currentPatientDiagnosisResolved = false;
+
         HidePatientResultPanel();
 
         if (currentPatientNumber >= totalPatientsInRun)
@@ -700,10 +690,6 @@ public class GameFlowManager : MonoBehaviour
             StartGameplayFlow();
     }
 
-    // -------------------------------------------------
-    // HASTA SONUÇ PANELİ
-    // -------------------------------------------------
-
     private void ShowPatientResultPanel()
     {
         if (interactionModeManager != null)
@@ -762,10 +748,6 @@ public class GameFlowManager : MonoBehaviour
             interactionModeManager.ExitUIMode();
     }
 
-    // -------------------------------------------------
-    // MENÜYE DÖNÜŞ
-    // -------------------------------------------------
-
     public void ReturnToMainMenuFromEndPanel()
     {
         if (interactionModeManager != null)
@@ -780,10 +762,6 @@ public class GameFlowManager : MonoBehaviour
         if (mainMenuManager != null)
             mainMenuManager.ReturnToMenu(totalCorrect, totalWrong);
     }
-
-    // -------------------------------------------------
-    // HEART UI
-    // -------------------------------------------------
 
     private void UpdateHeartsUI()
     {
@@ -801,10 +779,6 @@ public class GameFlowManager : MonoBehaviour
     {
         UpdateHeartsUI();
     }
-
-    // -------------------------------------------------
-    // HASTA AKIŞI
-    // -------------------------------------------------
 
     public void OnPatientArrived()
     {
@@ -837,6 +811,12 @@ public class GameFlowManager : MonoBehaviour
         else if (dialoguePanel != null)
             dialoguePanel.SetActive(false);
 
+        if (!currentPatientDiagnosisResolved)
+        {
+            Debug.LogWarning("Hasta çıktı ama teşhis çözülmüş görünmüyor. Akış durduruldu.");
+            return;
+        }
+
         if (pendingLoseGameOver)
         {
             pendingLoseGameOver = false;
@@ -861,10 +841,6 @@ public class GameFlowManager : MonoBehaviour
         StartGameplayFlow();
     }
 
-    // -------------------------------------------------
-    // TEŞHİS KAYDI
-    // -------------------------------------------------
-
     private void RegisterPatientAnalysis(bool isCorrect, string correctDiagnosisName, string playerDiagnosisName)
     {
         int patientNumberInDay = ((currentPatientNumber - 1) % patientsPerDay) + 1;
@@ -882,10 +858,6 @@ public class GameFlowManager : MonoBehaviour
         patientAnalysisHistory.Add(entry);
     }
 
-    // -------------------------------------------------
-    // TEŞHİS GÖNDERİMİ
-    // -------------------------------------------------
-
     public void SubmitDiagnosis(bool isCorrect)
     {
         lastDiagnosisWasCorrect = isCorrect;
@@ -900,6 +872,7 @@ public class GameFlowManager : MonoBehaviour
             AddWrongAnswer();
 
         diagnosisSubmittedForCurrentPatient = true;
+        currentPatientDiagnosisResolved = true;
 
         FinishDiagnosisFlow(null);
     }
@@ -955,6 +928,7 @@ public class GameFlowManager : MonoBehaviour
         }
 
         diagnosisSubmittedForCurrentPatient = true;
+        currentPatientDiagnosisResolved = true;
 
         FinishDiagnosisFlow(diagnosisResultText);
     }

@@ -33,6 +33,14 @@ public class MainMenuManager : MonoBehaviour
     public Transform menuCameraPoint;
     public Transform gameplayCameraPoint;
 
+    private ScrollRect historyScrollRect;
+
+    private void Awake()
+    {
+        if (historyContent != null)
+            historyScrollRect = historyContent.GetComponentInParent<ScrollRect>();
+    }
+
     private void Start()
     {
         ShowMainMenu();
@@ -219,7 +227,6 @@ public class MainMenuManager : MonoBehaviour
             return;
         }
 
-        // Sadece HistoryItemUI olan child'ları temizle
         for (int i = historyContent.childCount - 1; i >= 0; i--)
         {
             Transform child = historyContent.GetChild(i);
@@ -229,33 +236,25 @@ public class MainMenuManager : MonoBehaviour
 
         Canvas.ForceUpdateCanvases();
 
-        // En yeni üstte gözüksün diye sondan başa doğru basıyoruz
         for (int i = runHistoryManager.SessionHistoryList.Count - 1; i >= 0; i--)
         {
             SessionHistoryData session = runHistoryManager.SessionHistoryList[i];
             if (session == null)
                 continue;
 
-            HistoryItemUI item = Instantiate(historyItemPrefab, historyContent);
-
+            // En temiz instantiate: layout sistemi yönetsin
+            HistoryItemUI item = Instantiate(historyItemPrefab, historyContent, false);
             item.gameObject.SetActive(true);
-            item.transform.localScale = Vector3.one;
-            item.transform.localRotation = Quaternion.identity;
-            item.transform.localPosition = Vector3.zero;
+
+            item.SetHistoryContentRect(historyContent as RectTransform);
+            item.Setup(session);
 
             RectTransform itemRect = item.GetComponent<RectTransform>();
             if (itemRect != null)
             {
-                itemRect.anchorMin = new Vector2(0f, 1f);
-                itemRect.anchorMax = new Vector2(1f, 1f);
-                itemRect.pivot = new Vector2(0.5f, 1f);
-                itemRect.anchoredPosition = Vector2.zero;
-                itemRect.offsetMin = new Vector2(itemRect.offsetMin.x, itemRect.offsetMin.y);
-                itemRect.offsetMax = new Vector2(itemRect.offsetMax.x, itemRect.offsetMax.y);
+                itemRect.localScale = Vector3.one;
+                itemRect.localRotation = Quaternion.identity;
             }
-
-            item.SetHistoryContentRect(historyContent as RectTransform);
-            item.Setup(session);
 
             Debug.Log("History item oluşturuldu: " + session.completedDateText);
         }
@@ -266,12 +265,17 @@ public class MainMenuManager : MonoBehaviour
     private IEnumerator ForceHistoryLayoutRefreshNextFrame()
     {
         yield return null;
+        yield return new WaitForEndOfFrame();
 
         Canvas.ForceUpdateCanvases();
 
         RectTransform contentRect = historyContent as RectTransform;
         if (contentRect != null)
+        {
+            // Content pozisyonunu sıfırla
+            contentRect.anchoredPosition = Vector2.zero;
             LayoutRebuilder.ForceRebuildLayoutImmediate(contentRect);
+        }
 
         if (historyContent != null && historyContent.parent is RectTransform viewportRect)
             LayoutRebuilder.ForceRebuildLayoutImmediate(viewportRect);
@@ -288,6 +292,17 @@ public class MainMenuManager : MonoBehaviour
             RectTransform mainMenuRect = mainMenuPanel.GetComponent<RectTransform>();
             if (mainMenuRect != null)
                 LayoutRebuilder.ForceRebuildLayoutImmediate(mainMenuRect);
+        }
+
+        // ScrollView'ı en üste zorla
+        if (historyScrollRect == null && historyContent != null)
+            historyScrollRect = historyContent.GetComponentInParent<ScrollRect>();
+
+        if (historyScrollRect != null)
+        {
+            historyScrollRect.StopMovement();
+            historyScrollRect.horizontalNormalizedPosition = 0f;
+            historyScrollRect.verticalNormalizedPosition = 1f;
         }
 
         Canvas.ForceUpdateCanvases();
