@@ -20,6 +20,7 @@ public class PauseMenuController : MonoBehaviour
 
     private bool isPaused = false;
     private bool wasDialogueModeActiveBeforePause = false;
+    private bool wasForcedUIModeBeforePause = false;
 
     private void Start()
     {
@@ -34,6 +35,12 @@ public class PauseMenuController : MonoBehaviour
 
         Time.timeScale = 1f;
         isPaused = false;
+
+        if (gameFlowManager == null)
+            gameFlowManager = FindFirstObjectByType<GameFlowManager>();
+
+        if (interactionModeManager == null)
+            interactionModeManager = FindFirstObjectByType<PlayerInteractionModeManager>();
     }
 
     private void Update()
@@ -100,6 +107,10 @@ public class PauseMenuController : MonoBehaviour
             interactionModeManager != null &&
             interactionModeManager.IsDialogueModeActive();
 
+        wasForcedUIModeBeforePause =
+            interactionModeManager != null &&
+            interactionModeManager.IsInForcedUIMode();
+
         if (pauseMenuPanel != null)
             pauseMenuPanel.SetActive(true);
 
@@ -111,6 +122,10 @@ public class PauseMenuController : MonoBehaviour
 
         Cursor.lockState = CursorLockMode.None;
         Cursor.visible = true;
+
+        // Pause açıkken notebook da açılmasın
+        if (gameFlowManager != null)
+            gameFlowManager.SetNotebookBlocked(true);
 
         Time.timeScale = 0f;
         isPaused = true;
@@ -124,7 +139,7 @@ public class PauseMenuController : MonoBehaviour
         Time.timeScale = 1f;
         isPaused = false;
 
-        if (wasDialogueModeActiveBeforePause)
+        if (wasDialogueModeActiveBeforePause || wasForcedUIModeBeforePause)
         {
             if (mouseLook != null)
                 mouseLook.SetLookEnabled(false);
@@ -134,6 +149,10 @@ public class PauseMenuController : MonoBehaviour
 
             Cursor.lockState = CursorLockMode.None;
             Cursor.visible = true;
+
+            // Dialogue veya başka bir UI state varsa notebook kapalı kalmalı
+            if (gameFlowManager != null)
+                gameFlowManager.SetNotebookBlocked(true);
         }
         else
         {
@@ -145,6 +164,11 @@ public class PauseMenuController : MonoBehaviour
 
             Cursor.lockState = CursorLockMode.Locked;
             Cursor.visible = false;
+
+            // Free-look'a dönüldü, notebook gerçekten açılabilir mi
+            // buna GameFlowManager karar versin
+            if (gameFlowManager != null)
+                gameFlowManager.NotifyFreeLookStateEntered();
         }
     }
 
@@ -183,6 +207,9 @@ public class PauseMenuController : MonoBehaviour
         Cursor.lockState = CursorLockMode.None;
         Cursor.visible = true;
 
+        if (gameFlowManager != null)
+            gameFlowManager.SetNotebookBlocked(true);
+
         if (interactionModeManager != null)
             interactionModeManager.ExitUIMode();
 
@@ -209,5 +236,10 @@ public class PauseMenuController : MonoBehaviour
             "Doğru: " + gameFlowManager.totalCorrect + "\n" +
             "Yanlış: " + gameFlowManager.totalWrong + "\n" +
             "Kalan Hak: " + gameFlowManager.remainingHearts;
+    }
+
+    public bool IsPaused()
+    {
+        return isPaused;
     }
 }

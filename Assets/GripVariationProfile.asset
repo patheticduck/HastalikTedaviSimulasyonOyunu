@@ -17,6 +17,10 @@ MonoBehaviour:
     minValue: 38
     maxValue: 39.5
     decimalPlaces: 1
+  - key: fever_cold
+    minValue: 36.5
+    maxValue: 37.3
+    decimalPlaces: 1
   stringVariables:
   - key: symptom_start
     options:

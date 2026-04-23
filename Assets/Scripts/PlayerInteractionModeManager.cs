@@ -7,6 +7,7 @@ public class PlayerInteractionModeManager : MonoBehaviour
     public MouseLookLimited mouseLook;
     public DialogueManager dialogueManager;
     public GameObject dialoguePanel;
+    public GameFlowManager gameFlowManager;
 
     [Header("Optional Focus")]
     public Transform doctorLookRoot;
@@ -20,6 +21,12 @@ public class PlayerInteractionModeManager : MonoBehaviour
     private bool dialogueAvailable = false;
     private bool forceUIMode = false;
 
+    private void Start()
+    {
+        if (gameFlowManager == null)
+            gameFlowManager = FindFirstObjectByType<GameFlowManager>();
+    }
+
     private void Update()
     {
         if (Keyboard.current == null)
@@ -31,6 +38,11 @@ public class PlayerInteractionModeManager : MonoBehaviour
         if (Keyboard.current[toggleDialogueKey].wasPressedThisFrame)
         {
             if (!dialogueAvailable)
+                return;
+
+            // Tanı seçildikten sonra son konuşma akarken
+            // oyuncu dialog panelini manuel kapatamasın.
+            if (gameFlowManager != null && gameFlowManager.IsDiagnosisFlowInProgress())
                 return;
 
             ToggleDialogueMode();
@@ -51,6 +63,9 @@ public class PlayerInteractionModeManager : MonoBehaviour
 
         if (!dialogueModeActive && mouseLook != null)
             mouseLook.SetLookEnabled(true);
+
+        if (!dialogueModeActive && gameFlowManager != null)
+            gameFlowManager.NotifyFreeLookStateEntered();
     }
 
     public void SetDialogueAvailable(bool available)
@@ -66,6 +81,10 @@ public class PlayerInteractionModeManager : MonoBehaviour
 
             if (!forceUIMode && mouseLook != null)
                 mouseLook.SetLookEnabled(true);
+
+            // Dialogue tamamen kapandıysa, güvenli free-look durumunu yeniden değerlendir
+            if (!forceUIMode && gameFlowManager != null)
+                gameFlowManager.NotifyFreeLookStateEntered();
         }
     }
 
@@ -87,6 +106,10 @@ public class PlayerInteractionModeManager : MonoBehaviour
             doctorLookRoot.position = dialogueFocusPoint.position;
             doctorLookRoot.rotation = dialogueFocusPoint.rotation;
         }
+
+        // Dialogue açıkken notebook hiçbir şekilde açılmamalı
+        if (gameFlowManager != null)
+            gameFlowManager.SetNotebookBlocked(true);
     }
 
     public void CloseDialogueMode()
@@ -98,6 +121,11 @@ public class PlayerInteractionModeManager : MonoBehaviour
 
         if (!forceUIMode && mouseLook != null)
             mouseLook.SetLookEnabled(true);
+
+        // Dialogue kapanınca direkt aç demiyoruz,
+        // GameFlowManager güvenli mi diye kendi karar versin
+        if (!forceUIMode && gameFlowManager != null)
+            gameFlowManager.NotifyFreeLookStateEntered();
     }
 
     public void ToggleDialogueMode()
@@ -116,5 +144,10 @@ public class PlayerInteractionModeManager : MonoBehaviour
     public bool IsDialogueAvailable()
     {
         return dialogueAvailable;
+    }
+
+    public bool IsInForcedUIMode()
+    {
+        return forceUIMode;
     }
 }

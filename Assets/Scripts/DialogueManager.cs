@@ -73,6 +73,8 @@ public class DialogueManager : MonoBehaviour
     private bool isTyping = false;
     private bool skipRequested = false;
 
+    private PlayerInteractionModeManager interactionModeManager;
+
     private void Awake()
     {
         if (dialoguePanel != null)
@@ -83,6 +85,9 @@ public class DialogueManager : MonoBehaviour
     {
         if (notebookUIManager == null)
             notebookUIManager = FindFirstObjectByType<NotebookUIManager>();
+
+        if (interactionModeManager == null)
+            interactionModeManager = FindFirstObjectByType<PlayerInteractionModeManager>();
     }
 
     private void Update()
@@ -446,6 +451,15 @@ public class DialogueManager : MonoBehaviour
 
         RemoveCurrentOptions();
 
+        // Tanıya tıklanır tıklanmaz:
+        // - notebook açılmasın
+        // - Tab ile panel kapatılamasın
+        if (gameFlowManager != null)
+            gameFlowManager.SetNotebookBlocked(true);
+
+        if (interactionModeManager != null)
+            interactionModeManager.EnterUIMode();
+
         currentTurnFocusLine = CreateDialogueLineObject();
         yield return StartCoroutine(
             TypeDialogueIntoLine(
@@ -458,6 +472,21 @@ public class DialogueManager : MonoBehaviour
 
         DebugTopDiseaseScores();
 
+        Canvas.ForceUpdateCanvases();
+        yield return StartCoroutine(ScrollToConversationFocus(true));
+
+        // Son cümle gösterildikten sonra panel otomatik kapansın
+        // ve hasta çıkış/result akışı normal başlasın.
+        if (interactionModeManager != null)
+        {
+            interactionModeManager.SetDialogueAvailable(false);
+            interactionModeManager.ExitUIMode();
+        }
+        else if (dialoguePanel != null)
+        {
+            dialoguePanel.SetActive(false);
+        }
+
         if (gameFlowManager != null)
         {
             gameFlowManager.SubmitDiagnosis(diagnosis.diseaseId);
@@ -468,9 +497,6 @@ public class DialogueManager : MonoBehaviour
             GameObject systemLine = CreateDialogueLineObject();
             yield return StartCoroutine(TypeDialogueIntoLine(systemLine, "SİSTEM", "GameFlowManager bağlı değil.", false));
         }
-
-        Canvas.ForceUpdateCanvases();
-        yield return StartCoroutine(ScrollToConversationFocus(true));
 
         isBusy = false;
     }

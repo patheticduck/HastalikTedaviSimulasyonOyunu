@@ -8,6 +8,7 @@ public class NotebookInteractable : MonoBehaviour
     public Camera playerCamera;
     public PlayerInteractionModeManager interactionManager;
     public NotebookUIManager notebookUIManager;
+    public GameFlowManager gameFlowManager;
 
     [Header("Interaction")]
     public GameObject highlightObject;
@@ -38,6 +39,9 @@ public class NotebookInteractable : MonoBehaviour
 
         if (notebookUIManager == null)
             notebookUIManager = FindFirstObjectByType<NotebookUIManager>();
+
+        if (gameFlowManager == null)
+            gameFlowManager = FindFirstObjectByType<GameFlowManager>();
 
         originalPosition = transform.position;
         originalRotation = transform.rotation;
@@ -91,13 +95,33 @@ public class NotebookInteractable : MonoBehaviour
         if (hitNotebook != isLookingAt)
         {
             isLookingAt = hitNotebook;
-
-            if (highlightObject != null)
-                highlightObject.SetActive(isLookingAt && !isOpen);
-
-            if (interactText != null)
-                interactText.SetActive(isLookingAt && !isOpen);
+            RefreshInteractionVisuals();
         }
+    }
+
+    private void RefreshInteractionVisuals()
+    {
+        bool canShowPrompt = isLookingAt && !isOpen && !isAnimating && CanShowInteractionPrompt();
+
+        if (highlightObject != null)
+            highlightObject.SetActive(canShowPrompt);
+
+        if (interactText != null)
+            interactText.SetActive(canShowPrompt);
+    }
+
+    private bool CanShowInteractionPrompt()
+    {
+        if (interactionManager == null)
+            return false;
+
+        if (interactionManager.IsDialogueModeActive())
+            return false;
+
+        if (gameFlowManager != null && !gameFlowManager.CanOpenNotebook())
+            return false;
+
+        return true;
     }
 
     private void TryToggleNotebook()
@@ -117,25 +141,41 @@ public class NotebookInteractable : MonoBehaviour
             return;
         }
 
-        if (interactionManager.IsDialogueModeActive())
+        if (isOpen)
+        {
+            StartCoroutine(CloseNotebook());
+            return;
+        }
+
+        if (!CanOpenNotebookNow())
             return;
 
-        if (isOpen)
-            StartCoroutine(CloseNotebook());
-        else
-            StartCoroutine(OpenNotebook());
+        StartCoroutine(OpenNotebook());
+    }
+
+    private bool CanOpenNotebookNow()
+    {
+        if (interactionManager == null)
+            return false;
+
+        if (interactionManager.IsDialogueModeActive())
+            return false;
+
+        if (gameFlowManager != null && !gameFlowManager.CanOpenNotebook())
+            return false;
+
+        return true;
     }
 
     private IEnumerator OpenNotebook()
     {
+        if (!CanOpenNotebookNow())
+            yield break;
+
         isAnimating = true;
         isOpen = true;
 
-        if (highlightObject != null)
-            highlightObject.SetActive(false);
-
-        if (interactText != null)
-            interactText.SetActive(false);
+        RefreshInteractionVisuals();
 
         interactionManager.EnterUIMode();
 
@@ -152,6 +192,9 @@ public class NotebookInteractable : MonoBehaviour
 
         while (t < 1f)
         {
+            if (playerCamera == null)
+                break;
+
             t += Time.deltaTime * moveSpeed;
             transform.position = Vector3.Lerp(originalPosition, targetPos, t);
             transform.rotation = Quaternion.Slerp(originalRotation, targetRot, t);
@@ -165,6 +208,7 @@ public class NotebookInteractable : MonoBehaviour
             notebookUIManager.OpenNotebookUI();
 
         isAnimating = false;
+        RefreshInteractionVisuals();
     }
 
     private IEnumerator CloseNotebook()
@@ -192,12 +236,36 @@ public class NotebookInteractable : MonoBehaviour
 
         interactionManager.ExitUIMode();
 
-        if (highlightObject != null)
-            highlightObject.SetActive(isLookingAt);
-
-        if (interactText != null)
-            interactText.SetActive(isLookingAt);
+        if (gameFlowManager != null)
+            gameFlowManager.NotifyFreeLookStateEntered();
 
         isAnimating = false;
+        RefreshInteractionVisuals();
+    }
+
+    public bool IsNotebookOpen()
+    {
+        return isOpen;
+    }
+
+    public bool IsNotebookAnimating()
+    {
+        return isAnimating;
+    }
+
+    public void ForceCloseNotebookImmediate()
+    {
+        StopAllCoroutines();
+
+        isOpen = false;
+        isAnimating = false;
+
+        transform.position = originalPosition;
+        transform.rotation = originalRotation;
+
+        if (notebookUIManager != null)
+            notebookUIManager.CloseNotebookUI();
+
+        RefreshInteractionVisuals();
     }
 }

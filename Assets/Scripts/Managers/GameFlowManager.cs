@@ -28,6 +28,10 @@ public class GameFlowManager : MonoBehaviour
     [Header("Patient")]
     public PatientMovement patientMovement;
 
+    [Header("Patient Cases")]
+    public PatientCaseData gripCase;
+    public PatientCaseData coldCase;
+
     [Header("Panels")]
     public GameObject dialoguePanel;
     public GameObject endDayPanel;
@@ -66,6 +70,9 @@ public class GameFlowManager : MonoBehaviour
     [Header("Heart UI")]
     public GameObject[] hearts;
 
+    [Header("Notebook Access")]
+    [SerializeField] private bool blockNotebookInteraction = true;
+
     [Header("Game Data")]
     public int currentDay = 1;
     public int maxHearts = 5;
@@ -83,6 +90,12 @@ public class GameFlowManager : MonoBehaviour
     private bool waitingForDayContinue = false;
     private bool waitingForPatientResultContinue = false;
     private bool pendingLoseGameOver = false;
+
+    // Hasta şu anda sahne içi geçişte mi? (geliyor / gidiyor)
+    private bool patientTransitionInProgress = false;
+
+    // Tanı seçildi, son diyalog akıyor ve oyuncu artık paneli elle kapatamasın.
+    private bool diagnosisFlowInProgress = false;
 
     // Pause / Continue için:
     private bool diagnosisSubmittedForCurrentPatient = false;
@@ -115,6 +128,9 @@ public class GameFlowManager : MonoBehaviour
         if (interactionModeManager != null)
             interactionModeManager.SetDialogueAvailable(false);
 
+        SetNotebookBlocked(true);
+        patientTransitionInProgress = false;
+        diagnosisFlowInProgress = false;
         UpdateHeartsUI();
     }
 
@@ -140,6 +156,8 @@ public class GameFlowManager : MonoBehaviour
         pendingLoseGameOver = false;
         diagnosisSubmittedForCurrentPatient = false;
         currentPatientDiagnosisResolved = false;
+        patientTransitionInProgress = false;
+        diagnosisFlowInProgress = false;
         gameEnded = false;
 
         patientAnalysisHistory.Clear();
@@ -155,6 +173,7 @@ public class GameFlowManager : MonoBehaviour
             dayTransitionCanvasGroup.alpha = 0f;
 
         UpdateHeartsUI();
+        SetNotebookBlocked(true);
 
         if (patientMovement != null)
             patientMovement.HidePatient();
@@ -174,6 +193,8 @@ public class GameFlowManager : MonoBehaviour
 
         diagnosisSubmittedForCurrentPatient = false;
         currentPatientDiagnosisResolved = false;
+        patientTransitionInProgress = true;
+        diagnosisFlowInProgress = false;
 
         Debug.Log("Oyun akışı başlatıldı. Hasta No: " + currentPatientNumber);
 
@@ -189,10 +210,46 @@ public class GameFlowManager : MonoBehaviour
             interactionModeManager.ExitUIMode();
         }
 
+        // Hasta yürürken notebook açılamamalı
+        SetNotebookBlocked(true);
+
+        AssignCurrentPatientCase();
+
         if (patientMovement != null)
             patientMovement.BeginWalk();
         else
             Debug.LogWarning("PatientMovement bağlı değil!");
+    }
+
+    private void AssignCurrentPatientCase()
+    {
+        DialogueManager dialogueManager = FindFirstObjectByType<DialogueManager>();
+
+        if (dialogueManager == null)
+        {
+            Debug.LogError("DialogueManager bulunamadı, vaka atanamadı.");
+            return;
+        }
+
+        // Şimdilik:
+        // 1. hasta = Grip
+        // 2. hasta = Cold
+        // diğer tüm hastalar = Grip
+        if (currentPatientNumber == 2 && coldCase != null)
+        {
+            dialogueManager.currentCase = coldCase;
+            Debug.Log("Atanan vaka: COLD");
+            return;
+        }
+
+        if (gripCase != null)
+        {
+            dialogueManager.currentCase = gripCase;
+            Debug.Log("Atanan vaka: GRIP");
+            return;
+        }
+
+        Debug.LogWarning("Grip case atanmadığı için currentCase değiştirilemedi.");
     }
 
     public RuntimeSaveData BuildRuntimeSaveData()
@@ -227,10 +284,9 @@ public class GameFlowManager : MonoBehaviour
         dayWrong = save.dayWrong;
         diagnosisSubmittedForCurrentPatient = save.diagnosisSubmittedForCurrentPatient;
 
-        // Save'den dönüldüğünde bu hasta teşhis verilmiş haldeyse,
-        // gameplay devamında "çözülmüş ama fiziksel çıkış sonrası tamamlanacak"
-        // hasta gibi kabul edeceğiz.
         currentPatientDiagnosisResolved = save.diagnosisSubmittedForCurrentPatient;
+        patientTransitionInProgress = false;
+        diagnosisFlowInProgress = false;
 
         waitingForDayContinue = false;
         waitingForPatientResultContinue = false;
@@ -276,6 +332,8 @@ public class GameFlowManager : MonoBehaviour
             interactionModeManager.SetDialogueAvailable(false);
             interactionModeManager.ExitUIMode();
         }
+
+        SetNotebookBlocked(true);
     }
 
     public void ContinueAfterLoadedSave()
@@ -286,10 +344,12 @@ public class GameFlowManager : MonoBehaviour
             return;
         }
 
-        // Save alınırken teşhis verilmişse bu hasta pratikte bitmiş kabul edilir.
-        // Eski akışa benzer şekilde bir sonraki hasta / gün akışına geç.
         if (diagnosisSubmittedForCurrentPatient)
         {
+            SetNotebookBlocked(true);
+            patientTransitionInProgress = false;
+            diagnosisFlowInProgress = false;
+
             if (currentPatientNumber >= totalPatientsInRun)
             {
                 ShowGameOverPanel(true);
@@ -369,6 +429,8 @@ public class GameFlowManager : MonoBehaviour
 
     public void ShowDayTransitionPanel(string message)
     {
+        SetNotebookBlocked(true);
+
         if (dayTransitionPanel != null)
             dayTransitionPanel.SetActive(true);
 
@@ -380,10 +442,16 @@ public class GameFlowManager : MonoBehaviour
     {
         if (dayTransitionPanel != null)
             dayTransitionPanel.SetActive(false);
+
+        SetNotebookBlocked(true);
     }
 
     private void ShowEndOfDayPanel()
     {
+        SetNotebookBlocked(true);
+        patientTransitionInProgress = false;
+        diagnosisFlowInProgress = false;
+
         if (interactionModeManager != null)
             interactionModeManager.EnterUIMode();
 
@@ -424,11 +492,16 @@ public class GameFlowManager : MonoBehaviour
 
         if (interactionModeManager != null)
             interactionModeManager.ExitUIMode();
+
+        SetNotebookBlocked(true);
     }
 
     private void ShowGameOverPanel(bool isVictory)
     {
         gameEnded = true;
+        patientTransitionInProgress = false;
+        diagnosisFlowInProgress = false;
+        SetNotebookBlocked(true);
 
         if (interactionModeManager != null)
         {
@@ -603,6 +676,7 @@ public class GameFlowManager : MonoBehaviour
         waitingForPatientResultContinue = false;
         diagnosisSubmittedForCurrentPatient = false;
         currentPatientDiagnosisResolved = false;
+        diagnosisFlowInProgress = false;
 
         HidePatientResultPanel();
 
@@ -692,6 +766,10 @@ public class GameFlowManager : MonoBehaviour
 
     private void ShowPatientResultPanel()
     {
+        SetNotebookBlocked(true);
+        patientTransitionInProgress = false;
+        diagnosisFlowInProgress = false;
+
         if (interactionModeManager != null)
             interactionModeManager.EnterUIMode();
 
@@ -746,10 +824,16 @@ public class GameFlowManager : MonoBehaviour
 
         if (interactionModeManager != null)
             interactionModeManager.ExitUIMode();
+
+        SetNotebookBlocked(true);
     }
 
     public void ReturnToMainMenuFromEndPanel()
     {
+        SetNotebookBlocked(true);
+        patientTransitionInProgress = false;
+        diagnosisFlowInProgress = false;
+
         if (interactionModeManager != null)
             interactionModeManager.ExitUIMode();
 
@@ -784,6 +868,10 @@ public class GameFlowManager : MonoBehaviour
     {
         Debug.Log("Hasta geldi.");
 
+        // Hasta artık masada ama dialogue açıldığı için notebook yine kapalı
+        patientTransitionInProgress = false;
+        SetNotebookBlocked(true);
+
         if (interactionModeManager != null)
         {
             interactionModeManager.SetDialogueAvailable(true);
@@ -805,6 +893,12 @@ public class GameFlowManager : MonoBehaviour
     public void OnPatientExited()
     {
         Debug.Log("Hasta çıktı.");
+
+        diagnosisFlowInProgress = false;
+
+        // Çıkış geçişi bitti ama result panel açılacağı için notebook hâlâ kapalı
+        patientTransitionInProgress = false;
+        SetNotebookBlocked(true);
 
         if (interactionModeManager != null)
             interactionModeManager.SetDialogueAvailable(false);
@@ -873,6 +967,8 @@ public class GameFlowManager : MonoBehaviour
 
         diagnosisSubmittedForCurrentPatient = true;
         currentPatientDiagnosisResolved = true;
+        diagnosisFlowInProgress = true;
+        SetNotebookBlocked(true);
 
         FinishDiagnosisFlow(null);
     }
@@ -929,24 +1025,130 @@ public class GameFlowManager : MonoBehaviour
 
         diagnosisSubmittedForCurrentPatient = true;
         currentPatientDiagnosisResolved = true;
+        diagnosisFlowInProgress = true;
+        SetNotebookBlocked(true);
 
         FinishDiagnosisFlow(diagnosisResultText);
     }
 
     private void FinishDiagnosisFlow(string diagnosisResultText)
     {
-        DialogueManager dialogueManager = FindFirstObjectByType<DialogueManager>();
-
-        if (interactionModeManager != null)
-            interactionModeManager.SetDialogueAvailable(false);
-
-        if (dialogueManager != null)
-            dialogueManager.CloseDialoguePanel();
+        // Teşhis verildikten sonra son diyalog akarken panel açık kalmalı.
+        // Oyuncu artık Tab ile kapatamayacak; sadece notebook da açılamayacak.
+        SetNotebookBlocked(true);
+        patientTransitionInProgress = true;
 
         if (!string.IsNullOrEmpty(diagnosisResultText))
             Debug.Log("Teşhis sonuç metni: " + diagnosisResultText);
 
         if (patientMovement != null)
             patientMovement.BeginExit();
+    }
+
+    public void SetNotebookBlocked(bool blocked)
+    {
+        blockNotebookInteraction = blocked;
+    }
+
+    public bool IsNotebookBlocked()
+    {
+        return blockNotebookInteraction;
+    }
+
+    public bool IsPatientTransitionInProgress()
+    {
+        return patientTransitionInProgress;
+    }
+
+    public bool IsDiagnosisFlowInProgress()
+    {
+        return diagnosisFlowInProgress;
+    }
+
+    public bool CanOpenNotebook()
+    {
+        if (blockNotebookInteraction)
+            return false;
+
+        if (gameEnded)
+            return false;
+
+        if (diagnosisFlowInProgress)
+            return false;
+
+        if (patientTransitionInProgress)
+            return false;
+
+        if (dialoguePanel != null && dialoguePanel.activeSelf)
+            return false;
+
+        if (patientResultPanel != null && patientResultPanel.activeSelf)
+            return false;
+
+        if (endDayPanel != null && endDayPanel.activeSelf)
+            return false;
+
+        if (dayTransitionPanel != null && dayTransitionPanel.activeSelf)
+            return false;
+
+        if (gameOverPanel != null && gameOverPanel.activeSelf)
+            return false;
+
+        return true;
+    }
+
+    public void NotifyFreeLookStateEntered()
+    {
+        // Sadece gerçekten serbest oyun anında notebook açılabilir olsun.
+        if (gameEnded)
+        {
+            SetNotebookBlocked(true);
+            return;
+        }
+
+        if (diagnosisFlowInProgress)
+        {
+            SetNotebookBlocked(true);
+            return;
+        }
+
+        if (patientTransitionInProgress)
+        {
+            SetNotebookBlocked(true);
+            return;
+        }
+
+        if (dialoguePanel != null && dialoguePanel.activeSelf)
+        {
+            SetNotebookBlocked(true);
+            return;
+        }
+
+        if (patientResultPanel != null && patientResultPanel.activeSelf)
+        {
+            SetNotebookBlocked(true);
+            return;
+        }
+
+        if (endDayPanel != null && endDayPanel.activeSelf)
+        {
+            SetNotebookBlocked(true);
+            return;
+        }
+
+        if (dayTransitionPanel != null && dayTransitionPanel.activeSelf)
+        {
+            SetNotebookBlocked(true);
+            return;
+        }
+
+        if (gameOverPanel != null && gameOverPanel.activeSelf)
+        {
+            SetNotebookBlocked(true);
+            return;
+        }
+
+        // Buraya geldiyse güvenli boş/free-look andayız.
+        SetNotebookBlocked(false);
     }
 }
