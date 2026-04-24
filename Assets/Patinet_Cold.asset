@@ -445,7 +445,7 @@ MonoBehaviour:
     - choiceText: Solunum seslerini dinle
       choiceType: 1
       doctorLine: "S\u0131rt\u0131n\u0131z a\xE7\u0131n."
-      patientReply: Tamam doktor :)
+      patientReply: Tamam doktor.
       assistantReply: "Akci\u011Fer ve solunum seslerinde belirgin ek bulgu yok."
       nextNodeId: 
       returnToHub: 1

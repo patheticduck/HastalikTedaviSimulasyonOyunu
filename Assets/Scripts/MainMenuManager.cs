@@ -2,6 +2,7 @@ using UnityEngine.UI;
 using UnityEngine;
 using Transform = UnityEngine.Transform;
 using System.Collections;
+using TMPro;
 
 public class MainMenuManager : MonoBehaviour
 {
@@ -16,6 +17,10 @@ public class MainMenuManager : MonoBehaviour
     [Header("History UI")]
     public Transform historyContent;
     public HistoryItemUI historyItemPrefab;
+
+    [Header("History Delete Mode")]
+    public Button deleteModeButton;
+    public TextMeshProUGUI deleteModeButtonText;
 
     [Header("Game Panels")]
     public GameObject dialoguePanel;
@@ -34,6 +39,7 @@ public class MainMenuManager : MonoBehaviour
     public Transform gameplayCameraPoint;
 
     private ScrollRect historyScrollRect;
+    private bool isHistoryDeleteMode = false;
 
     private void Awake()
     {
@@ -43,6 +49,13 @@ public class MainMenuManager : MonoBehaviour
 
     private void Start()
     {
+        if (deleteModeButton != null)
+        {
+            deleteModeButton.onClick.RemoveAllListeners();
+            deleteModeButton.onClick.AddListener(ToggleHistoryDeleteMode);
+        }
+
+        UpdateDeleteModeButtonText();
         ShowMainMenu();
     }
 
@@ -213,6 +226,15 @@ public class MainMenuManager : MonoBehaviour
 
         historySection.SetActive(hasAnyHistory);
 
+        if (!hasAnyHistory)
+        {
+            isHistoryDeleteMode = false;
+            UpdateDeleteModeButtonText();
+        }
+
+        if (deleteModeButton != null)
+            deleteModeButton.gameObject.SetActive(hasAnyHistory);
+
         Debug.Log("History görünür mü? " + hasAnyHistory);
 
         if (hasAnyHistory)
@@ -236,18 +258,18 @@ public class MainMenuManager : MonoBehaviour
 
         Canvas.ForceUpdateCanvases();
 
-        for (int i = runHistoryManager.SessionHistoryList.Count - 1; i >= 0; i--)
+        for (int i = 0; i < runHistoryManager.SessionHistoryList.Count; i++)
         {
             SessionHistoryData session = runHistoryManager.SessionHistoryList[i];
             if (session == null)
                 continue;
 
-            // En temiz instantiate: layout sistemi yönetsin
             HistoryItemUI item = Instantiate(historyItemPrefab, historyContent, false);
             item.gameObject.SetActive(true);
 
             item.SetHistoryContentRect(historyContent as RectTransform);
-            item.Setup(session);
+            item.Setup(session, i, DeleteHistoryItemAt);
+            item.SetDeleteMode(isHistoryDeleteMode);
 
             RectTransform itemRect = item.GetComponent<RectTransform>();
             if (itemRect != null)
@@ -262,6 +284,49 @@ public class MainMenuManager : MonoBehaviour
         StartCoroutine(ForceHistoryLayoutRefreshNextFrame());
     }
 
+    private void ToggleHistoryDeleteMode()
+    {
+        isHistoryDeleteMode = !isHistoryDeleteMode;
+        UpdateDeleteModeButtonText();
+        ApplyDeleteModeToHistoryItems();
+    }
+
+    private void UpdateDeleteModeButtonText()
+    {
+        if (deleteModeButtonText != null)
+            deleteModeButtonText.text = isHistoryDeleteMode ? "İptal Et" : "Sil";
+    }
+
+    private void ApplyDeleteModeToHistoryItems()
+    {
+        if (historyContent == null)
+            return;
+
+        foreach (Transform child in historyContent)
+        {
+            HistoryItemUI item = child.GetComponent<HistoryItemUI>();
+            if (item != null)
+                item.SetDeleteMode(isHistoryDeleteMode);
+        }
+    }
+
+    private void DeleteHistoryItemAt(int index)
+    {
+        if (runHistoryManager == null)
+            return;
+
+        runHistoryManager.RemoveSessionAt(index);
+
+        if (runHistoryManager.SessionHistoryList.Count == 0)
+        {
+            isHistoryDeleteMode = false;
+            UpdateDeleteModeButtonText();
+        }
+
+        UpdateHistorySection();
+        StartCoroutine(ForceHistoryLayoutRefreshNextFrame());
+    }
+
     private IEnumerator ForceHistoryLayoutRefreshNextFrame()
     {
         yield return null;
@@ -272,7 +337,6 @@ public class MainMenuManager : MonoBehaviour
         RectTransform contentRect = historyContent as RectTransform;
         if (contentRect != null)
         {
-            // Content pozisyonunu sıfırla
             contentRect.anchoredPosition = Vector2.zero;
             LayoutRebuilder.ForceRebuildLayoutImmediate(contentRect);
         }
@@ -294,7 +358,6 @@ public class MainMenuManager : MonoBehaviour
                 LayoutRebuilder.ForceRebuildLayoutImmediate(mainMenuRect);
         }
 
-        // ScrollView'ı en üste zorla
         if (historyScrollRect == null && historyContent != null)
             historyScrollRect = historyContent.GetComponentInParent<ScrollRect>();
 

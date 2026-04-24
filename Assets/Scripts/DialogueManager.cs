@@ -1000,42 +1000,30 @@ public class DialogueManager : MonoBehaviour
     }
 
     private string GetSpeakerPrefix(string speaker)
+{
+    switch (speaker)
     {
-        switch (speaker)
-        {
-            case "HASTA":
-                return "<size=26><color=#FFFFFF><b>HASTA —</b></color> ";
+        case "HASTA":
+            return "<size=22><color=#EEC28F><b>HASTA —</b></color> <size=20><color=#FFFFFF>";
 
-            case "DOKTOR":
-                return "<size=25><color=#FF8C42><b>DOKTOR —</b></color> ";
+        case "DOKTOR":
+            return "<size=22><color=#C3D9A8><b>DOKTOR —</b></color> <size=20><color=#FFFFFF>";
 
-            case "ASİSTAN":
-                return "<size=22><color=#CFCFCF><i>ASİSTAN — ";
+        case "ASİSTAN":
+            return "<size=22><color=#3498DB><b>ASİSTAN —</b></color> <size=20><color=#FFFFFF>";
 
-            case "SİSTEM":
-                return "<size=21><color=#AAAAAA><i>SİSTEM — ";
+        case "SİSTEM":
+            return "<size=22><color=#4A4A4A><b>SİSTEM —</b></color> <size=20><color=#FFFFFF>";
 
-            default:
-                return "";
-        }
+        default:
+            return "<size=20><color=#FFFFFF>";
     }
+}
 
     private string GetSpeakerSuffix(string speaker)
-    {
-        switch (speaker)
-        {
-            case "HASTA":
-            case "DOKTOR":
-                return "</size>";
-
-            case "ASİSTAN":
-            case "SİSTEM":
-                return "</i></size>";
-
-            default:
-                return "";
-        }
-    }
+{
+    return "</color></size>";
+}
 
     private GameObject CreateDialogueLineObject()
     {
@@ -1274,11 +1262,11 @@ public class DialogueManager : MonoBehaviour
 
         TextMeshProUGUI text = headerObj.AddComponent<TextMeshProUGUI>();
         text.text = title.ToUpper();
-        text.fontSize = 20;
+        text.fontSize = 22;
         text.fontStyle = FontStyles.Bold;
-        text.color = new Color32(220, 220, 220, 255);
+        text.color = new Color32(180, 180, 180, 255);
         text.alignment = TextAlignmentOptions.Left;
-        text.enableWordWrapping = false;
+        text.textWrappingMode = TextWrappingModes.NoWrap;
     }
 
     private void CreateDivider()

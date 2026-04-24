@@ -1,3 +1,4 @@
+using System;
 using System.Text;
 using TMPro;
 using UnityEngine;
@@ -16,6 +17,10 @@ public class HistoryItemUI : MonoBehaviour,
     public GameObject detailPanel;
     public TextMeshProUGUI detailText;
     public LayoutElement detailLayoutElement;
+
+    [Header("Delete UI")]
+    public Button deleteButton;
+    public TextMeshProUGUI deleteButtonText;
 
     [Header("History Scroll Root")]
     public RectTransform historyContentRect;
@@ -39,6 +44,9 @@ public class HistoryItemUI : MonoBehaviour,
     private LayoutElement rootLayoutElement;
     private RectTransform rootRect;
     private RectTransform detailPanelRect;
+
+    private int historyIndex = -1;
+    private Action<int> onDeleteClicked;
 
     private const float HeaderHeight = 60f;
     private const float ClosedExtraPadding = 4f;
@@ -105,8 +113,11 @@ public class HistoryItemUI : MonoBehaviour,
         historyContentRect = contentRect;
     }
 
-    public void Setup(SessionHistoryData sessionData)
+    public void Setup(SessionHistoryData sessionData, int index, Action<int> deleteCallback)
     {
+        historyIndex = index;
+        onDeleteClicked = deleteCallback;
+
         if (sessionData == null)
             return;
 
@@ -140,6 +151,8 @@ public class HistoryItemUI : MonoBehaviour,
             detailText.text = BuildDetailText(sessionData);
         }
 
+        CreateDeleteButtonIfNeeded();
+
         isOpen = startOpen;
 
         if (detailPanel != null)
@@ -158,6 +171,60 @@ public class HistoryItemUI : MonoBehaviour,
         RefreshLayout();
     }
 
+    private void CreateDeleteButtonIfNeeded()
+    {
+        if (headerButton == null)
+            return;
+
+        if (deleteButton != null)
+            return;
+
+        GameObject deleteObj = new GameObject("DeleteButton");
+        deleteObj.transform.SetParent(headerButton.transform, false);
+
+        RectTransform rect = deleteObj.AddComponent<RectTransform>();
+        rect.anchorMin = new Vector2(1f, 0.5f);
+        rect.anchorMax = new Vector2(1f, 0.5f);
+        rect.pivot = new Vector2(0.5f, 0.5f);
+        rect.anchoredPosition = new Vector2(-28f, 0f);
+        rect.sizeDelta = new Vector2(32f, 32f);
+
+        Image image = deleteObj.AddComponent<Image>();
+        image.color = new Color32(180, 45, 45, 255);
+
+        deleteButton = deleteObj.AddComponent<Button>();
+        deleteButton.onClick.RemoveAllListeners();
+        deleteButton.onClick.AddListener(() =>
+        {
+            onDeleteClicked?.Invoke(historyIndex);
+        });
+
+        GameObject textObj = new GameObject("Text");
+        textObj.transform.SetParent(deleteObj.transform, false);
+
+        RectTransform textRect = textObj.AddComponent<RectTransform>();
+        textRect.anchorMin = Vector2.zero;
+        textRect.anchorMax = Vector2.one;
+        textRect.offsetMin = Vector2.zero;
+        textRect.offsetMax = Vector2.zero;
+
+        deleteButtonText = textObj.AddComponent<TextMeshProUGUI>();
+        deleteButtonText.text = "-";
+        deleteButtonText.fontSize = 26;
+        deleteButtonText.fontStyle = FontStyles.Bold;
+        deleteButtonText.color = Color.white;
+        deleteButtonText.alignment = TextAlignmentOptions.Center;
+        deleteButtonText.raycastTarget = false;
+
+        deleteObj.SetActive(false);
+    }
+
+    public void SetDeleteMode(bool active)
+    {
+        if (deleteButton != null)
+            deleteButton.gameObject.SetActive(active);
+    }
+
     private void RefreshLayout()
     {
         float detailHeight = 0f;
@@ -169,12 +236,10 @@ public class HistoryItemUI : MonoBehaviour,
             else
                 detailHeight = fixedDetailHeight;
 
-            // Layout Element'i runtime'da zorla
             detailLayoutElement.minHeight = detailHeight;
             detailLayoutElement.preferredHeight = detailHeight;
             detailLayoutElement.flexibleHeight = 0f;
 
-            // RectTransform'u da runtime'da zorla
             if (detailPanelRect != null)
                 detailPanelRect.SetSizeWithCurrentAnchors(RectTransform.Axis.Vertical, detailHeight);
         }
