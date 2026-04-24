@@ -264,6 +264,11 @@ public class GameFlowManager : MonoBehaviour
         save.dayCorrect = dayCorrect;
         save.dayWrong = dayWrong;
         save.diagnosisSubmittedForCurrentPatient = diagnosisSubmittedForCurrentPatient;
+        save.patientResultPanelPendingAfterLoad = diagnosisSubmittedForCurrentPatient;
+        save.lastDiagnosisWasCorrect = lastDiagnosisWasCorrect;
+        save.lastDiagnosisResultText = lastDiagnosisResultText;
+        save.lastCorrectDiagnosisName = lastCorrectDiagnosisName;
+        save.pendingLoseGameOver = pendingLoseGameOver;
         save.hasSave = true;
         save.patientAnalysisHistory = ClonePatientAnalysisHistory();
 
@@ -271,109 +276,95 @@ public class GameFlowManager : MonoBehaviour
     }
 
     public void ApplyRuntimeSaveData(RuntimeSaveData save)
+{
+    if (save == null)
+        return;
+
+    currentDay = save.currentDay;
+    currentPatientNumber = save.currentPatientNumber;
+    totalCorrect = save.totalCorrect;
+    totalWrong = save.totalWrong;
+    remainingHearts = save.remainingHearts;
+    dayCorrect = save.dayCorrect;
+    dayWrong = save.dayWrong;
+
+    diagnosisSubmittedForCurrentPatient = save.diagnosisSubmittedForCurrentPatient;
+
+    lastDiagnosisWasCorrect = save.lastDiagnosisWasCorrect;
+    lastDiagnosisResultText = save.lastDiagnosisResultText;
+    lastCorrectDiagnosisName = save.lastCorrectDiagnosisName;
+    pendingLoseGameOver = save.pendingLoseGameOver;
+
+    currentPatientDiagnosisResolved = save.diagnosisSubmittedForCurrentPatient;
+
+    patientTransitionInProgress = false;
+    diagnosisFlowInProgress = false;
+
+    waitingForDayContinue = false;
+    waitingForPatientResultContinue = false;
+    gameEnded = false;
+
+    patientAnalysisHistory.Clear();
+
+    if (save.patientAnalysisHistory != null)
     {
-        if (save == null)
-            return;
+        foreach (PatientAnalysisEntry entry in save.patientAnalysisHistory)
+        {
+            if (entry == null)
+                continue;
 
-        currentDay = save.currentDay;
-        currentPatientNumber = save.currentPatientNumber;
-        totalCorrect = save.totalCorrect;
-        totalWrong = save.totalWrong;
-        remainingHearts = save.remainingHearts;
-        dayCorrect = save.dayCorrect;
-        dayWrong = save.dayWrong;
-        diagnosisSubmittedForCurrentPatient = save.diagnosisSubmittedForCurrentPatient;
+            patientAnalysisHistory.Add(new PatientAnalysisEntry
+            {
+                dayNumber = entry.dayNumber,
+                patientNumberInDay = entry.patientNumberInDay,
+                globalPatientNumber = entry.globalPatientNumber,
+                isCorrect = entry.isCorrect,
+                correctDiagnosisName = entry.correctDiagnosisName,
+                playerDiagnosisName = entry.playerDiagnosisName
+            });
+        }
+    }
 
-        currentPatientDiagnosisResolved = save.diagnosisSubmittedForCurrentPatient;
+    if (dialoguePanel != null) dialoguePanel.SetActive(false);
+    if (endDayPanel != null) endDayPanel.SetActive(false);
+    if (gameOverPanel != null) gameOverPanel.SetActive(false);
+    if (dayTransitionPanel != null) dayTransitionPanel.SetActive(false);
+    if (patientResultPanel != null) patientResultPanel.SetActive(false);
+
+    if (patientMovement != null)
+        patientMovement.HidePatient();
+
+    if (interactionModeManager != null)
+    {
+        interactionModeManager.SetDialogueAvailable(false);
+        interactionModeManager.ExitUIMode();
+    }
+
+    SetNotebookBlocked(true);
+}
+
+    public void ContinueAfterLoadedSave()
+{
+    if (diagnosisSubmittedForCurrentPatient)
+    {
+        SetNotebookBlocked(true);
         patientTransitionInProgress = false;
         diagnosisFlowInProgress = false;
 
-        waitingForDayContinue = false;
-        waitingForPatientResultContinue = false;
-        pendingLoseGameOver = false;
-        gameEnded = false;
+        waitingForPatientResultContinue = true;
+        ShowPatientResultPanel();
 
-        lastDiagnosisWasCorrect = false;
-        lastDiagnosisResultText = "";
-        lastCorrectDiagnosisName = "";
-
-        patientAnalysisHistory.Clear();
-
-        if (save.patientAnalysisHistory != null)
-        {
-            foreach (PatientAnalysisEntry entry in save.patientAnalysisHistory)
-            {
-                if (entry == null)
-                    continue;
-
-                patientAnalysisHistory.Add(new PatientAnalysisEntry
-                {
-                    dayNumber = entry.dayNumber,
-                    patientNumberInDay = entry.patientNumberInDay,
-                    globalPatientNumber = entry.globalPatientNumber,
-                    isCorrect = entry.isCorrect,
-                    correctDiagnosisName = entry.correctDiagnosisName,
-                    playerDiagnosisName = entry.playerDiagnosisName
-                });
-            }
-        }
-
-        if (dialoguePanel != null) dialoguePanel.SetActive(false);
-        if (endDayPanel != null) endDayPanel.SetActive(false);
-        if (gameOverPanel != null) gameOverPanel.SetActive(false);
-        if (dayTransitionPanel != null) dayTransitionPanel.SetActive(false);
-        if (patientResultPanel != null) patientResultPanel.SetActive(false);
-
-        if (patientMovement != null)
-            patientMovement.HidePatient();
-
-        if (interactionModeManager != null)
-        {
-            interactionModeManager.SetDialogueAvailable(false);
-            interactionModeManager.ExitUIMode();
-        }
-
-        SetNotebookBlocked(true);
+        return;
     }
 
-    public void ContinueAfterLoadedSave()
+    if (remainingHearts <= 0)
     {
-        if (remainingHearts <= 0)
-        {
-            ShowGameOverPanel(false);
-            return;
-        }
-
-        if (diagnosisSubmittedForCurrentPatient)
-        {
-            SetNotebookBlocked(true);
-            patientTransitionInProgress = false;
-            diagnosisFlowInProgress = false;
-
-            if (currentPatientNumber >= totalPatientsInRun)
-            {
-                ShowGameOverPanel(true);
-                return;
-            }
-
-            bool isEndOfDay = (currentPatientNumber % patientsPerDay == 0);
-
-            if (isEndOfDay)
-            {
-                waitingForDayContinue = true;
-                ShowEndOfDayPanel();
-            }
-            else
-            {
-                currentPatientNumber++;
-                StartCoroutine(StartNextPatientAfterDelay(0.2f));
-            }
-
-            return;
-        }
-
-        StartGameplayFlow();
+        ShowGameOverPanel(false);
+        return;
     }
+
+    StartGameplayFlow();
+}
 
     private List<PatientAnalysisEntry> ClonePatientAnalysisHistory()
     {
@@ -680,6 +671,13 @@ public class GameFlowManager : MonoBehaviour
 
         HidePatientResultPanel();
 
+        if (pendingLoseGameOver || remainingHearts <= 0)
+        {
+            pendingLoseGameOver = false;
+            ShowGameOverPanel(false);
+            return;
+        }
+
         if (currentPatientNumber >= totalPatientsInRun)
         {
             ShowGameOverPanel(true);
@@ -847,6 +845,34 @@ public class GameFlowManager : MonoBehaviour
             mainMenuManager.ReturnToMenu(totalCorrect, totalWrong);
     }
 
+    public void ForceStopAllGameplay()
+{
+    Debug.Log("GAME HARD STOP");
+
+    patientTransitionInProgress = false;
+    diagnosisFlowInProgress = false;
+    waitingForDayContinue = false;
+    waitingForPatientResultContinue = false;
+    pendingLoseGameOver = false;
+
+    if (patientMovement != null)
+        patientMovement.StopMovementImmediately();
+
+    if (dialoguePanel != null) dialoguePanel.SetActive(false);
+    if (patientResultPanel != null) patientResultPanel.SetActive(false);
+    if (endDayPanel != null) endDayPanel.SetActive(false);
+    if (gameOverPanel != null) gameOverPanel.SetActive(false);
+    if (dayTransitionPanel != null) dayTransitionPanel.SetActive(false);
+
+    if (interactionModeManager != null)
+    {
+        interactionModeManager.SetDialogueAvailable(false);
+        interactionModeManager.ExitUIMode();
+    }
+
+    SetNotebookBlocked(true);
+}
+
     private void UpdateHeartsUI()
     {
         if (hearts == null || hearts.Length == 0)
@@ -908,13 +934,6 @@ public class GameFlowManager : MonoBehaviour
         if (!currentPatientDiagnosisResolved)
         {
             Debug.LogWarning("Hasta çıktı ama teşhis çözülmüş görünmüyor. Akış durduruldu.");
-            return;
-        }
-
-        if (pendingLoseGameOver)
-        {
-            pendingLoseGameOver = false;
-            ShowGameOverPanel(false);
             return;
         }
 

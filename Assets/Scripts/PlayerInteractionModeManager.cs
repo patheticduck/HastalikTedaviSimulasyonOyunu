@@ -32,6 +32,10 @@ public class PlayerInteractionModeManager : MonoBehaviour
         if (Keyboard.current == null)
             return;
 
+         PauseMenuController pause = FindFirstObjectByType<PauseMenuController>();
+        if (pause != null && pause.IsPaused())
+            return;
+
         if (forceUIMode)
             return;
 

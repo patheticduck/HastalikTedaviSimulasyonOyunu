@@ -13,6 +13,14 @@ public class RuntimeSaveData
     public int dayWrong;
 
     public bool diagnosisSubmittedForCurrentPatient;
+    public bool patientResultPanelPendingAfterLoad;
+
+    public bool lastDiagnosisWasCorrect;
+    public string lastDiagnosisResultText;
+    public string lastCorrectDiagnosisName;
+
+    public bool pendingLoseGameOver;
+
     public bool hasSave;
 
     public List<PatientAnalysisEntry> patientAnalysisHistory = new List<PatientAnalysisEntry>();

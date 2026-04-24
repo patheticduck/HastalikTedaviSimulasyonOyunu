@@ -4,6 +4,8 @@ using TMPro;
 
 public class PauseMenuController : MonoBehaviour
 {
+    public static PauseMenuController Instance;
+
     [Header("UI")]
     public GameObject pauseMenuPanel;
     public GameObject crosshair;
@@ -21,6 +23,11 @@ public class PauseMenuController : MonoBehaviour
     private bool isPaused = false;
     private bool wasDialogueModeActiveBeforePause = false;
     private bool wasForcedUIModeBeforePause = false;
+
+    private void Awake()
+    {
+        Instance = this;
+    }
 
     private void Start()
     {
@@ -78,8 +85,7 @@ public class PauseMenuController : MonoBehaviour
         if (mainMenuPanel != null && mainMenuPanel.activeSelf)
             return false;
 
-        if (notebookPanel != null && notebookPanel.activeSelf)
-            return false;
+        // Notebook açıkken pause açılabilsin diye notebookPanel kontrolü yok.
 
         if (gameFlowManager != null)
         {
@@ -101,6 +107,9 @@ public class PauseMenuController : MonoBehaviour
 
     public void PauseGame()
     {
+        isPaused = true;
+        Time.timeScale = 0f;
+
         RefreshPauseInfo();
 
         wasDialogueModeActiveBeforePause =
@@ -112,7 +121,10 @@ public class PauseMenuController : MonoBehaviour
             interactionModeManager.IsInForcedUIMode();
 
         if (pauseMenuPanel != null)
+        {
             pauseMenuPanel.SetActive(true);
+            pauseMenuPanel.transform.SetAsLastSibling();
+        }
 
         if (mouseLook != null)
             mouseLook.SetLookEnabled(false);
@@ -123,12 +135,8 @@ public class PauseMenuController : MonoBehaviour
         Cursor.lockState = CursorLockMode.None;
         Cursor.visible = true;
 
-        // Pause açıkken notebook da açılmasın
         if (gameFlowManager != null)
             gameFlowManager.SetNotebookBlocked(true);
-
-        Time.timeScale = 0f;
-        isPaused = true;
     }
 
     public void ResumeGame()
@@ -150,7 +158,6 @@ public class PauseMenuController : MonoBehaviour
             Cursor.lockState = CursorLockMode.None;
             Cursor.visible = true;
 
-            // Dialogue veya başka bir UI state varsa notebook kapalı kalmalı
             if (gameFlowManager != null)
                 gameFlowManager.SetNotebookBlocked(true);
         }
@@ -165,8 +172,6 @@ public class PauseMenuController : MonoBehaviour
             Cursor.lockState = CursorLockMode.Locked;
             Cursor.visible = false;
 
-            // Free-look'a dönüldü, notebook gerçekten açılabilir mi
-            // buna GameFlowManager karar versin
             if (gameFlowManager != null)
                 gameFlowManager.NotifyFreeLookStateEntered();
         }
@@ -192,6 +197,9 @@ public class PauseMenuController : MonoBehaviour
 
     public void ReturnToMainMenu()
     {
+        if (gameFlowManager != null)
+            gameFlowManager.ForceStopAllGameplay();
+
         Time.timeScale = 1f;
         isPaused = false;
 

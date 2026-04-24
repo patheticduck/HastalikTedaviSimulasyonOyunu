@@ -92,6 +92,10 @@ public class DialogueManager : MonoBehaviour
 
     private void Update()
     {
+        PauseMenuController pause = FindFirstObjectByType<PauseMenuController>();
+        if (pause != null && pause.IsPaused())
+            return;
+            
         if (!isTyping)
             return;
 

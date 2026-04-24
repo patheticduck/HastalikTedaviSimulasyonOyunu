@@ -58,6 +58,9 @@ public class NotebookInteractable : MonoBehaviour
 
     private void Update()
     {
+        if (PauseMenuController.Instance != null && PauseMenuController.Instance.IsPaused())
+            return;
+
         if (Keyboard.current == null)
             return;
 
@@ -112,6 +115,9 @@ public class NotebookInteractable : MonoBehaviour
 
     private bool CanShowInteractionPrompt()
     {
+        if (PauseMenuController.Instance != null && PauseMenuController.Instance.IsPaused())
+            return false;
+
         if (interactionManager == null)
             return false;
 
@@ -126,6 +132,9 @@ public class NotebookInteractable : MonoBehaviour
 
     private void TryToggleNotebook()
     {
+        if (PauseMenuController.Instance != null && PauseMenuController.Instance.IsPaused())
+            return;
+
         if (isAnimating)
             return;
 
@@ -155,6 +164,9 @@ public class NotebookInteractable : MonoBehaviour
 
     private bool CanOpenNotebookNow()
     {
+        if (PauseMenuController.Instance != null && PauseMenuController.Instance.IsPaused())
+            return false;
+
         if (interactionManager == null)
             return false;
 
@@ -169,6 +181,9 @@ public class NotebookInteractable : MonoBehaviour
 
     private IEnumerator OpenNotebook()
     {
+        if (PauseMenuController.Instance != null && PauseMenuController.Instance.IsPaused())
+            yield break;
+
         if (!CanOpenNotebookNow())
             yield break;
 
@@ -192,6 +207,9 @@ public class NotebookInteractable : MonoBehaviour
 
         while (t < 1f)
         {
+            if (PauseMenuController.Instance != null && PauseMenuController.Instance.IsPaused())
+                yield break;
+
             if (playerCamera == null)
                 break;
 
@@ -213,6 +231,9 @@ public class NotebookInteractable : MonoBehaviour
 
     private IEnumerator CloseNotebook()
     {
+        if (PauseMenuController.Instance != null && PauseMenuController.Instance.IsPaused())
+            yield break;
+
         isAnimating = true;
         isOpen = false;
 
@@ -225,6 +246,9 @@ public class NotebookInteractable : MonoBehaviour
 
         while (t < 1f)
         {
+            if (PauseMenuController.Instance != null && PauseMenuController.Instance.IsPaused())
+                yield break;
+
             t += Time.deltaTime * moveSpeed;
             transform.position = Vector3.Lerp(currentPos, originalPosition, t);
             transform.rotation = Quaternion.Slerp(currentRot, originalRotation, t);

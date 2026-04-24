@@ -107,4 +107,9 @@ public class PatientMovement : MonoBehaviour
         hasArrived = false;
         gameObject.SetActive(false);
     }
+    public void StopMovementImmediately()
+{
+    canMove = false;
+    hasArrived = false;
+}
 }

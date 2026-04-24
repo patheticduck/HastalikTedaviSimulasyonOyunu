@@ -56,6 +56,9 @@ public class DoctorBookInteractable : MonoBehaviour
 
     private void Update()
     {
+        if (IsPauseActive())
+            return;
+
         if (Keyboard.current == null)
             return;
 
@@ -66,6 +69,21 @@ public class DoctorBookInteractable : MonoBehaviour
 
         if (isOpen && Keyboard.current.escapeKey.wasPressedThisFrame)
             CloseBook();
+    }
+
+    private bool IsPauseActive()
+    {
+        if (PauseMenuController.Instance == null)
+            return false;
+
+        if (PauseMenuController.Instance.IsPaused())
+            return true;
+
+        if (PauseMenuController.Instance.pauseMenuPanel != null &&
+            PauseMenuController.Instance.pauseMenuPanel.activeInHierarchy)
+            return true;
+
+        return false;
     }
 
     private void CheckLookAt()
@@ -114,6 +132,9 @@ public class DoctorBookInteractable : MonoBehaviour
 
     private bool CanOpenBookNow()
     {
+        if (IsPauseActive())
+            return false;
+
         if (interactionManager == null)
             return false;
 
@@ -128,6 +149,9 @@ public class DoctorBookInteractable : MonoBehaviour
 
     private void TryToggleBook()
     {
+        if (IsPauseActive())
+            return;
+
         if (isAnimating)
             return;
 
@@ -169,6 +193,12 @@ public class DoctorBookInteractable : MonoBehaviour
 
         while (t < 1f)
         {
+            if (IsPauseActive())
+            {
+                isAnimating = false;
+                yield break;
+            }
+
             t += Time.deltaTime * moveSpeed;
             transform.position = Vector3.Lerp(startPos, targetPos, t);
             transform.rotation = Quaternion.Slerp(startRot, targetRot, t);
@@ -187,6 +217,9 @@ public class DoctorBookInteractable : MonoBehaviour
 
     private void CloseBook()
     {
+        if (IsPauseActive())
+            return;
+
         if (!isOpen || isAnimating)
             return;
 
@@ -195,6 +228,9 @@ public class DoctorBookInteractable : MonoBehaviour
 
     public void CloseBookFromButton()
     {
+        if (IsPauseActive())
+            return;
+
         CloseBook();
     }
 
@@ -212,6 +248,12 @@ public class DoctorBookInteractable : MonoBehaviour
 
         while (t < 1f)
         {
+            if (IsPauseActive())
+            {
+                isAnimating = false;
+                yield break;
+            }
+
             t += Time.deltaTime * moveSpeed;
             transform.position = Vector3.Lerp(startPos, originalPosition, t);
             transform.rotation = Quaternion.Slerp(startRot, originalRotation, t);
