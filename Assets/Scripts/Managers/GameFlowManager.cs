@@ -70,6 +70,14 @@ public class GameFlowManager : MonoBehaviour
     [Header("Heart UI")]
     public GameObject[] hearts;
 
+    [Header("Energy UI")]
+    public GameObject energyPanel;
+    public EnergyUIManager energyUIManager;
+    public int maxEnergy = 5;
+    public int currentEnergy = 5;
+
+    private bool doctorBookUnlockedForCurrentPatient = false;
+
     [Header("Notebook Access")]
     [SerializeField] private bool blockNotebookInteraction = true;
 
@@ -91,17 +99,9 @@ public class GameFlowManager : MonoBehaviour
     private bool waitingForPatientResultContinue = false;
     private bool pendingLoseGameOver = false;
 
-    // Hasta şu anda sahne içi geçişte mi? (geliyor / gidiyor)
     private bool patientTransitionInProgress = false;
-
-    // Tanı seçildi, son diyalog akıyor ve oyuncu artık paneli elle kapatamasın.
     private bool diagnosisFlowInProgress = false;
-
-    // Pause / Continue için:
     private bool diagnosisSubmittedForCurrentPatient = false;
-
-    // Bu hasta için teşhis süreci çözüldü mü?
-    // Hasta gerçekten "tamamlandı" sayılması için yine çıkış beklenir.
     private bool currentPatientDiagnosisResolved = false;
 
     private int dayCorrect = 0;
@@ -121,6 +121,7 @@ public class GameFlowManager : MonoBehaviour
         if (dayTransitionPanel != null) dayTransitionPanel.SetActive(false);
         if (heartsPanel != null) heartsPanel.SetActive(false);
         if (patientResultPanel != null) patientResultPanel.SetActive(false);
+        SetEnergyPanelVisible(false);
 
         if (dayTransitionCanvasGroup != null)
             dayTransitionCanvasGroup.alpha = 0f;
@@ -131,7 +132,12 @@ public class GameFlowManager : MonoBehaviour
         SetNotebookBlocked(true);
         patientTransitionInProgress = false;
         diagnosisFlowInProgress = false;
+
+        currentEnergy = maxEnergy;
+        ResetDoctorBookForNewPatient();
+
         UpdateHeartsUI();
+        UpdateEnergyUI();
     }
 
     public void ResetGame()
@@ -140,6 +146,9 @@ public class GameFlowManager : MonoBehaviour
         currentPatientNumber = 1;
 
         remainingHearts = maxHearts;
+        currentEnergy = maxEnergy;
+        ResetDoctorBookForNewPatient();
+
         totalCorrect = 0;
         totalWrong = 0;
 
@@ -168,11 +177,13 @@ public class GameFlowManager : MonoBehaviour
         if (dayTransitionPanel != null) dayTransitionPanel.SetActive(false);
         if (heartsPanel != null) heartsPanel.SetActive(true);
         if (patientResultPanel != null) patientResultPanel.SetActive(false);
+        SetEnergyPanelVisible(true);
 
         if (dayTransitionCanvasGroup != null)
             dayTransitionCanvasGroup.alpha = 0f;
 
         UpdateHeartsUI();
+        UpdateEnergyUI();
         SetNotebookBlocked(true);
 
         if (patientMovement != null)
@@ -191,8 +202,11 @@ public class GameFlowManager : MonoBehaviour
     {
         if (gameEnded) return;
 
+        SetEnergyPanelVisible(true);
+
         diagnosisSubmittedForCurrentPatient = false;
         currentPatientDiagnosisResolved = false;
+        ResetDoctorBookForNewPatient();
         patientTransitionInProgress = true;
         diagnosisFlowInProgress = false;
 
@@ -210,7 +224,6 @@ public class GameFlowManager : MonoBehaviour
             interactionModeManager.ExitUIMode();
         }
 
-        // Hasta yürürken notebook açılamamalı
         SetNotebookBlocked(true);
 
         AssignCurrentPatientCase();
@@ -231,10 +244,6 @@ public class GameFlowManager : MonoBehaviour
             return;
         }
 
-        // Şimdilik:
-        // 1. hasta = Grip
-        // 2. hasta = Cold
-        // diğer tüm hastalar = Grip
         if (currentPatientNumber == 2 && coldCase != null)
         {
             dialogueManager.currentCase = coldCase;
@@ -276,95 +285,103 @@ public class GameFlowManager : MonoBehaviour
     }
 
     public void ApplyRuntimeSaveData(RuntimeSaveData save)
-{
-    if (save == null)
-        return;
-
-    currentDay = save.currentDay;
-    currentPatientNumber = save.currentPatientNumber;
-    totalCorrect = save.totalCorrect;
-    totalWrong = save.totalWrong;
-    remainingHearts = save.remainingHearts;
-    dayCorrect = save.dayCorrect;
-    dayWrong = save.dayWrong;
-
-    diagnosisSubmittedForCurrentPatient = save.diagnosisSubmittedForCurrentPatient;
-
-    lastDiagnosisWasCorrect = save.lastDiagnosisWasCorrect;
-    lastDiagnosisResultText = save.lastDiagnosisResultText;
-    lastCorrectDiagnosisName = save.lastCorrectDiagnosisName;
-    pendingLoseGameOver = save.pendingLoseGameOver;
-
-    currentPatientDiagnosisResolved = save.diagnosisSubmittedForCurrentPatient;
-
-    patientTransitionInProgress = false;
-    diagnosisFlowInProgress = false;
-
-    waitingForDayContinue = false;
-    waitingForPatientResultContinue = false;
-    gameEnded = false;
-
-    patientAnalysisHistory.Clear();
-
-    if (save.patientAnalysisHistory != null)
     {
-        foreach (PatientAnalysisEntry entry in save.patientAnalysisHistory)
-        {
-            if (entry == null)
-                continue;
+        if (save == null)
+            return;
 
-            patientAnalysisHistory.Add(new PatientAnalysisEntry
-            {
-                dayNumber = entry.dayNumber,
-                patientNumberInDay = entry.patientNumberInDay,
-                globalPatientNumber = entry.globalPatientNumber,
-                isCorrect = entry.isCorrect,
-                correctDiagnosisName = entry.correctDiagnosisName,
-                playerDiagnosisName = entry.playerDiagnosisName
-            });
-        }
-    }
+        currentDay = save.currentDay;
+        currentPatientNumber = save.currentPatientNumber;
+        totalCorrect = save.totalCorrect;
+        totalWrong = save.totalWrong;
+        remainingHearts = save.remainingHearts;
+        currentEnergy = Mathf.Clamp(currentEnergy, 0, maxEnergy);
+        ResetDoctorBookForNewPatient();
 
-    if (dialoguePanel != null) dialoguePanel.SetActive(false);
-    if (endDayPanel != null) endDayPanel.SetActive(false);
-    if (gameOverPanel != null) gameOverPanel.SetActive(false);
-    if (dayTransitionPanel != null) dayTransitionPanel.SetActive(false);
-    if (patientResultPanel != null) patientResultPanel.SetActive(false);
+        dayCorrect = save.dayCorrect;
+        dayWrong = save.dayWrong;
 
-    if (patientMovement != null)
-        patientMovement.HidePatient();
+        diagnosisSubmittedForCurrentPatient = save.diagnosisSubmittedForCurrentPatient;
 
-    if (interactionModeManager != null)
-    {
-        interactionModeManager.SetDialogueAvailable(false);
-        interactionModeManager.ExitUIMode();
-    }
+        lastDiagnosisWasCorrect = save.lastDiagnosisWasCorrect;
+        lastDiagnosisResultText = save.lastDiagnosisResultText;
+        lastCorrectDiagnosisName = save.lastCorrectDiagnosisName;
+        pendingLoseGameOver = save.pendingLoseGameOver;
 
-    SetNotebookBlocked(true);
-}
+        currentPatientDiagnosisResolved = save.diagnosisSubmittedForCurrentPatient;
 
-    public void ContinueAfterLoadedSave()
-{
-    if (diagnosisSubmittedForCurrentPatient)
-    {
-        SetNotebookBlocked(true);
         patientTransitionInProgress = false;
         diagnosisFlowInProgress = false;
 
-        waitingForPatientResultContinue = true;
-        ShowPatientResultPanel();
+        waitingForDayContinue = false;
+        waitingForPatientResultContinue = false;
+        gameEnded = false;
 
-        return;
+        patientAnalysisHistory.Clear();
+
+        if (save.patientAnalysisHistory != null)
+        {
+            foreach (PatientAnalysisEntry entry in save.patientAnalysisHistory)
+            {
+                if (entry == null)
+                    continue;
+
+                patientAnalysisHistory.Add(new PatientAnalysisEntry
+                {
+                    dayNumber = entry.dayNumber,
+                    patientNumberInDay = entry.patientNumberInDay,
+                    globalPatientNumber = entry.globalPatientNumber,
+                    isCorrect = entry.isCorrect,
+                    correctDiagnosisName = entry.correctDiagnosisName,
+                    playerDiagnosisName = entry.playerDiagnosisName
+                });
+            }
+        }
+
+        if (dialoguePanel != null) dialoguePanel.SetActive(false);
+        if (endDayPanel != null) endDayPanel.SetActive(false);
+        if (gameOverPanel != null) gameOverPanel.SetActive(false);
+        if (dayTransitionPanel != null) dayTransitionPanel.SetActive(false);
+        if (patientResultPanel != null) patientResultPanel.SetActive(false);
+        SetEnergyPanelVisible(true);
+
+        if (patientMovement != null)
+            patientMovement.HidePatient();
+
+        if (interactionModeManager != null)
+        {
+            interactionModeManager.SetDialogueAvailable(false);
+            interactionModeManager.ExitUIMode();
+        }
+
+        SetNotebookBlocked(true);
+        UpdateHeartsUI();
+        UpdateEnergyUI();
     }
 
-    if (remainingHearts <= 0)
+    public void ContinueAfterLoadedSave()
     {
-        ShowGameOverPanel(false);
-        return;
-    }
+        SetEnergyPanelVisible(true);
 
-    StartGameplayFlow();
-}
+        if (diagnosisSubmittedForCurrentPatient)
+        {
+            SetNotebookBlocked(true);
+            patientTransitionInProgress = false;
+            diagnosisFlowInProgress = false;
+
+            waitingForPatientResultContinue = true;
+            ShowPatientResultPanel();
+
+            return;
+        }
+
+        if (remainingHearts <= 0)
+        {
+            ShowGameOverPanel(false);
+            return;
+        }
+
+        StartGameplayFlow();
+    }
 
     private List<PatientAnalysisEntry> ClonePatientAnalysisHistory()
     {
@@ -505,6 +522,8 @@ public class GameFlowManager : MonoBehaviour
         if (patientResultPanel != null) patientResultPanel.SetActive(false);
         if (endDayPanel != null) endDayPanel.SetActive(false);
         if (gameOverPanel != null) gameOverPanel.SetActive(true);
+
+        SetEnergyPanelVisible(false);
 
         if (gameOverTitleText != null)
         {
@@ -840,38 +859,108 @@ public class GameFlowManager : MonoBehaviour
         if (patientResultPanel != null) patientResultPanel.SetActive(false);
         if (dayTransitionPanel != null) dayTransitionPanel.SetActive(false);
         if (dialoguePanel != null) dialoguePanel.SetActive(false);
+        SetEnergyPanelVisible(false);
 
         if (mainMenuManager != null)
             mainMenuManager.ReturnToMenu(totalCorrect, totalWrong);
     }
 
     public void ForceStopAllGameplay()
-{
-    Debug.Log("GAME HARD STOP");
-
-    patientTransitionInProgress = false;
-    diagnosisFlowInProgress = false;
-    waitingForDayContinue = false;
-    waitingForPatientResultContinue = false;
-    pendingLoseGameOver = false;
-
-    if (patientMovement != null)
-        patientMovement.StopMovementImmediately();
-
-    if (dialoguePanel != null) dialoguePanel.SetActive(false);
-    if (patientResultPanel != null) patientResultPanel.SetActive(false);
-    if (endDayPanel != null) endDayPanel.SetActive(false);
-    if (gameOverPanel != null) gameOverPanel.SetActive(false);
-    if (dayTransitionPanel != null) dayTransitionPanel.SetActive(false);
-
-    if (interactionModeManager != null)
     {
-        interactionModeManager.SetDialogueAvailable(false);
-        interactionModeManager.ExitUIMode();
+        Debug.Log("GAME HARD STOP");
+
+        patientTransitionInProgress = false;
+        diagnosisFlowInProgress = false;
+        waitingForDayContinue = false;
+        waitingForPatientResultContinue = false;
+        pendingLoseGameOver = false;
+
+        if (patientMovement != null)
+            patientMovement.StopMovementImmediately();
+
+        if (dialoguePanel != null) dialoguePanel.SetActive(false);
+        if (patientResultPanel != null) patientResultPanel.SetActive(false);
+        if (endDayPanel != null) endDayPanel.SetActive(false);
+        if (gameOverPanel != null) gameOverPanel.SetActive(false);
+        if (dayTransitionPanel != null) dayTransitionPanel.SetActive(false);
+        SetEnergyPanelVisible(false);
+
+        if (interactionModeManager != null)
+        {
+            interactionModeManager.SetDialogueAvailable(false);
+            interactionModeManager.ExitUIMode();
+        }
+
+        SetNotebookBlocked(true);
     }
 
-    SetNotebookBlocked(true);
-}
+    public bool TryUseEnergyForDoctorBook()
+    {
+        if (gameEnded)
+        {
+            Debug.Log("Oyun bittikten sonra enerji kullanılamaz.");
+            return false;
+        }
+
+        if (doctorBookUnlockedForCurrentPatient)
+        {
+            Debug.Log("DoctorBook bu hasta için zaten açık.");
+            return false;
+        }
+
+        if (currentEnergy <= 0)
+        {
+            Debug.Log("Enerji kalmadı.");
+            return false;
+        }
+
+        currentEnergy--;
+        doctorBookUnlockedForCurrentPatient = true;
+        UpdateEnergyUI();
+
+        Debug.Log("Enerji kullanıldı. DoctorBook bu hasta için açıldı. Kalan enerji: " + currentEnergy);
+        return true;
+    }
+
+    public bool IsDoctorBookUnlockedForCurrentPatient()
+    {
+        return doctorBookUnlockedForCurrentPatient;
+    }
+
+    public void ResetDoctorBookForNewPatient()
+    {
+        doctorBookUnlockedForCurrentPatient = false;
+        UpdateEnergyUI();
+    }
+
+    public bool CanUseEnergyForDoctorBook()
+    {
+        if (gameEnded)
+            return false;
+
+        if (doctorBookUnlockedForCurrentPatient)
+            return false;
+
+        return currentEnergy > 0;
+    }
+
+    private void SetEnergyPanelVisible(bool visible)
+    {
+        if (energyPanel != null)
+            energyPanel.SetActive(visible);
+
+        if (visible)
+            UpdateEnergyUI();
+    }
+
+    private void UpdateEnergyUI()
+    {
+        if (energyUIManager == null)
+            energyUIManager = FindFirstObjectByType<EnergyUIManager>();
+
+        if (energyUIManager != null)
+            energyUIManager.UpdateEnergyUI();
+    }
 
     private void UpdateHeartsUI()
     {
@@ -888,15 +977,16 @@ public class GameFlowManager : MonoBehaviour
     public void RefreshGameUIAfterLoad()
     {
         UpdateHeartsUI();
+        UpdateEnergyUI();
     }
 
     public void OnPatientArrived()
     {
         Debug.Log("Hasta geldi.");
 
-        // Hasta artık masada ama dialogue açıldığı için notebook yine kapalı
         patientTransitionInProgress = false;
         SetNotebookBlocked(true);
+        SetEnergyPanelVisible(true);
 
         if (interactionModeManager != null)
         {
@@ -922,7 +1012,6 @@ public class GameFlowManager : MonoBehaviour
 
         diagnosisFlowInProgress = false;
 
-        // Çıkış geçişi bitti ama result panel açılacağı için notebook hâlâ kapalı
         patientTransitionInProgress = false;
         SetNotebookBlocked(true);
 
@@ -1052,8 +1141,6 @@ public class GameFlowManager : MonoBehaviour
 
     private void FinishDiagnosisFlow(string diagnosisResultText)
     {
-        // Teşhis verildikten sonra son diyalog akarken panel açık kalmalı.
-        // Oyuncu artık Tab ile kapatamayacak; sadece notebook da açılamayacak.
         SetNotebookBlocked(true);
         patientTransitionInProgress = true;
 
@@ -1118,7 +1205,6 @@ public class GameFlowManager : MonoBehaviour
 
     public void NotifyFreeLookStateEntered()
     {
-        // Sadece gerçekten serbest oyun anında notebook açılabilir olsun.
         if (gameEnded)
         {
             SetNotebookBlocked(true);
@@ -1167,7 +1253,6 @@ public class GameFlowManager : MonoBehaviour
             return;
         }
 
-        // Buraya geldiyse güvenli boş/free-look andayız.
         SetNotebookBlocked(false);
     }
 }

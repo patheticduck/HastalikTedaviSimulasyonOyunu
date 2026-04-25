@@ -125,7 +125,12 @@ public class DoctorBookInteractable : MonoBehaviour
             {
                 TextMeshProUGUI tmp = interactText.GetComponent<TextMeshProUGUI>();
                 if (tmp != null)
-                    tmp.text = "[E] Doktor Kitabını Aç";
+                {
+                    if (IsDoctorBookUnlocked())
+                        tmp.text = "[E] Doktor Kitabını Aç";
+                    else
+                        tmp.text = "Doktor Kitabı kilitli - Enerji kullan";
+                }
             }
         }
     }
@@ -147,6 +152,14 @@ public class DoctorBookInteractable : MonoBehaviour
         return true;
     }
 
+    private bool IsDoctorBookUnlocked()
+    {
+        if (gameFlowManager == null)
+            return false;
+
+        return gameFlowManager.IsDoctorBookUnlockedForCurrentPatient();
+    }
+
     private void TryToggleBook()
     {
         if (IsPauseActive())
@@ -164,6 +177,13 @@ public class DoctorBookInteractable : MonoBehaviour
         if (!CanOpenBookNow())
             return;
 
+        if (!IsDoctorBookUnlocked())
+        {
+            Debug.Log("DoctorBook kilitli. Açmak için enerji kullanmalısın.");
+            RefreshInteractionVisuals();
+            return;
+        }
+
         StartCoroutine(OpenBookRoutine());
     }
 
@@ -176,6 +196,9 @@ public class DoctorBookInteractable : MonoBehaviour
 
         if (interactionManager != null)
             interactionManager.EnterUIMode();
+
+        yield return null;
+        yield return new WaitForEndOfFrame();
 
         Vector3 targetPos =
             playerCamera.transform.position +
@@ -208,11 +231,32 @@ public class DoctorBookInteractable : MonoBehaviour
         transform.position = targetPos;
         transform.rotation = targetRot;
 
-        if (doctorBookUIManager != null)
-            doctorBookUIManager.OpenBook();
+        yield return StartCoroutine(SafeOpenBookPanelRoutine());
+
+        Cursor.lockState = CursorLockMode.None;
+        Cursor.visible = true;
 
         isAnimating = false;
         RefreshInteractionVisuals();
+    }
+
+    private IEnumerator SafeOpenBookPanelRoutine()
+    {
+        if (doctorBookUIManager == null)
+            yield break;
+
+        doctorBookUIManager.OpenBook();
+
+        yield return null;
+        yield return new WaitForEndOfFrame();
+
+        if (!doctorBookUIManager.IsBookPanelOpen())
+            doctorBookUIManager.OpenBook();
+
+        yield return null;
+
+        if (!doctorBookUIManager.IsBookPanelOpen())
+            doctorBookUIManager.OpenBook();
     }
 
     private void CloseBook()

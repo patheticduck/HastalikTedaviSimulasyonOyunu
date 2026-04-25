@@ -8,6 +8,7 @@ public class PlayerInteractionModeManager : MonoBehaviour
     public DialogueManager dialogueManager;
     public GameObject dialoguePanel;
     public GameFlowManager gameFlowManager;
+    public EnergyUIManager energyUIManager;
 
     [Header("Optional Focus")]
     public Transform doctorLookRoot;
@@ -25,6 +26,9 @@ public class PlayerInteractionModeManager : MonoBehaviour
     {
         if (gameFlowManager == null)
             gameFlowManager = FindFirstObjectByType<GameFlowManager>();
+
+        if (energyUIManager == null)
+            energyUIManager = FindFirstObjectByType<EnergyUIManager>();
     }
 
     private void Update()
@@ -32,8 +36,13 @@ public class PlayerInteractionModeManager : MonoBehaviour
         if (Keyboard.current == null)
             return;
 
-         PauseMenuController pause = FindFirstObjectByType<PauseMenuController>();
+        PauseMenuController pause = FindFirstObjectByType<PauseMenuController>();
         if (pause != null && pause.IsPaused())
+            return;
+
+        // Enerji onay paneli açıksa Tab ile dialogue aç/kapat yapılmasın.
+        // Oyuncu önce Evet/Hayır seçsin.
+        if (energyUIManager != null && energyUIManager.IsConfirmPanelOpen())
             return;
 
         if (forceUIMode)

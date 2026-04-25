@@ -1,5 +1,4 @@
 using System.Collections.Generic;
-using System.Text;
 using TMPro;
 using UnityEngine;
 using UnityEngine.UI;
@@ -36,12 +35,28 @@ public class DoctorBookUIManager : MonoBehaviour
     public void OpenBook()
     {
         if (doctorBookPanel != null)
+        {
             doctorBookPanel.SetActive(true);
+            doctorBookPanel.transform.SetAsLastSibling();
+
+            CanvasGroup canvasGroup = doctorBookPanel.GetComponent<CanvasGroup>();
+            if (canvasGroup != null)
+            {
+                canvasGroup.alpha = 1f;
+                canvasGroup.interactable = true;
+                canvasGroup.blocksRaycasts = true;
+            }
+        }
 
         dialogueManager = FindFirstObjectByType<DialogueManager>();
 
         currentPageIndex = 0;
         ShowCurrentPage();
+    }
+
+    public bool IsBookPanelOpen()
+    {
+        return doctorBookPanel != null && doctorBookPanel.activeInHierarchy;
     }
 
     public void CloseBook()
@@ -135,9 +150,6 @@ public class DoctorBookUIManager : MonoBehaviour
 
         foreach (string item in dialogueManager.GetPerformedTests())
             evidenceTexts.Add(item);
-
-        Debug.Log("BOOK EvidenceTexts: " + string.Join(" | ", evidenceTexts));
-        Debug.Log("BOOK Keywords: " + string.Join(" | ", page.highlightKeywords));
 
         if (evidenceTexts.Count == 0)
             return text;
