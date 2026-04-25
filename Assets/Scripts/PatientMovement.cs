@@ -48,6 +48,10 @@ public class PatientMovement : MonoBehaviour
             {
                 Debug.Log("Hasta hedef noktaya ulaştı.");
 
+                // Hasta hedefe gelince targetPoint'in baktığı yöne döner
+                if (targetPoint != null)
+                    transform.rotation = targetPoint.rotation;
+
                 if (gameFlowManager != null)
                     gameFlowManager.OnPatientArrived();
             }
@@ -63,10 +67,9 @@ public class PatientMovement : MonoBehaviour
         }
     }
 
-    // 🔥 OYUN BAŞLARKEN ÇAĞRILACAK ANA FONKSİYON
     public void BeginWalk()
     {
-        if (startPoint != null)
+        if (startPoint != null && targetPoint != null)
         {
             transform.position = startPoint.position;
             transform.rotation = startPoint.rotation;
@@ -107,9 +110,10 @@ public class PatientMovement : MonoBehaviour
         hasArrived = false;
         gameObject.SetActive(false);
     }
+
     public void StopMovementImmediately()
-{
-    canMove = false;
-    hasArrived = false;
-}
+    {
+        canMove = false;
+        hasArrived = false;
+    }
 }
