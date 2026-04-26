@@ -27,6 +27,9 @@ public class MainMenuManager : MonoBehaviour
     public GameObject endDayPanel;
     public GameObject dayTransitionPanel;
     public GameObject heartsPanel;
+    public GameObject notebookPanel;
+    public GameObject doctorBookPanel;
+    public GameObject energyConfirmPanel;
 
     [Header("Manager")]
     public GameFlowManager gameFlowManager;
@@ -75,6 +78,15 @@ public class MainMenuManager : MonoBehaviour
 
         if (heartsPanel != null)
             heartsPanel.SetActive(false);
+        
+        if (notebookPanel != null)
+            notebookPanel.SetActive(false);
+
+        if (doctorBookPanel != null)
+            doctorBookPanel.SetActive(false);
+        
+        if (energyConfirmPanel != null)
+            energyConfirmPanel.SetActive(false);
 
         MoveCameraRootTo(menuCameraPoint);
 

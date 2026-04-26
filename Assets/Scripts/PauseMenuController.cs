@@ -6,6 +6,10 @@ public class PauseMenuController : MonoBehaviour
 {
     public static PauseMenuController Instance;
 
+    [Header("Panels To Close On Main Menu")]
+    public GameObject doctorBookPanel;
+    public GameObject notebookPanel;
+
     [Header("UI")]
     public GameObject pauseMenuPanel;
     public GameObject crosshair;
@@ -13,12 +17,13 @@ public class PauseMenuController : MonoBehaviour
 
     [Header("Blocking Panels")]
     public GameObject mainMenuPanel;
-    public GameObject notebookPanel;
 
     [Header("References")]
     public MouseLookLimited mouseLook;
     public GameFlowManager gameFlowManager;
     public PlayerInteractionModeManager interactionModeManager;
+    public NotebookInteractable notebookInteractable;
+    public DoctorBookInteractable doctorBookInteractable;
 
     private bool isPaused = false;
     private bool wasDialogueModeActiveBeforePause = false;
@@ -112,6 +117,25 @@ public class PauseMenuController : MonoBehaviour
 
         RefreshPauseInfo();
 
+        bool interruptedBookAnimation = false;
+
+        if (notebookInteractable != null && notebookInteractable.IsNotebookAnimating())
+        {
+            notebookInteractable.ForceCloseNotebookImmediate();
+            interruptedBookAnimation = true;
+        }
+
+        if (doctorBookInteractable != null && doctorBookInteractable.IsBookAnimating())
+        {
+            doctorBookInteractable.ForceCloseBookImmediate();
+            interruptedBookAnimation = true;
+        }
+
+        if (interruptedBookAnimation && interactionModeManager != null)
+        {
+        interactionModeManager.ExitUIMode();
+        }
+
         wasDialogueModeActiveBeforePause =
             interactionModeManager != null &&
             interactionModeManager.IsDialogueModeActive();
@@ -199,6 +223,18 @@ public class PauseMenuController : MonoBehaviour
     {
         if (gameFlowManager != null)
             gameFlowManager.ForceStopAllGameplay();
+        
+        if (notebookInteractable != null)
+            notebookInteractable.ForceCloseNotebookImmediate();
+
+        if (doctorBookInteractable != null)
+            doctorBookInteractable.ForceCloseBookImmediate();
+
+        if (notebookPanel != null)
+            notebookPanel.SetActive(false);
+
+        if (doctorBookPanel != null)
+            doctorBookPanel.SetActive(false);
 
         Time.timeScale = 1f;
         isPaused = false;

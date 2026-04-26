@@ -277,6 +277,26 @@ public class DoctorBookInteractable : MonoBehaviour
 
         CloseBook();
     }
+    public void ForceCloseBookImmediate()
+    {
+        StopAllCoroutines();
+
+        isOpen = false;
+        isAnimating = false;
+
+        transform.position = originalPosition;
+        transform.rotation = originalRotation;
+
+        if (doctorBookUIManager != null)
+            doctorBookUIManager.CloseBook();
+
+        RefreshInteractionVisuals();
+    }
+
+    public bool IsBookAnimating()
+    {
+        return isAnimating;
+    }
 
     private IEnumerator CloseBookRoutine()
     {
