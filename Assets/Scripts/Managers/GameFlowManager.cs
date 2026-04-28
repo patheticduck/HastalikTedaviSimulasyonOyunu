@@ -270,6 +270,9 @@ public class GameFlowManager : MonoBehaviour
         save.totalCorrect = totalCorrect;
         save.totalWrong = totalWrong;
         save.remainingHearts = remainingHearts;
+        save.maxEnergy = maxEnergy;
+        save.currentEnergy = currentEnergy;
+        save.doctorBookUnlockedForCurrentPatient = doctorBookUnlockedForCurrentPatient;
         save.dayCorrect = dayCorrect;
         save.dayWrong = dayWrong;
         save.diagnosisSubmittedForCurrentPatient = diagnosisSubmittedForCurrentPatient;
@@ -294,8 +297,10 @@ public class GameFlowManager : MonoBehaviour
         totalCorrect = save.totalCorrect;
         totalWrong = save.totalWrong;
         remainingHearts = save.remainingHearts;
-        currentEnergy = Mathf.Clamp(currentEnergy, 0, maxEnergy);
-        ResetDoctorBookForNewPatient();
+
+        maxEnergy = save.maxEnergy > 0 ? save.maxEnergy : maxEnergy;
+        currentEnergy = Mathf.Clamp(save.currentEnergy, 0, maxEnergy);
+        doctorBookUnlockedForCurrentPatient = save.doctorBookUnlockedForCurrentPatient;
 
         dayCorrect = save.dayCorrect;
         dayWrong = save.dayWrong;

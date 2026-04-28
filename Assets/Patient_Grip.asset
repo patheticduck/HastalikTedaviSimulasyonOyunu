@@ -555,10 +555,7 @@ MonoBehaviour:
       choiceType: 2
       doctorLine: "Toplad\u0131\u011F\u0131m bilgilere g\xF6re bir tan\u0131 koyaca\u011F\u0131m."
       patientReply: 
-      assistantReply: "Ate\u015F, ani ba\u015Flang\u0131\xE7, halsizlik, kas a\u011Fr\u0131s\u0131
-        ve kuru \xF6ks\xFCr\xFCk birlikteli\u011Fi grip olas\u0131l\u0131\u011F\u0131n\u0131
-        belirgin art\u0131r\u0131yor. Bo\u011Faz bulgular\u0131 e\u015Flik etse de
-        tablo tek ba\u015F\u0131na farenjit ile s\u0131n\u0131rl\u0131 g\xF6r\xFCnm\xFCyor."
+      assistantReply: 
       nextNodeId: 
       returnToHub: 0
       opensDiagnosisPanel: 1

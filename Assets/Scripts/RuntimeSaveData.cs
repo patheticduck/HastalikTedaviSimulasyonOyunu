@@ -9,6 +9,10 @@ public class RuntimeSaveData
     public int totalWrong;
     public int remainingHearts;
 
+    public int maxEnergy;
+    public int currentEnergy;
+    public bool doctorBookUnlockedForCurrentPatient;
+
     public int dayCorrect;
     public int dayWrong;
 

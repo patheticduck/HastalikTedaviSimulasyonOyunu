@@ -16,6 +16,9 @@ public class DialogueManager : MonoBehaviour
     public GameObject optionButtonPrefab;
     public ScrollRect scrollRect;
 
+    [Header("Diagnosis Return")]
+    [SerializeField] private string returnFromDiagnosisText = "GERİ DÖN";
+
     [Header("Typewriter")]
     [SerializeField] private float dialogueTypeSpeed = 0.02f;
     [SerializeField] private float optionTypeSpeed = 0.015f;
@@ -52,14 +55,11 @@ public class DialogueManager : MonoBehaviour
     private readonly HashSet<string> performedTests = new HashSet<string>();
     private readonly HashSet<string> shownAssistantHints = new HashSet<string>();
 
-    // Notebook için oyuncuya gösterilecek TÜRKÇE kayıtlar
     private readonly HashSet<string> notebookSymptoms = new HashSet<string>();
     private readonly HashSet<string> notebookTests = new HashSet<string>();
     private readonly HashSet<string> notebookNotes = new HashSet<string>();
 
-    // Runtime random değerler
     private readonly Dictionary<string, string> runtimeTextValues = new Dictionary<string, string>();
-
     private readonly Dictionary<string, int> diseaseScores = new Dictionary<string, int>();
 
     private int askedQuestionCount = 0;
@@ -95,7 +95,7 @@ public class DialogueManager : MonoBehaviour
         PauseMenuController pause = FindFirstObjectByType<PauseMenuController>();
         if (pause != null && pause.IsPaused())
             return;
-            
+
         if (!isTyping)
             return;
 
@@ -110,9 +110,7 @@ public class DialogueManager : MonoBehaviour
                             Touchscreen.current.primaryTouch.press.wasPressedThisFrame;
 
         if (spacePressed || mousePressed || touchPressed)
-        {
             skipRequested = true;
-        }
     }
 
     public void RequestSkipTyping()
@@ -349,7 +347,6 @@ public class DialogueManager : MonoBehaviour
             }
         }
 
-        // Notebook için Türkçe kayıtları ekle
         if (choice.notebookSymptoms != null)
         {
             foreach (string item in choice.notebookSymptoms)
@@ -455,9 +452,6 @@ public class DialogueManager : MonoBehaviour
 
         RemoveCurrentOptions();
 
-        // Tanıya tıklanır tıklanmaz:
-        // - notebook açılmasın
-        // - Tab ile panel kapatılamasın
         if (gameFlowManager != null)
             gameFlowManager.SetNotebookBlocked(true);
 
@@ -479,8 +473,6 @@ public class DialogueManager : MonoBehaviour
         Canvas.ForceUpdateCanvases();
         yield return StartCoroutine(ScrollToConversationFocus(true));
 
-        // Son cümle gösterildikten sonra panel otomatik kapansın
-        // ve hasta çıkış/result akışı normal başlasın.
         if (interactionModeManager != null)
         {
             interactionModeManager.SetDialogueAvailable(false);
@@ -522,6 +514,7 @@ public class DialogueManager : MonoBehaviour
             yield break;
         }
 
+        /*
         if (askedQuestionCount < 3)
         {
             GameObject systemLine = CreateDialogueLineObject();
@@ -533,6 +526,7 @@ public class DialogueManager : MonoBehaviour
             GameObject systemLine = CreateDialogueLineObject();
             yield return StartCoroutine(TypeDialogueIntoLine(systemLine, "SİSTEM", "En az bir muayene veya test tanıyı netleştirebilir.", false));
         }
+        */
 
         DebugTopDiseaseScores();
 
@@ -560,7 +554,56 @@ public class DialogueManager : MonoBehaviour
             }
         }
 
+        CreateReturnFromDiagnosisButton();
+
         yield return StartCoroutine(ScrollToConversationFocus(false));
+    }
+
+    private void CreateReturnFromDiagnosisButton()
+    {
+        if (optionButtonPrefab == null || diagnosisContainer == null)
+            return;
+
+        GameObject optionObj = Instantiate(optionButtonPrefab, diagnosisContainer);
+
+        DialogueOptionButton optionScript = optionObj.GetComponent<DialogueOptionButton>();
+        if (optionScript != null)
+            SetOptionButtonTextInstant(optionScript, returnFromDiagnosisText);
+
+        Button button = optionObj.GetComponent<Button>();
+        if (button == null)
+            button = optionObj.GetComponentInChildren<Button>();
+
+        if (button == null)
+        {
+            Debug.LogError("CreateReturnFromDiagnosisButton: optionButtonPrefab içinde Button bulunamadı.");
+            return;
+        }
+
+        button.onClick.RemoveAllListeners();
+        button.onClick.AddListener(ReturnFromDiagnosisPanel);
+    }
+
+    public void ReturnFromDiagnosisPanel()
+    {
+        if (isBusy)
+            return;
+
+        StartCoroutine(ReturnFromDiagnosisPanelRoutine());
+    }
+
+    private IEnumerator ReturnFromDiagnosisPanelRoutine()
+    {
+        isBusy = true;
+
+        RemoveCurrentOptions();
+
+        if (string.IsNullOrEmpty(currentNodeId))
+            currentNodeId = rootNodeId;
+
+        yield return StartCoroutine(ShowNodeRoutine(currentNodeId, false));
+
+        isBusy = false;
     }
 
     private IEnumerator ShowNodeRoutine(string nodeId, bool showNodeIntro)
@@ -639,9 +682,7 @@ public class DialogueManager : MonoBehaviour
             CreateSectionHeaderAndContainer("Sorular", out questionsContainer);
 
             foreach (DialogueChoiceData choice in questionChoices)
-            {
                 yield return StartCoroutine(CreateChoiceButtonRoutine(choice, questionsContainer));
-            }
         }
 
         if (testChoices.Count > 0)
@@ -649,9 +690,7 @@ public class DialogueManager : MonoBehaviour
             CreateSectionHeaderAndContainer("Testler", out testsContainer);
 
             foreach (DialogueChoiceData choice in testChoices)
-            {
                 yield return StartCoroutine(CreateChoiceButtonRoutine(choice, testsContainer));
-            }
         }
 
         if (diagnosisChoices.Count > 0)
@@ -659,9 +698,7 @@ public class DialogueManager : MonoBehaviour
             CreateSectionHeaderAndContainer("Tanı", out diagnosisContainer);
 
             foreach (DialogueChoiceData choice in diagnosisChoices)
-            {
                 yield return StartCoroutine(CreateChoiceButtonRoutine(choice, diagnosisContainer));
-            }
         }
 
         yield return StartCoroutine(ScrollToConversationFocus(false));
@@ -1004,30 +1041,30 @@ public class DialogueManager : MonoBehaviour
     }
 
     private string GetSpeakerPrefix(string speaker)
-{
-    switch (speaker)
     {
-        case "HASTA":
-            return "<size=22><color=#EEC28F><b>HASTA —</b></color> <size=20><color=#FFFFFF>";
+        switch (speaker)
+        {
+            case "HASTA":
+                return "<size=22><color=#EEC28F><b>HASTA —</b></color> <size=20><color=#FFFFFF>";
 
-        case "DOKTOR":
-            return "<size=22><color=#C3D9A8><b>DOKTOR —</b></color> <size=20><color=#FFFFFF>";
+            case "DOKTOR":
+                return "<size=22><color=#C3D9A8><b>DOKTOR —</b></color> <size=20><color=#FFFFFF>";
 
-        case "ASİSTAN":
-            return "<size=22><color=#3498DB><b>ASİSTAN —</b></color> <size=20><color=#FFFFFF>";
+            case "ASİSTAN":
+                return "<size=22><color=#3498DB><b>ASİSTAN —</b></color> <size=20><color=#FFFFFF>";
 
-        case "SİSTEM":
-            return "<size=22><color=#4A4A4A><b>SİSTEM —</b></color> <size=20><color=#FFFFFF>";
+            case "SİSTEM":
+                return "<size=22><color=#4A4A4A><b>SİSTEM —</b></color> <size=20><color=#FFFFFF>";
 
-        default:
-            return "<size=20><color=#FFFFFF>";
+            default:
+                return "<size=20><color=#FFFFFF>";
+        }
     }
-}
 
     private string GetSpeakerSuffix(string speaker)
-{
-    return "</color></size>";
-}
+    {
+        return "</color></size>";
+    }
 
     private GameObject CreateDialogueLineObject()
     {
@@ -1311,9 +1348,7 @@ public class DialogueManager : MonoBehaviour
         if (contentRoot != null)
         {
             foreach (Transform child in contentRoot)
-            {
                 Destroy(child.gameObject);
-            }
         }
     }
 

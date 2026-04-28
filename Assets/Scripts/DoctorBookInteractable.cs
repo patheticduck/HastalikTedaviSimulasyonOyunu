@@ -16,6 +16,10 @@ public class DoctorBookInteractable : MonoBehaviour
     public GameObject interactText;
     public float interactDistance = 3f;
 
+    [Header("Interaction Text")]
+    public string unlockedInteractText = "[E] Doktor Kitabını Aç";
+    public string lockedInteractText = "Doktor Kitabı kilitli - Enerji kullan";
+
     [Header("Animation")]
     public float moveSpeed = 5f;
     public Vector3 cameraOffset = new Vector3(0f, -0.05f, 0.6f);
@@ -127,9 +131,9 @@ public class DoctorBookInteractable : MonoBehaviour
                 if (tmp != null)
                 {
                     if (IsDoctorBookUnlocked())
-                        tmp.text = "[E] Doktor Kitabını Aç";
+                        tmp.text = unlockedInteractText;
                     else
-                        tmp.text = "Doktor Kitabı kilitli - Enerji kullan";
+                        tmp.text = lockedInteractText;
                 }
             }
         }
@@ -277,6 +281,7 @@ public class DoctorBookInteractable : MonoBehaviour
 
         CloseBook();
     }
+
     public void ForceCloseBookImmediate()
     {
         StopAllCoroutines();

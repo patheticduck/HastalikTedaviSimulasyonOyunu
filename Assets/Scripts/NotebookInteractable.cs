@@ -1,6 +1,7 @@
 using System.Collections;
 using UnityEngine;
 using UnityEngine.InputSystem;
+using TMPro;
 
 public class NotebookInteractable : MonoBehaviour
 {
@@ -14,6 +15,9 @@ public class NotebookInteractable : MonoBehaviour
     public GameObject highlightObject;
     public GameObject interactText;
     public float interactDistance = 3f;
+
+    [Header("Interaction Text")]
+    public string notebookInteractText = "[E] Kayıt Defterini Aç";
 
     [Header("Animation")]
     public float moveSpeed = 5f;
@@ -110,7 +114,16 @@ public class NotebookInteractable : MonoBehaviour
             highlightObject.SetActive(canShowPrompt);
 
         if (interactText != null)
+        {
             interactText.SetActive(canShowPrompt);
+
+            if (canShowPrompt)
+            {
+                TextMeshProUGUI tmp = interactText.GetComponent<TextMeshProUGUI>();
+                if (tmp != null)
+                    tmp.text = notebookInteractText;
+            }
+        }
     }
 
     private bool CanShowInteractionPrompt()
