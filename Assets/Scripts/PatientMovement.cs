@@ -6,15 +6,20 @@ public class PatientMovement : MonoBehaviour
     public Transform startPoint;
     public Transform targetPoint;
     public float moveSpeed = 2f;
-    public float stopDistance = 0.2f;
+    public float stopDistance = 1f;
 
     [Header("Flow")]
     public GameFlowManager gameFlowManager;
 
-    private bool hasArrived = false;
+    private Animator animator;
     private bool canMove = false;
     private bool walkingIn = true;
     private Vector3 currentTarget;
+
+    void Awake()
+    {
+        animator = GetComponentInChildren<Animator>();
+    }
 
     void Update()
     {
@@ -36,39 +41,45 @@ public class PatientMovement : MonoBehaviour
         Vector3 direction = targetPosition - transform.position;
         direction.y = 0f;
 
-        if (direction != Vector3.zero)
+        if (direction.sqrMagnitude > 0.001f)
             transform.forward = direction.normalized;
 
         if (Vector3.Distance(transform.position, targetPosition) <= stopDistance)
         {
-            canMove = false;
-            hasArrived = true;
+            ArriveAtTarget();
+        }
+    }
 
-            if (walkingIn)
-            {
-                Debug.Log("Hasta hedef noktaya ulaştı.");
+    private void ArriveAtTarget()
+    {
+        Debug.Log("BURAYA GİRDİ: Hasta hedefe ulaştı.");
 
-                // Hasta hedefe gelince targetPoint'in baktığı yöne döner
-                if (targetPoint != null)
-                    transform.rotation = targetPoint.rotation;
+        canMove = false;
+        PlayIdle();
 
-                if (gameFlowManager != null)
-                    gameFlowManager.OnPatientArrived();
-            }
-            else
-            {
-                Debug.Log("Hasta odadan çıktı.");
+        if (walkingIn)
+        {
+            if (targetPoint != null)
+                transform.rotation = targetPoint.rotation;
 
-                gameObject.SetActive(false);
+            if (gameFlowManager != null)
+                gameFlowManager.OnPatientArrived();
+        }
+        else
+        {
+            gameObject.SetActive(false);
 
-                if (gameFlowManager != null)
-                    gameFlowManager.OnPatientExited();
-            }
+            if (gameFlowManager != null)
+                gameFlowManager.OnPatientExited();
         }
     }
 
     public void BeginWalk()
     {
+        gameObject.SetActive(true);
+
+        animator = GetComponentInChildren<Animator>();
+
         if (startPoint != null && targetPoint != null)
         {
             transform.position = startPoint.position;
@@ -77,15 +88,17 @@ public class PatientMovement : MonoBehaviour
         }
 
         walkingIn = true;
-        hasArrived = false;
         canMove = true;
-        gameObject.SetActive(true);
+
+        PlayWalk();
 
         Debug.Log("Hasta içeri yürümeye başladı.");
     }
 
     public void BeginExit()
     {
+        animator = GetComponentInChildren<Animator>();
+
         if (startPoint == null)
         {
             HidePatient();
@@ -97,9 +110,10 @@ public class PatientMovement : MonoBehaviour
         }
 
         walkingIn = false;
-        hasArrived = false;
         canMove = true;
         currentTarget = startPoint.position;
+
+        PlayWalk();
 
         Debug.Log("Hasta dışarı çıkmaya başladı.");
     }
@@ -107,13 +121,47 @@ public class PatientMovement : MonoBehaviour
     public void HidePatient()
     {
         canMove = false;
-        hasArrived = false;
+        PlayIdle();
         gameObject.SetActive(false);
     }
 
     public void StopMovementImmediately()
     {
         canMove = false;
-        hasArrived = false;
+        PlayIdle();
+    }
+
+    private void PlayWalk()
+    {
+        if (animator == null)
+            animator = GetComponentInChildren<Animator>();
+
+        if (animator != null)
+        {
+            animator.SetBool("isWalking", true);
+            animator.Play("walk", 0, 0f);
+            Debug.Log("WALK: isWalking TRUE");
+        }
+        else
+        {
+            Debug.LogWarning("Animator bulunamadı!");
+        }
+    }
+
+    private void PlayIdle()
+    {
+        if (animator == null)
+            animator = GetComponentInChildren<Animator>();
+
+        if (animator != null)
+        {
+            animator.SetBool("isWalking", false);
+            animator.Play("Idle 0", 0, 0f);
+            Debug.Log("IDLE: isWalking FALSE");
+        }
+        else
+        {
+            Debug.LogWarning("Animator bulunamadı!");
+        }
     }
 }
