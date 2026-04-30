@@ -836,7 +836,7 @@ MonoBehaviour:
   interactionModeManager: {fileID: 333407512}
   patientMovement: {fileID: 667541130}
   gripCase: {fileID: 11400000, guid: 65d78d7193546784a9a50f498fe3a8a9, type: 2}
-  coldCase: {fileID: 11400000, guid: df216ad5b6d61a347b0876e614f75d43, type: 2}
+  coldCase: {fileID: 11400000, guid: 207a350aaa770fe43abb565dfdd2f7e6, type: 2}
   dialoguePanel: {fileID: 1794947422}
   endDayPanel: {fileID: 1909657772}
   gameOverPanel: {fileID: 1797343934}
