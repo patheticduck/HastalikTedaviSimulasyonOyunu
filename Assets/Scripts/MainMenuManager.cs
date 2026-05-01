@@ -14,6 +14,9 @@ public class MainMenuManager : MonoBehaviour
     public Button newGameButton;
     public Button continueButton;
 
+    [Header("Continue Info UI")]
+    public TextMeshProUGUI continueInfoText;
+
     [Header("History UI")]
     public Transform historyContent;
     public HistoryItemUI historyItemPrefab;
@@ -78,15 +81,18 @@ public class MainMenuManager : MonoBehaviour
 
         if (heartsPanel != null)
             heartsPanel.SetActive(false);
-        
+
         if (notebookPanel != null)
             notebookPanel.SetActive(false);
 
         if (doctorBookPanel != null)
             doctorBookPanel.SetActive(false);
-        
+
         if (energyConfirmPanel != null)
             energyConfirmPanel.SetActive(false);
+
+        if (AudioManager.Instance != null)
+            AudioManager.Instance.PlayMainMenuMusic();
 
         MoveCameraRootTo(menuCameraPoint);
 
@@ -99,6 +105,7 @@ public class MainMenuManager : MonoBehaviour
             RuntimeSaveManager.Instance.currentSave.hasSave;
 
         UpdateContinueButtonState(canContinue);
+        UpdateContinueInfoText(canContinue);
 
         UpdateHistorySection();
 
@@ -122,6 +129,9 @@ public class MainMenuManager : MonoBehaviour
         if (heartsPanel != null)
             heartsPanel.SetActive(true);
 
+        if (AudioManager.Instance != null)
+            AudioManager.Instance.PlayGameplayMusic();
+
         MoveCameraRootTo(gameplayCameraPoint);
 
         if (mouseLook != null)
@@ -129,6 +139,8 @@ public class MainMenuManager : MonoBehaviour
 
         if (RuntimeSaveManager.Instance != null)
             RuntimeSaveManager.Instance.ClearSave();
+
+        UpdateContinueInfoText(false);
 
         if (gameFlowManager != null)
         {
@@ -167,6 +179,9 @@ public class MainMenuManager : MonoBehaviour
 
         if (heartsPanel != null)
             heartsPanel.SetActive(true);
+
+        if (AudioManager.Instance != null)
+            AudioManager.Instance.PlayGameplayMusic();
 
         MoveCameraRootTo(gameplayCameraPoint);
 
@@ -224,6 +239,46 @@ public class MainMenuManager : MonoBehaviour
 
         doctorLookRoot.position = targetPoint.position;
         doctorLookRoot.rotation = targetPoint.rotation;
+    }
+
+    private void UpdateContinueInfoText(bool canContinue)
+    {
+        if (continueInfoText == null)
+            return;
+
+        if (!canContinue ||
+            RuntimeSaveManager.Instance == null ||
+            RuntimeSaveManager.Instance.currentSave == null ||
+            !RuntimeSaveManager.Instance.currentSave.hasSave)
+        {
+            continueInfoText.gameObject.SetActive(false);
+            return;
+        }
+
+        RuntimeSaveData save = RuntimeSaveManager.Instance.currentSave;
+
+        int patientsPerDay = 3;
+        int totalPatients = 21;
+
+        if (gameFlowManager != null)
+        {
+            if (gameFlowManager.patientsPerDay > 0)
+                patientsPerDay = gameFlowManager.patientsPerDay;
+
+            if (gameFlowManager.totalPatientsInRun > 0)
+                totalPatients = gameFlowManager.totalPatientsInRun;
+        }
+
+        int patientInDay = ((save.currentPatientNumber - 1) % patientsPerDay) + 1;
+
+        continueInfoText.gameObject.SetActive(true);
+
+        continueInfoText.text =
+            "Devam Eden Oyun\n" +
+            "Gün: " + save.currentDay + "\n" +
+            "Hasta: " + patientInDay + " (" + save.currentPatientNumber + "/" + totalPatients + ")\n" +
+            "Doğru: " + save.totalCorrect + "   Yanlış: " + save.totalWrong + "\n" +
+            "Kalan Hak: " + save.remainingHearts;
     }
 
     private void UpdateHistorySection()

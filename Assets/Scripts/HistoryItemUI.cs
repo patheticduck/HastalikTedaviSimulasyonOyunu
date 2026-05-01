@@ -163,6 +163,9 @@ public class HistoryItemUI : MonoBehaviour,
 
     public void ToggleDetail()
     {
+        if (AudioManager.Instance != null)
+            AudioManager.Instance.PlayClick();
+
         isOpen = !isOpen;
 
         if (detailPanel != null)
@@ -196,6 +199,9 @@ public class HistoryItemUI : MonoBehaviour,
         deleteButton.onClick.RemoveAllListeners();
         deleteButton.onClick.AddListener(() =>
         {
+            if (AudioManager.Instance != null)
+                AudioManager.Instance.PlayClick();
+                
             onDeleteClicked?.Invoke(historyIndex);
         });
 

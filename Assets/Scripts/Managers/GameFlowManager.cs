@@ -528,6 +528,16 @@ public class GameFlowManager : MonoBehaviour
         if (endDayPanel != null) endDayPanel.SetActive(false);
         if (gameOverPanel != null) gameOverPanel.SetActive(true);
 
+        if (AudioManager.Instance != null)
+        {
+            AudioManager.Instance.StopAllMusic();
+
+            if (isVictory)
+                AudioManager.Instance.PlayWin();
+            else
+                AudioManager.Instance.PlayLose();
+        }
+
         SetEnergyPanelVisible(false);
 
         if (gameOverTitleText != null)
