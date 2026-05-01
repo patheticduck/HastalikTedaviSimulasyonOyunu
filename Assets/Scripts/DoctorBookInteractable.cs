@@ -196,6 +196,9 @@ public class DoctorBookInteractable : MonoBehaviour
         isAnimating = true;
         isOpen = true;
 
+        if (AudioManager.Instance != null)
+            AudioManager.Instance.PlayBookOpenClose();
+
         RefreshInteractionVisuals();
 
         if (interactionManager != null)
@@ -306,6 +309,9 @@ public class DoctorBookInteractable : MonoBehaviour
     private IEnumerator CloseBookRoutine()
     {
         isAnimating = true;
+
+        if (AudioManager.Instance != null)
+            AudioManager.Instance.PlayBookOpenClose();
 
         if (doctorBookUIManager != null)
             doctorBookUIManager.CloseBook();

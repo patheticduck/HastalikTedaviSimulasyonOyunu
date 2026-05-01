@@ -572,9 +572,9 @@ public class GameFlowManager : MonoBehaviour
         StringBuilder sb = new StringBuilder();
 
         if (isVictory)
-            sb.AppendLine("7 günü başarıyla tamamladın.");
+            sb.AppendLine("5 günü başarıyla tamamladın.");
         else
-            sb.AppendLine("5 yanlış teşhis hakkını doldurdun.");
+            sb.AppendLine("3 yanlış teşhis hakkını doldurdun.");
 
         sb.AppendLine();
         sb.AppendLine("Toplam Doğru: " + totalCorrect);

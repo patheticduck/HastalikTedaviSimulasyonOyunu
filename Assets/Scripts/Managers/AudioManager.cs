@@ -17,15 +17,25 @@ public class AudioManager : MonoBehaviour
     public AudioClip clickSound;
     public AudioClip winSound;
     public AudioClip loseSound;
+    public AudioClip bookOpenCloseSound;
+    public AudioClip pageTurnSound;
+
+    [Header("Volume Values")]
+    [Range(0f, 1f)] public float mainMenuVolume = 1f;
+    [Range(0f, 1f)] public float gameplayVolume = 1f;
+    [Range(0f, 1f)] public float sfxVolume = 1f;
 
     private Coroutine gameplayRoutine;
+    private bool isMainMenuMusicPlaying = false;
+    private bool isGameplayMusicPlaying = false;
 
     private void Awake()
     {
         if (Instance == null)
         {
             Instance = this;
-            DontDestroyOnLoad(gameObject); // RuntimeSaveManager gibi sahneler arası korunur
+            DontDestroyOnLoad(gameObject);
+            ApplySFXVolume();
         }
         else
         {
@@ -33,9 +43,6 @@ public class AudioManager : MonoBehaviour
         }
     }
 
-    // =========================
-    // 🎵 MAIN MENU MUSIC
-    // =========================
     public void PlayMainMenuMusic()
     {
         StopGameplayMusic();
@@ -43,19 +50,23 @@ public class AudioManager : MonoBehaviour
         if (mainMenuMusic == null || musicSource == null)
             return;
 
+        isMainMenuMusicPlaying = true;
+        isGameplayMusicPlaying = false;
+
         musicSource.Stop();
+        musicSource.volume = mainMenuVolume;
         musicSource.clip = mainMenuMusic;
         musicSource.loop = true;
         musicSource.Play();
     }
 
-    // =========================
-    // 🎮 GAMEPLAY MUSIC
-    // =========================
     public void PlayGameplayMusic()
     {
-        if (gameplayMusics == null || gameplayMusics.Length == 0)
+        if (musicSource == null || gameplayMusics == null || gameplayMusics.Length == 0)
             return;
+
+        isMainMenuMusicPlaying = false;
+        isGameplayMusicPlaying = true;
 
         StopGameplayMusic();
         gameplayRoutine = StartCoroutine(GameplayMusicLoop());
@@ -72,6 +83,7 @@ public class AudioManager : MonoBehaviour
             if (clip != null)
             {
                 musicSource.Stop();
+                musicSource.volume = gameplayVolume;
                 musicSource.clip = clip;
                 musicSource.loop = false;
                 musicSource.Play();
@@ -103,13 +115,13 @@ public class AudioManager : MonoBehaviour
     {
         StopGameplayMusic();
 
+        isMainMenuMusicPlaying = false;
+        isGameplayMusicPlaying = false;
+
         if (musicSource != null)
             musicSource.Stop();
     }
 
-    // =========================
-    // 🔊 SFX
-    // =========================
     public void PlayClick()
     {
         PlaySFX(clickSound);
@@ -125,11 +137,50 @@ public class AudioManager : MonoBehaviour
         PlaySFX(loseSound);
     }
 
+    public void PlayBookOpenClose()
+    {
+        PlaySFX(bookOpenCloseSound);
+    }
+
+    public void PlayPageTurn()
+    {
+        PlaySFX(pageTurnSound);
+    }
+
     private void PlaySFX(AudioClip clip)
     {
         if (clip == null || sfxSource == null)
             return;
 
+        sfxSource.volume = sfxVolume;
         sfxSource.PlayOneShot(clip);
+    }
+
+    public void SetMainMenuVolume(float value)
+    {
+        mainMenuVolume = Mathf.Clamp01(value);
+
+        if (musicSource != null && isMainMenuMusicPlaying)
+            musicSource.volume = mainMenuVolume;
+    }
+
+    public void SetGameplayVolume(float value)
+    {
+        gameplayVolume = Mathf.Clamp01(value);
+
+        if (musicSource != null && isGameplayMusicPlaying)
+            musicSource.volume = gameplayVolume;
+    }
+
+    public void SetSFXVolume(float value)
+    {
+        sfxVolume = Mathf.Clamp01(value);
+        ApplySFXVolume();
+    }
+
+    private void ApplySFXVolume()
+    {
+        if (sfxSource != null)
+            sfxSource.volume = sfxVolume;
     }
 }

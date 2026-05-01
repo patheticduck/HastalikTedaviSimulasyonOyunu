@@ -203,6 +203,9 @@ public class NotebookInteractable : MonoBehaviour
         isAnimating = true;
         isOpen = true;
 
+        if (AudioManager.Instance != null)
+            AudioManager.Instance.PlayBookOpenClose();
+
         RefreshInteractionVisuals();
 
         interactionManager.EnterUIMode();
@@ -250,6 +253,9 @@ public class NotebookInteractable : MonoBehaviour
         isAnimating = true;
         isOpen = false;
 
+        if (AudioManager.Instance != null)
+            AudioManager.Instance.PlayBookOpenClose();
+
         if (notebookUIManager != null)
             notebookUIManager.CloseNotebookUI();
 
@@ -288,6 +294,17 @@ public class NotebookInteractable : MonoBehaviour
     public bool IsNotebookAnimating()
     {
         return isAnimating;
+    }
+
+    public void CloseNotebookFromButton()
+    {
+        if (!isOpen || isAnimating)
+            return;
+
+        if (PauseMenuController.Instance != null && PauseMenuController.Instance.IsPaused())
+            return;
+
+        StartCoroutine(CloseNotebook());
     }
 
     public void ForceCloseNotebookImmediate()
