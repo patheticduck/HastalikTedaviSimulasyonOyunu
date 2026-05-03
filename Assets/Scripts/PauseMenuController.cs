@@ -17,6 +17,7 @@ public class PauseMenuController : MonoBehaviour
 
     [Header("Blocking Panels")]
     public GameObject mainMenuPanel;
+    public GameObject settingsPanel;
 
     [Header("References")]
     public MouseLookLimited mouseLook;
@@ -68,17 +69,20 @@ public class PauseMenuController : MonoBehaviour
         pausePressed = Keyboard.current.escapeKey.wasPressedThisFrame;
 #endif
 
-        if (pausePressed)
+        if (!pausePressed)
+            return;
+
+        if (settingsPanel != null && settingsPanel.activeSelf)
+            return;
+
+        if (isPaused)
         {
-            if (isPaused)
-            {
-                ResumeGame();
-            }
-            else
-            {
-                if (CanOpenPause())
-                    PauseGame();
-            }
+            ResumeGame();
+        }
+        else
+        {
+            if (CanOpenPause())
+                PauseGame();
         }
     }
 
@@ -90,7 +94,8 @@ public class PauseMenuController : MonoBehaviour
         if (mainMenuPanel != null && mainMenuPanel.activeSelf)
             return false;
 
-        // Notebook açıkken pause açılabilsin diye notebookPanel kontrolü yok.
+        if (settingsPanel != null && settingsPanel.activeSelf)
+            return false;
 
         if (gameFlowManager != null)
         {
@@ -133,7 +138,7 @@ public class PauseMenuController : MonoBehaviour
 
         if (interruptedBookAnimation && interactionModeManager != null)
         {
-        interactionModeManager.ExitUIMode();
+            interactionModeManager.ExitUIMode();
         }
 
         wasDialogueModeActiveBeforePause =
@@ -223,7 +228,7 @@ public class PauseMenuController : MonoBehaviour
     {
         if (gameFlowManager != null)
             gameFlowManager.ForceStopAllGameplay();
-        
+
         if (notebookInteractable != null)
             notebookInteractable.ForceCloseNotebookImmediate();
 

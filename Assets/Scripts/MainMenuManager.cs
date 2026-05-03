@@ -67,6 +67,8 @@ public class MainMenuManager : MonoBehaviour
 
     public void ShowMainMenu()
     {
+        Time.timeScale = 0f;
+
         if (mainMenuPanel != null)
             mainMenuPanel.SetActive(true);
 
@@ -114,6 +116,8 @@ public class MainMenuManager : MonoBehaviour
 
     public void StartGameFromMenu()
     {
+        Time.timeScale = 1f;
+
         if (mainMenuPanel != null)
             mainMenuPanel.SetActive(false);
 
@@ -155,6 +159,8 @@ public class MainMenuManager : MonoBehaviour
 
     public void ContinueGameFromMenu()
     {
+        Time.timeScale = 1f;
+
         if (RuntimeSaveManager.Instance == null ||
             RuntimeSaveManager.Instance.currentSave == null ||
             !RuntimeSaveManager.Instance.currentSave.hasSave)
