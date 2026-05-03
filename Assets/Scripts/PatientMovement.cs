@@ -11,14 +11,18 @@ public class PatientMovement : MonoBehaviour
     [Header("Flow")]
     public GameFlowManager gameFlowManager;
 
+    [Header("Patient Visuals")]
+    public GameObject[] patientVisuals;
+    private int currentPatientIndex = 0;
+
     private Animator animator;
     private bool canMove = false;
     private bool walkingIn = true;
     private Vector3 currentTarget;
 
-    void Awake()
+    void OnEnable()
     {
-        animator = GetComponentInChildren<Animator>();
+        SetPatientVisual(currentPatientIndex);
     }
 
     void Update()
@@ -52,7 +56,7 @@ public class PatientMovement : MonoBehaviour
 
     private void ArriveAtTarget()
     {
-        Debug.Log("BURAYA GİRDİ: Hasta hedefe ulaştı.");
+        Debug.Log("Hasta hedefe ulaştı.");
 
         canMove = false;
         PlayIdle();
@@ -67,6 +71,8 @@ public class PatientMovement : MonoBehaviour
         }
         else
         {
+            currentPatientIndex++;
+
             gameObject.SetActive(false);
 
             if (gameFlowManager != null)
@@ -76,9 +82,15 @@ public class PatientMovement : MonoBehaviour
 
     public void BeginWalk()
     {
+        if (patientVisuals == null || patientVisuals.Length == 0)
+        {
+            Debug.LogWarning("Patient Visuals boş!");
+            return;
+        }
+
         gameObject.SetActive(true);
 
-        animator = GetComponentInChildren<Animator>();
+        SetPatientVisual(currentPatientIndex);
 
         if (startPoint != null && targetPoint != null)
         {
@@ -92,16 +104,24 @@ public class PatientMovement : MonoBehaviour
 
         PlayWalk();
 
-        Debug.Log("Hasta içeri yürümeye başladı.");
+        Debug.Log("Hasta içeri yürümeye başladı: " + GetCurrentPatientName());
     }
 
     public void BeginExit()
     {
-        animator = GetComponentInChildren<Animator>();
+        if (patientVisuals == null || patientVisuals.Length == 0)
+        {
+            Debug.LogWarning("Patient Visuals boş!");
+            return;
+        }
+
+        SetPatientVisual(currentPatientIndex);
 
         if (startPoint == null)
         {
             HidePatient();
+
+            currentPatientIndex++;
 
             if (gameFlowManager != null)
                 gameFlowManager.OnPatientExited();
@@ -115,7 +135,7 @@ public class PatientMovement : MonoBehaviour
 
         PlayWalk();
 
-        Debug.Log("Hasta dışarı çıkmaya başladı.");
+        Debug.Log("Hasta dışarı çıkmaya başladı: " + GetCurrentPatientName());
     }
 
     public void HidePatient()
@@ -131,6 +151,38 @@ public class PatientMovement : MonoBehaviour
         PlayIdle();
     }
 
+    public void SetPatientVisual(int index)
+    {
+        if (patientVisuals == null || patientVisuals.Length == 0)
+        {
+            animator = GetComponentInChildren<Animator>();
+            return;
+        }
+
+        int visualIndex = Mathf.Abs(index) % patientVisuals.Length;
+
+        for (int i = 0; i < patientVisuals.Length; i++)
+        {
+            if (patientVisuals[i] != null)
+                patientVisuals[i].SetActive(i == visualIndex);
+        }
+
+        animator = GetComponentInChildren<Animator>();
+    }
+
+    private string GetCurrentPatientName()
+    {
+        if (patientVisuals == null || patientVisuals.Length == 0)
+            return "Hasta yok";
+
+        int visualIndex = Mathf.Abs(currentPatientIndex) % patientVisuals.Length;
+
+        if (patientVisuals[visualIndex] == null)
+            return "Boş hasta elementi";
+
+        return patientVisuals[visualIndex].name;
+    }
+
     private void PlayWalk()
     {
         if (animator == null)
@@ -140,7 +192,6 @@ public class PatientMovement : MonoBehaviour
         {
             animator.SetBool("isWalking", true);
             animator.Play("walk", 0, 0f);
-            Debug.Log("WALK: isWalking TRUE");
         }
         else
         {
@@ -157,7 +208,6 @@ public class PatientMovement : MonoBehaviour
         {
             animator.SetBool("isWalking", false);
             animator.Play("Idle 0", 0, 0f);
-            Debug.Log("IDLE: isWalking FALSE");
         }
         else
         {
