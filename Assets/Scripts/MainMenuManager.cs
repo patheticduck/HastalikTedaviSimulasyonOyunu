@@ -25,6 +25,12 @@ public class MainMenuManager : MonoBehaviour
     public Button deleteModeButton;
     public TextMeshProUGUI deleteModeButtonText;
 
+    [Header("Clear All History")]
+    public Button clearAllButton;
+    public GameObject confirmDeleteAllPanel;
+    public Button confirmDeleteYesButton;
+    public Button confirmDeleteNoButton;
+
     [Header("Game Panels")]
     public GameObject dialoguePanel;
     public GameObject endDayPanel;
@@ -61,6 +67,27 @@ public class MainMenuManager : MonoBehaviour
             deleteModeButton.onClick.AddListener(ToggleHistoryDeleteMode);
         }
 
+        if (clearAllButton != null)
+        {
+            clearAllButton.onClick.RemoveAllListeners();
+            clearAllButton.onClick.AddListener(OpenConfirmDeleteAllPanel);
+        }
+
+        if (confirmDeleteYesButton != null)
+        {
+            confirmDeleteYesButton.onClick.RemoveAllListeners();
+            confirmDeleteYesButton.onClick.AddListener(ConfirmClearAllHistory);
+        }
+
+        if (confirmDeleteNoButton != null)
+        {
+            confirmDeleteNoButton.onClick.RemoveAllListeners();
+            confirmDeleteNoButton.onClick.AddListener(CloseConfirmDeleteAllPanel);
+        }
+
+        if (confirmDeleteAllPanel != null)
+            confirmDeleteAllPanel.SetActive(false);
+
         UpdateDeleteModeButtonText();
         ShowMainMenu();
     }
@@ -92,6 +119,9 @@ public class MainMenuManager : MonoBehaviour
 
         if (energyConfirmPanel != null)
             energyConfirmPanel.SetActive(false);
+
+        if (confirmDeleteAllPanel != null)
+            confirmDeleteAllPanel.SetActive(false);
 
         if (AudioManager.Instance != null)
             AudioManager.Instance.PlayMainMenuMusic();
@@ -303,10 +333,16 @@ public class MainMenuManager : MonoBehaviour
         {
             isHistoryDeleteMode = false;
             UpdateDeleteModeButtonText();
+
+            if (confirmDeleteAllPanel != null)
+                confirmDeleteAllPanel.SetActive(false);
         }
 
         if (deleteModeButton != null)
             deleteModeButton.gameObject.SetActive(hasAnyHistory);
+
+        if (clearAllButton != null)
+            clearAllButton.gameObject.SetActive(hasAnyHistory);
 
         Debug.Log("History görünür mü? " + hasAnyHistory);
 
@@ -395,6 +431,42 @@ public class MainMenuManager : MonoBehaviour
             isHistoryDeleteMode = false;
             UpdateDeleteModeButtonText();
         }
+
+        UpdateHistorySection();
+        StartCoroutine(ForceHistoryLayoutRefreshNextFrame());
+    }
+
+    public void OpenConfirmDeleteAllPanel()
+    {
+        if (AudioManager.Instance != null)
+            AudioManager.Instance.PlayClick();
+
+        if (confirmDeleteAllPanel != null)
+            confirmDeleteAllPanel.SetActive(true);
+    }
+
+    public void CloseConfirmDeleteAllPanel()
+    {
+        if (AudioManager.Instance != null)
+            AudioManager.Instance.PlayClick();
+
+        if (confirmDeleteAllPanel != null)
+            confirmDeleteAllPanel.SetActive(false);
+    }
+
+    public void ConfirmClearAllHistory()
+    {
+        if (AudioManager.Instance != null)
+            AudioManager.Instance.PlayClick();
+
+        if (runHistoryManager != null)
+            runHistoryManager.ClearAllHistory();
+
+        isHistoryDeleteMode = false;
+        UpdateDeleteModeButtonText();
+
+        if (confirmDeleteAllPanel != null)
+            confirmDeleteAllPanel.SetActive(false);
 
         UpdateHistorySection();
         StartCoroutine(ForceHistoryLayoutRefreshNextFrame());
