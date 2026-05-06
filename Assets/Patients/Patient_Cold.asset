@@ -507,12 +507,10 @@ MonoBehaviour:
       nextNodeId: 
       returnToHub: 0
       opensDiagnosisPanel: 1
-      reusable: 0
+      reusable: 1
       hideAfterUse: 0
       gainedTags: []
-      requiredTags:
-      - temp_checked
-      - sneezing_yes
+      requiredTags: []
       blockedTags: []
       discoveredSymptoms: []
       performedTests: []

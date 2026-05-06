@@ -553,27 +553,23 @@ MonoBehaviour:
         score: 1
     - choiceText: "Tan\u0131 koy"
       choiceType: 2
-      doctorLine: "Toplad\u0131\u011F\u0131m bilgilere g\xF6re bir tan\u0131 koyaca\u011F\u0131m."
+      doctorLine: 
       patientReply: 
       assistantReply: 
       nextNodeId: 
       returnToHub: 0
       opensDiagnosisPanel: 1
-      reusable: 0
+      reusable: 1
       hideAfterUse: 0
-      gainedTags:
-      - night_cough
-      requiredTags:
-      - dry_cough
+      gainedTags: []
+      requiredTags: []
       blockedTags: []
       discoveredSymptoms: []
       performedTests: []
       notebookSymptoms: []
       notebookTests: []
       notebookNotes: []
-      diseaseEffects:
-      - diseaseId: GRIP
-        score: 1
+      diseaseEffects: []
   diagnosisChoices:
   - diseaseId: GRIP
     diagnosisName: Grip
