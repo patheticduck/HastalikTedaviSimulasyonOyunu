@@ -124,6 +124,8 @@ public class GameFlowManager : MonoBehaviour
 
     private readonly List<PatientAnalysisEntry> patientAnalysisHistory = new List<PatientAnalysisEntry>();
 
+    private string currentRunId = "";
+
     private void Start()
     {
         if (dialoguePanel != null) dialoguePanel.SetActive(false);
@@ -153,6 +155,8 @@ public class GameFlowManager : MonoBehaviour
 
     public void ResetGame()
     {
+        currentRunId = System.Guid.NewGuid().ToString();
+
         currentDay = 1;
         currentPatientNumber = 1;
 
@@ -418,6 +422,7 @@ public class GameFlowManager : MonoBehaviour
         save.lastCorrectDiagnosisName = lastCorrectDiagnosisName;
         save.pendingLoseGameOver = pendingLoseGameOver;
         save.hasSave = true;
+        save.runId = currentRunId;
         save.patientAnalysisHistory = ClonePatientAnalysisHistory();
 
         save.plannedPatientCaseIds = new List<string>(plannedPatientCaseIds);
@@ -429,6 +434,11 @@ public class GameFlowManager : MonoBehaviour
     {
         if (save == null)
             return;
+
+        currentRunId = save.runId;
+
+        if (string.IsNullOrEmpty(currentRunId))
+            currentRunId = System.Guid.NewGuid().ToString();
 
         currentDay = save.currentDay;
         currentPatientNumber = save.currentPatientNumber;

@@ -27,9 +27,14 @@ public class RuntimeSaveData
 
     public bool hasSave;
 
-    // Yeni sistem:
-    // Oyun başında rastgele oluşturulan 15 hastalık sırası burada saklanır.
-    // Böylece Save/Load sonrası hastalar yeniden random seçilmez.
+    // Aynı oyun döngüsünü ayırt etmek için kullanılır.
+    public string runId;
+
+    // Continue save oluşturulma zamanı
+    public string savedDateText;
+    public long savedAtTicks;
+
+    // Oyun başında oluşturulan hasta sırası
     public List<string> plannedPatientCaseIds = new List<string>();
 
     public List<PatientAnalysisEntry> patientAnalysisHistory = new List<PatientAnalysisEntry>();

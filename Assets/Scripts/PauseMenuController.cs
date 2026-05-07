@@ -18,6 +18,8 @@ public class PauseMenuController : MonoBehaviour
     [Header("Blocking Panels")]
     public GameObject mainMenuPanel;
     public GameObject settingsPanel;
+    public GameObject continueSavePanel;
+    public GameObject confirmClearAllContinuePanel;
 
     [Header("References")]
     public MouseLookLimited mouseLook;
@@ -75,6 +77,12 @@ public class PauseMenuController : MonoBehaviour
         if (settingsPanel != null && settingsPanel.activeSelf)
             return;
 
+        if (continueSavePanel != null && continueSavePanel.activeSelf)
+            return;
+
+        if (confirmClearAllContinuePanel != null && confirmClearAllContinuePanel.activeSelf)
+            return;
+
         if (isPaused)
         {
             ResumeGame();
@@ -95,6 +103,12 @@ public class PauseMenuController : MonoBehaviour
             return false;
 
         if (settingsPanel != null && settingsPanel.activeSelf)
+            return false;
+
+        if (continueSavePanel != null && continueSavePanel.activeSelf)
+            return false;
+
+        if (confirmClearAllContinuePanel != null && confirmClearAllContinuePanel.activeSelf)
             return false;
 
         if (gameFlowManager != null)

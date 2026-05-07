@@ -14,8 +14,21 @@ public class MainMenuManager : MonoBehaviour
     public Button newGameButton;
     public Button continueButton;
 
-    [Header("Continue Info UI")]
-    public TextMeshProUGUI continueInfoText;
+    [Header("Continue Save Panel")]
+    public GameObject continueSavePanel;
+    public Transform continueSaveContent;
+    public ContinueSaveItemUI continueSaveItemPrefab;
+    public TextMeshProUGUI continueSaveDetailText;
+    public Button continueSelectedSaveButton;
+    public Button continueSaveBackButton;
+
+    [Header("Continue Save Delete")]
+    public Button continueSaveDeleteModeButton;
+    public TextMeshProUGUI continueSaveDeleteModeButtonText;
+    public Button continueSaveClearAllButton;
+    public GameObject confirmClearAllContinuePanel;
+    public Button confirmClearAllContinueYesButton;
+    public Button confirmClearAllContinueNoButton;
 
     [Header("History UI")]
     public Transform historyContent;
@@ -51,16 +64,70 @@ public class MainMenuManager : MonoBehaviour
     public Transform gameplayCameraPoint;
 
     private ScrollRect historyScrollRect;
+    private ScrollRect continueSaveScrollRect;
+
     private bool isHistoryDeleteMode = false;
+    private bool isContinueSaveDeleteMode = false;
+
+    private int selectedContinueSaveIndex = -1;
+    private RuntimeSaveData selectedContinueSave = null;
+
+    private string activeContinueSaveRunId = "";
 
     private void Awake()
     {
         if (historyContent != null)
             historyScrollRect = historyContent.GetComponentInParent<ScrollRect>();
+
+        if (continueSaveContent != null)
+            continueSaveScrollRect = continueSaveContent.GetComponentInParent<ScrollRect>();
     }
 
     private void Start()
     {
+        if (continueButton != null)
+        {
+            continueButton.onClick.RemoveAllListeners();
+            continueButton.onClick.AddListener(OpenContinueSavePanel);
+        }
+
+        if (continueSelectedSaveButton != null)
+        {
+            continueSelectedSaveButton.onClick.RemoveAllListeners();
+            continueSelectedSaveButton.onClick.AddListener(ContinueSelectedSave);
+            continueSelectedSaveButton.interactable = false;
+        }
+
+        if (continueSaveBackButton != null)
+        {
+            continueSaveBackButton.onClick.RemoveAllListeners();
+            continueSaveBackButton.onClick.AddListener(CloseContinueSavePanel);
+        }
+
+        if (continueSaveDeleteModeButton != null)
+        {
+            continueSaveDeleteModeButton.onClick.RemoveAllListeners();
+            continueSaveDeleteModeButton.onClick.AddListener(ToggleContinueSaveDeleteMode);
+        }
+
+        if (continueSaveClearAllButton != null)
+        {
+            continueSaveClearAllButton.onClick.RemoveAllListeners();
+            continueSaveClearAllButton.onClick.AddListener(OpenConfirmClearAllContinuePanel);
+        }
+
+        if (confirmClearAllContinueYesButton != null)
+        {
+            confirmClearAllContinueYesButton.onClick.RemoveAllListeners();
+            confirmClearAllContinueYesButton.onClick.AddListener(ConfirmClearAllContinueSaves);
+        }
+
+        if (confirmClearAllContinueNoButton != null)
+        {
+            confirmClearAllContinueNoButton.onClick.RemoveAllListeners();
+            confirmClearAllContinueNoButton.onClick.AddListener(CloseConfirmClearAllContinuePanel);
+        }
+
         if (deleteModeButton != null)
         {
             deleteModeButton.onClick.RemoveAllListeners();
@@ -88,7 +155,17 @@ public class MainMenuManager : MonoBehaviour
         if (confirmDeleteAllPanel != null)
             confirmDeleteAllPanel.SetActive(false);
 
+        if (confirmClearAllContinuePanel != null)
+            confirmClearAllContinuePanel.SetActive(false);
+
+        if (continueSavePanel != null)
+            continueSavePanel.SetActive(false);
+
+        ClearContinueSaveSelection();
+
         UpdateDeleteModeButtonText();
+        UpdateContinueSaveDeleteModeButtonText();
+
         ShowMainMenu();
     }
 
@@ -98,6 +175,9 @@ public class MainMenuManager : MonoBehaviour
 
         if (mainMenuPanel != null)
             mainMenuPanel.SetActive(true);
+
+        if (continueSavePanel != null)
+            continueSavePanel.SetActive(false);
 
         if (dialoguePanel != null)
             dialoguePanel.SetActive(false);
@@ -123,6 +203,9 @@ public class MainMenuManager : MonoBehaviour
         if (confirmDeleteAllPanel != null)
             confirmDeleteAllPanel.SetActive(false);
 
+        if (confirmClearAllContinuePanel != null)
+            confirmClearAllContinuePanel.SetActive(false);
+
         if (AudioManager.Instance != null)
             AudioManager.Instance.PlayMainMenuMusic();
 
@@ -133,12 +216,9 @@ public class MainMenuManager : MonoBehaviour
 
         bool canContinue =
             RuntimeSaveManager.Instance != null &&
-            RuntimeSaveManager.Instance.currentSave != null &&
-            RuntimeSaveManager.Instance.currentSave.hasSave;
+            RuntimeSaveManager.Instance.HasAnyContinueSave();
 
         UpdateContinueButtonState(canContinue);
-        UpdateContinueInfoText(canContinue);
-
         UpdateHistorySection();
 
         StartCoroutine(ForceHistoryLayoutRefreshNextFrame());
@@ -148,8 +228,13 @@ public class MainMenuManager : MonoBehaviour
     {
         Time.timeScale = 1f;
 
+        activeContinueSaveRunId = "";
+
         if (mainMenuPanel != null)
             mainMenuPanel.SetActive(false);
+
+        if (continueSavePanel != null)
+            continueSavePanel.SetActive(false);
 
         if (dialoguePanel != null)
             dialoguePanel.SetActive(false);
@@ -174,8 +259,6 @@ public class MainMenuManager : MonoBehaviour
         if (RuntimeSaveManager.Instance != null)
             RuntimeSaveManager.Instance.ClearSave();
 
-        UpdateContinueInfoText(false);
-
         if (gameFlowManager != null)
         {
             gameFlowManager.ResetGame();
@@ -187,19 +270,188 @@ public class MainMenuManager : MonoBehaviour
         }
     }
 
-    public void ContinueGameFromMenu()
+    public void OpenContinueSavePanel()
     {
-        Time.timeScale = 1f;
+        if (AudioManager.Instance != null)
+            AudioManager.Instance.PlayClick();
 
-        if (RuntimeSaveManager.Instance == null ||
-            RuntimeSaveManager.Instance.currentSave == null ||
-            !RuntimeSaveManager.Instance.currentSave.hasSave)
+        bool hasAnySave =
+            RuntimeSaveManager.Instance != null &&
+            RuntimeSaveManager.Instance.HasAnyContinueSave();
+
+        if (!hasAnySave)
         {
             Debug.LogWarning("Devam edilecek kayıt bulunamadı.");
             return;
         }
 
-        RuntimeSaveData save = RuntimeSaveManager.Instance.currentSave;
+        if (mainMenuPanel != null)
+            mainMenuPanel.SetActive(false);
+
+        if (continueSavePanel != null)
+            continueSavePanel.SetActive(true);
+
+        if (confirmClearAllContinuePanel != null)
+            confirmClearAllContinuePanel.SetActive(false);
+
+        ClearContinueSaveSelection();
+        RebuildContinueSaveUI();
+
+        StartCoroutine(ForceContinueSaveLayoutRefreshNextFrame());
+    }
+
+    public void CloseContinueSavePanel()
+    {
+        if (AudioManager.Instance != null)
+            AudioManager.Instance.PlayClick();
+
+        if (continueSavePanel != null)
+            continueSavePanel.SetActive(false);
+
+        if (confirmClearAllContinuePanel != null)
+            confirmClearAllContinuePanel.SetActive(false);
+
+        if (mainMenuPanel != null)
+            mainMenuPanel.SetActive(true);
+
+        isContinueSaveDeleteMode = false;
+        UpdateContinueSaveDeleteModeButtonText();
+        ClearContinueSaveSelection();
+
+        ShowMainMenu();
+    }
+
+    private void RebuildContinueSaveUI()
+    {
+        if (continueSaveContent == null || continueSaveItemPrefab == null)
+        {
+            Debug.LogWarning("RebuildContinueSaveUI -> content veya prefab eksik.");
+            return;
+        }
+
+        for (int i = continueSaveContent.childCount - 1; i >= 0; i--)
+        {
+            Transform child = continueSaveContent.GetChild(i);
+            if (child.GetComponent<ContinueSaveItemUI>() != null)
+                Destroy(child.gameObject);
+        }
+
+        if (RuntimeSaveManager.Instance == null ||
+            RuntimeSaveManager.Instance.ContinueSaveList == null)
+            return;
+
+        for (int i = 0; i < RuntimeSaveManager.Instance.ContinueSaveList.Count; i++)
+        {
+            RuntimeSaveData save = RuntimeSaveManager.Instance.ContinueSaveList[i];
+            if (save == null)
+                continue;
+
+            ContinueSaveItemUI item = Instantiate(continueSaveItemPrefab, continueSaveContent, false);
+            item.gameObject.SetActive(true);
+            item.Setup(save, i, SelectContinueSave, DeleteContinueSaveItemAt);
+            item.SetDeleteMode(isContinueSaveDeleteMode);
+
+            RectTransform itemRect = item.GetComponent<RectTransform>();
+            if (itemRect != null)
+            {
+                itemRect.localScale = Vector3.one;
+                itemRect.localRotation = Quaternion.identity;
+            }
+        }
+
+        StartCoroutine(ForceContinueSaveLayoutRefreshNextFrame());
+    }
+
+    private void SelectContinueSave(int index, RuntimeSaveData save)
+    {
+        selectedContinueSaveIndex = index;
+        selectedContinueSave = save;
+
+        if (continueSelectedSaveButton != null)
+            continueSelectedSaveButton.interactable = selectedContinueSave != null;
+
+        if (continueSaveDetailText != null)
+            continueSaveDetailText.text = BuildContinueSaveDetailText(save);
+
+        Debug.Log("Continue save seçildi. Index: " + index);
+    }
+
+    private void ClearContinueSaveSelection()
+    {
+        selectedContinueSaveIndex = -1;
+        selectedContinueSave = null;
+
+        if (continueSelectedSaveButton != null)
+            continueSelectedSaveButton.interactable = false;
+
+        if (continueSaveDetailText != null)
+            continueSaveDetailText.text = "Devam etmek istediğiniz kaydı seçin.";
+    }
+
+    private string BuildContinueSaveDetailText(RuntimeSaveData save)
+    {
+        if (save == null)
+            return "Kayıt bilgisi bulunamadı.";
+
+        int patientsPerDay = 3;
+        int totalPatients = 15;
+
+        if (gameFlowManager != null)
+        {
+            if (gameFlowManager.patientsPerDay > 0)
+                patientsPerDay = gameFlowManager.patientsPerDay;
+
+            if (gameFlowManager.totalPatientsInRun > 0)
+                totalPatients = gameFlowManager.totalPatientsInRun;
+        }
+
+        int patientInDay = ((save.currentPatientNumber - 1) % patientsPerDay) + 1;
+
+        return
+            "Seçilen Devam Kaydı\n\n" +
+            "Kayıt Tarihi: " + (string.IsNullOrEmpty(save.savedDateText) ? "Bilinmiyor" : save.savedDateText) + "\n" +
+            "Gün: " + save.currentDay + "\n" +
+            "Hasta: " + patientInDay + " (" + save.currentPatientNumber + "/" + totalPatients + ")\n" +
+            "Toplam Doğru: " + save.totalCorrect + "\n" +
+            "Toplam Yanlış: " + save.totalWrong + "\n" +
+            "Kalan Can: " + save.remainingHearts + "\n" +
+            "Enerji: " + save.currentEnergy + " / " + save.maxEnergy;
+    }
+
+    public void ContinueSelectedSave()
+    {
+        if (AudioManager.Instance != null)
+            AudioManager.Instance.PlayClick();
+
+        if (selectedContinueSave == null)
+        {
+            Debug.LogWarning("Seçili devam kaydı yok.");
+            return;
+        }
+
+        activeContinueSaveRunId = selectedContinueSave.runId;
+
+        if (RuntimeSaveManager.Instance != null)
+            RuntimeSaveManager.Instance.SetCurrentSave(selectedContinueSave);
+
+        ContinueGameFromSelectedSave(selectedContinueSave);
+    }
+
+    private void ContinueGameFromSelectedSave(RuntimeSaveData save)
+    {
+        if (save == null || !save.hasSave)
+        {
+            Debug.LogWarning("Devam edilecek kayıt geçersiz.");
+            return;
+        }
+
+        Time.timeScale = 1f;
+
+        if (continueSavePanel != null)
+            continueSavePanel.SetActive(false);
+
+        if (confirmClearAllContinuePanel != null)
+            confirmClearAllContinuePanel.SetActive(false);
 
         if (mainMenuPanel != null)
             mainMenuPanel.SetActive(false);
@@ -241,6 +493,101 @@ public class MainMenuManager : MonoBehaviour
         }
     }
 
+    public void ContinueGameFromMenu()
+    {
+        OpenContinueSavePanel();
+    }
+
+    private void ToggleContinueSaveDeleteMode()
+    {
+        if (AudioManager.Instance != null)
+            AudioManager.Instance.PlayClick();
+
+        isContinueSaveDeleteMode = !isContinueSaveDeleteMode;
+
+        UpdateContinueSaveDeleteModeButtonText();
+        ApplyContinueSaveDeleteModeToItems();
+    }
+
+    private void UpdateContinueSaveDeleteModeButtonText()
+    {
+        if (continueSaveDeleteModeButtonText != null)
+            continueSaveDeleteModeButtonText.text = isContinueSaveDeleteMode ? "İptal Et" : "Sil";
+    }
+
+    private void ApplyContinueSaveDeleteModeToItems()
+    {
+        if (continueSaveContent == null)
+            return;
+
+        foreach (Transform child in continueSaveContent)
+        {
+            ContinueSaveItemUI item = child.GetComponent<ContinueSaveItemUI>();
+            if (item != null)
+                item.SetDeleteMode(isContinueSaveDeleteMode);
+        }
+    }
+
+    private void DeleteContinueSaveItemAt(int index)
+    {
+        if (RuntimeSaveManager.Instance == null)
+            return;
+
+        RuntimeSaveManager.Instance.RemoveContinueSaveAt(index);
+
+        ClearContinueSaveSelection();
+
+        if (!RuntimeSaveManager.Instance.HasAnyContinueSave())
+        {
+            isContinueSaveDeleteMode = false;
+            UpdateContinueSaveDeleteModeButtonText();
+
+            CloseContinueSavePanel();
+            return;
+        }
+
+        RebuildContinueSaveUI();
+        UpdateContinueButtonState(RuntimeSaveManager.Instance.HasAnyContinueSave());
+    }
+
+    public void OpenConfirmClearAllContinuePanel()
+    {
+        if (AudioManager.Instance != null)
+            AudioManager.Instance.PlayClick();
+
+        if (confirmClearAllContinuePanel != null)
+            confirmClearAllContinuePanel.SetActive(true);
+    }
+
+    public void CloseConfirmClearAllContinuePanel()
+    {
+        if (AudioManager.Instance != null)
+            AudioManager.Instance.PlayClick();
+
+        if (confirmClearAllContinuePanel != null)
+            confirmClearAllContinuePanel.SetActive(false);
+    }
+
+    public void ConfirmClearAllContinueSaves()
+    {
+        if (AudioManager.Instance != null)
+            AudioManager.Instance.PlayClick();
+
+        if (RuntimeSaveManager.Instance != null)
+            RuntimeSaveManager.Instance.ClearAllContinueSaves();
+
+        isContinueSaveDeleteMode = false;
+        UpdateContinueSaveDeleteModeButtonText();
+        ClearContinueSaveSelection();
+
+        if (confirmClearAllContinuePanel != null)
+            confirmClearAllContinuePanel.SetActive(false);
+
+        UpdateContinueButtonState(false);
+
+        CloseContinueSavePanel();
+    }
+
     public void ReturnToMenu(int correct, int wrong)
     {
         if (runHistoryManager != null && gameFlowManager != null)
@@ -262,6 +609,13 @@ public class MainMenuManager : MonoBehaviour
             Debug.LogWarning("ReturnToMenu -> runHistoryManager veya gameFlowManager null.");
         }
 
+        if (!string.IsNullOrEmpty(activeContinueSaveRunId) && RuntimeSaveManager.Instance != null)
+        {
+            RuntimeSaveManager.Instance.RemoveContinueSaveByRunId(activeContinueSaveRunId);
+            Debug.Log("Tamamlanan oyuna ait continue save silindi. RunId: " + activeContinueSaveRunId);
+            activeContinueSaveRunId = "";
+        }
+
         if (RuntimeSaveManager.Instance != null)
             RuntimeSaveManager.Instance.ClearSave();
 
@@ -275,46 +629,6 @@ public class MainMenuManager : MonoBehaviour
 
         doctorLookRoot.position = targetPoint.position;
         doctorLookRoot.rotation = targetPoint.rotation;
-    }
-
-    private void UpdateContinueInfoText(bool canContinue)
-    {
-        if (continueInfoText == null)
-            return;
-
-        if (!canContinue ||
-            RuntimeSaveManager.Instance == null ||
-            RuntimeSaveManager.Instance.currentSave == null ||
-            !RuntimeSaveManager.Instance.currentSave.hasSave)
-        {
-            continueInfoText.gameObject.SetActive(false);
-            return;
-        }
-
-        RuntimeSaveData save = RuntimeSaveManager.Instance.currentSave;
-
-        int patientsPerDay = 3;
-        int totalPatients = 21;
-
-        if (gameFlowManager != null)
-        {
-            if (gameFlowManager.patientsPerDay > 0)
-                patientsPerDay = gameFlowManager.patientsPerDay;
-
-            if (gameFlowManager.totalPatientsInRun > 0)
-                totalPatients = gameFlowManager.totalPatientsInRun;
-        }
-
-        int patientInDay = ((save.currentPatientNumber - 1) % patientsPerDay) + 1;
-
-        continueInfoText.gameObject.SetActive(true);
-
-        continueInfoText.text =
-            "Devam Eden Oyun\n" +
-            "Gün: " + save.currentDay + "\n" +
-            "Hasta: " + patientInDay + " (" + save.currentPatientNumber + "/" + totalPatients + ")\n" +
-            "Doğru: " + save.totalCorrect + "   Yanlış: " + save.totalWrong + "\n" +
-            "Kalan Hak: " + save.remainingHearts;
     }
 
     private void UpdateHistorySection()
@@ -511,6 +825,43 @@ public class MainMenuManager : MonoBehaviour
             historyScrollRect.StopMovement();
             historyScrollRect.horizontalNormalizedPosition = 0f;
             historyScrollRect.verticalNormalizedPosition = 1f;
+        }
+
+        Canvas.ForceUpdateCanvases();
+    }
+
+    private IEnumerator ForceContinueSaveLayoutRefreshNextFrame()
+    {
+        yield return null;
+        yield return new WaitForEndOfFrame();
+
+        Canvas.ForceUpdateCanvases();
+
+        RectTransform contentRect = continueSaveContent as RectTransform;
+        if (contentRect != null)
+        {
+            contentRect.anchoredPosition = Vector2.zero;
+            LayoutRebuilder.ForceRebuildLayoutImmediate(contentRect);
+        }
+
+        if (continueSaveContent != null && continueSaveContent.parent is RectTransform viewportRect)
+            LayoutRebuilder.ForceRebuildLayoutImmediate(viewportRect);
+
+        if (continueSavePanel != null)
+        {
+            RectTransform panelRect = continueSavePanel.GetComponent<RectTransform>();
+            if (panelRect != null)
+                LayoutRebuilder.ForceRebuildLayoutImmediate(panelRect);
+        }
+
+        if (continueSaveScrollRect == null && continueSaveContent != null)
+            continueSaveScrollRect = continueSaveContent.GetComponentInParent<ScrollRect>();
+
+        if (continueSaveScrollRect != null)
+        {
+            continueSaveScrollRect.StopMovement();
+            continueSaveScrollRect.horizontalNormalizedPosition = 0f;
+            continueSaveScrollRect.verticalNormalizedPosition = 1f;
         }
 
         Canvas.ForceUpdateCanvases();
