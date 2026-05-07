@@ -28,9 +28,20 @@ public class GameFlowManager : MonoBehaviour
     [Header("Patient")]
     public PatientMovement patientMovement;
 
-    [Header("Patient Cases")]
+    [Header("Patient Pools")]
+    public List<PatientCaseData> respiratoryCases = new List<PatientCaseData>();
+    public List<PatientCaseData> gastroCases = new List<PatientCaseData>();
+    public List<PatientCaseData> specialCases = new List<PatientCaseData>();
+
+    [Header("Old Patient Cases - Deprecated")]
+    [Tooltip("Eski sistemden kalma. Yeni sistemde respiratoryCases listesine ekle.")]
     public PatientCaseData gripCase;
+
+    [Tooltip("Eski sistemden kalma. Yeni sistemde respiratoryCases listesine ekle.")]
     public PatientCaseData coldCase;
+
+    private readonly List<PatientCaseData> plannedPatientCases = new List<PatientCaseData>();
+    private readonly List<string> plannedPatientCaseIds = new List<string>();
 
     [Header("Panels")]
     public GameObject dialoguePanel;
@@ -90,7 +101,7 @@ public class GameFlowManager : MonoBehaviour
     public int totalWrong = 0;
 
     [Header("Patient Flow")]
-    public int totalPatientsInRun = 21;
+    public int totalPatientsInRun = 15;
     public int patientsPerDay = 3;
     public int currentPatientNumber = 1;
 
@@ -171,6 +182,8 @@ public class GameFlowManager : MonoBehaviour
 
         patientAnalysisHistory.Clear();
 
+        GeneratePlannedPatientCases();
+
         if (dialoguePanel != null) dialoguePanel.SetActive(false);
         if (endDayPanel != null) endDayPanel.SetActive(false);
         if (gameOverPanel != null) gameOverPanel.SetActive(false);
@@ -195,7 +208,135 @@ public class GameFlowManager : MonoBehaviour
             interactionModeManager.ExitUIMode();
         }
 
-        Debug.Log("Yeni oyun başlatıldı.");
+        Debug.Log("Yeni oyun başlatıldı. Rastgele hasta sırası oluşturuldu.");
+    }
+
+    private void GeneratePlannedPatientCases()
+    {
+        plannedPatientCases.Clear();
+        plannedPatientCaseIds.Clear();
+
+        List<PatientCaseData> respiratoryPool = BuildCleanPool(respiratoryCases);
+        List<PatientCaseData> gastroPool = BuildCleanPool(gastroCases);
+        List<PatientCaseData> specialPool = BuildCleanPool(specialCases);
+
+        AddDeprecatedCasesIfNeeded(respiratoryPool);
+
+        AddRandomCasesFromPool(respiratoryPool, 6, "Solunum");
+        AddRandomCasesFromPool(gastroPool, 6, "Mide/Gastro");
+        AddRandomCasesFromPool(specialPool, 3, "Özel");
+
+        totalPatientsInRun = plannedPatientCases.Count;
+
+        foreach (PatientCaseData patientCase in plannedPatientCases)
+            plannedPatientCaseIds.Add(GetCaseSaveId(patientCase));
+
+        Debug.Log("Planlanan hasta sayısı: " + plannedPatientCases.Count);
+    }
+
+    private List<PatientCaseData> BuildCleanPool(List<PatientCaseData> source)
+    {
+        List<PatientCaseData> cleanPool = new List<PatientCaseData>();
+
+        if (source == null)
+            return cleanPool;
+
+        foreach (PatientCaseData patientCase in source)
+        {
+            if (patientCase == null)
+                continue;
+
+            if (!cleanPool.Contains(patientCase))
+                cleanPool.Add(patientCase);
+        }
+
+        return cleanPool;
+    }
+
+    private void AddDeprecatedCasesIfNeeded(List<PatientCaseData> respiratoryPool)
+    {
+        if (gripCase != null && !respiratoryPool.Contains(gripCase))
+            respiratoryPool.Add(gripCase);
+
+        if (coldCase != null && !respiratoryPool.Contains(coldCase))
+            respiratoryPool.Add(coldCase);
+    }
+
+    private void AddRandomCasesFromPool(List<PatientCaseData> pool, int targetCount, string poolName)
+    {
+        if (pool == null || pool.Count == 0)
+        {
+            Debug.LogWarning(poolName + " hasta havuzu boş.");
+            return;
+        }
+
+        if (pool.Count < targetCount)
+        {
+            Debug.LogWarning(poolName + " havuzunda yeterli hasta yok. İstenen: " + targetCount + ", Var olan: " + pool.Count);
+        }
+
+        List<PatientCaseData> tempPool = new List<PatientCaseData>(pool);
+        int count = Mathf.Min(targetCount, tempPool.Count);
+
+        for (int i = 0; i < count; i++)
+        {
+            int randomIndex = Random.Range(0, tempPool.Count);
+            PatientCaseData selectedCase = tempPool[randomIndex];
+
+            plannedPatientCases.Add(selectedCase);
+            tempPool.RemoveAt(randomIndex);
+        }
+    }
+
+    private string GetCaseSaveId(PatientCaseData patientCase)
+    {
+        if (patientCase == null)
+            return "";
+
+        if (!string.IsNullOrEmpty(patientCase.caseId))
+            return patientCase.caseId;
+
+        return patientCase.name;
+    }
+
+    private PatientCaseData FindCaseBySaveId(string caseId)
+    {
+        if (string.IsNullOrEmpty(caseId))
+            return null;
+
+        List<PatientCaseData> allCases = new List<PatientCaseData>();
+        allCases.AddRange(BuildCleanPool(respiratoryCases));
+        allCases.AddRange(BuildCleanPool(gastroCases));
+        allCases.AddRange(BuildCleanPool(specialCases));
+
+        AddDeprecatedCasesIfNeeded(allCases);
+
+        foreach (PatientCaseData patientCase in allCases)
+        {
+            if (patientCase == null)
+                continue;
+
+            if (patientCase.caseId == caseId || patientCase.name == caseId)
+                return patientCase;
+        }
+
+        return null;
+    }
+
+    private PatientCaseData GetCurrentPlannedPatientCase()
+    {
+        if (plannedPatientCases.Count == 0)
+            GeneratePlannedPatientCases();
+
+        int index = currentPatientNumber - 1;
+
+        if (index < 0 || index >= plannedPatientCases.Count)
+        {
+            Debug.LogError("Hasta index hatası. currentPatientNumber: " + currentPatientNumber + ", planned count: " + plannedPatientCases.Count);
+            return null;
+        }
+
+        return plannedPatientCases[index];
     }
 
     public void StartGameplayFlow()
@@ -244,21 +385,16 @@ public class GameFlowManager : MonoBehaviour
             return;
         }
 
-        if (currentPatientNumber == 2 && coldCase != null)
+        PatientCaseData selectedCase = GetCurrentPlannedPatientCase();
+
+        if (selectedCase != null)
         {
-            dialogueManager.currentCase = coldCase;
-            Debug.Log("Atanan vaka: COLD");
+            dialogueManager.currentCase = selectedCase;
+            Debug.Log("Atanan vaka: " + selectedCase.name);
             return;
         }
 
-        if (gripCase != null)
-        {
-            dialogueManager.currentCase = gripCase;
-            Debug.Log("Atanan vaka: GRIP");
-            return;
-        }
-
-        Debug.LogWarning("Grip case atanmadığı için currentCase değiştirilemedi.");
+        Debug.LogWarning("Planlanan hasta bulunamadı. Vaka atanamadı.");
     }
 
     public RuntimeSaveData BuildRuntimeSaveData()
@@ -283,6 +419,8 @@ public class GameFlowManager : MonoBehaviour
         save.pendingLoseGameOver = pendingLoseGameOver;
         save.hasSave = true;
         save.patientAnalysisHistory = ClonePatientAnalysisHistory();
+
+        save.plannedPatientCaseIds = new List<string>(plannedPatientCaseIds);
 
         return save;
     }
@@ -320,6 +458,8 @@ public class GameFlowManager : MonoBehaviour
         waitingForDayContinue = false;
         waitingForPatientResultContinue = false;
         gameEnded = false;
+
+        RestorePlannedPatientCasesFromSave(save.plannedPatientCaseIds);
 
         patientAnalysisHistory.Clear();
 
@@ -361,6 +501,38 @@ public class GameFlowManager : MonoBehaviour
         SetNotebookBlocked(true);
         UpdateHeartsUI();
         UpdateEnergyUI();
+    }
+
+    private void RestorePlannedPatientCasesFromSave(List<string> savedCaseIds)
+    {
+        plannedPatientCases.Clear();
+        plannedPatientCaseIds.Clear();
+
+        if (savedCaseIds == null || savedCaseIds.Count == 0)
+        {
+            Debug.LogWarning("Save içinde hasta sırası bulunamadı. Yeni sıra oluşturuluyor.");
+            GeneratePlannedPatientCases();
+            return;
+        }
+
+        foreach (string caseId in savedCaseIds)
+        {
+            PatientCaseData patientCase = FindCaseBySaveId(caseId);
+
+            if (patientCase == null)
+            {
+                Debug.LogWarning("Save içindeki hasta bulunamadı: " + caseId);
+                continue;
+            }
+
+            plannedPatientCases.Add(patientCase);
+            plannedPatientCaseIds.Add(caseId);
+        }
+
+        totalPatientsInRun = plannedPatientCases.Count;
+
+        if (plannedPatientCases.Count == 0)
+            GeneratePlannedPatientCases();
     }
 
     public void ContinueAfterLoadedSave()
