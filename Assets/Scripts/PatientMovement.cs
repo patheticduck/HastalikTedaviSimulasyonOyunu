@@ -4,9 +4,16 @@ public class PatientMovement : MonoBehaviour
 {
     [Header("Movement")]
     public Transform startPoint;
+    public Transform corridorPoint;
+    public Transform doorPoint;
+    public Transform insideDoorPoint;
     public Transform targetPoint;
     public float moveSpeed = 2f;
-    public float stopDistance = 1f;
+    public float stopDistance = 0.35f;
+
+    [Header("Door")]
+    public DoorAutoController doorController;
+    public float doorTriggerDistance = 0.6f;
 
     [Header("Flow")]
     public GameFlowManager gameFlowManager;
@@ -18,7 +25,12 @@ public class PatientMovement : MonoBehaviour
     private Animator animator;
     private bool canMove = false;
     private bool walkingIn = true;
-    private Vector3 currentTarget;
+    private bool doorOpened = false;
+    private bool doorClosedAfterEntry = false;
+    private bool doorClosedAfterExit = false;
+
+    private int pathIndex = 0;
+    private Vector3[] walkPath;
 
     void OnEnable()
     {
@@ -27,8 +39,12 @@ public class PatientMovement : MonoBehaviour
 
     void Update()
     {
-        if (!canMove)
+        if (!canMove || walkPath == null || walkPath.Length == 0)
             return;
+
+        HandleDoorByDistance();
+
+        Vector3 currentTarget = walkPath[pathIndex];
 
         Vector3 targetPosition = new Vector3(
             currentTarget.x,
@@ -50,14 +66,54 @@ public class PatientMovement : MonoBehaviour
 
         if (Vector3.Distance(transform.position, targetPosition) <= stopDistance)
         {
-            ArriveAtTarget();
+            pathIndex++;
+
+            if (pathIndex >= walkPath.Length)
+                ArriveAtTarget();
+        }
+    }
+
+    private void HandleDoorByDistance()
+    {
+        if (doorController == null)
+            return;
+
+        if (walkingIn)
+        {
+            if (!doorOpened && doorPoint != null &&
+                Vector3.Distance(transform.position, doorPoint.position) <= doorTriggerDistance)
+            {
+                doorController.OpenDoor();
+                doorOpened = true;
+            }
+
+            if (!doorClosedAfterEntry && insideDoorPoint != null &&
+                Vector3.Distance(transform.position, insideDoorPoint.position) <= doorTriggerDistance)
+            {
+                doorController.CloseDoor();
+                doorClosedAfterEntry = true;
+            }
+        }
+        else
+        {
+            if (!doorOpened && insideDoorPoint != null &&
+                Vector3.Distance(transform.position, insideDoorPoint.position) <= doorTriggerDistance)
+            {
+                doorController.OpenDoor();
+                doorOpened = true;
+            }
+
+            if (!doorClosedAfterExit && corridorPoint != null &&
+                Vector3.Distance(transform.position, corridorPoint.position) <= doorTriggerDistance)
+            {
+                doorController.CloseDoor();
+                doorClosedAfterExit = true;
+            }
         }
     }
 
     private void ArriveAtTarget()
     {
-        Debug.Log("Hasta hedefe ulaştı.");
-
         canMove = false;
         PlayIdle();
 
@@ -71,8 +127,10 @@ public class PatientMovement : MonoBehaviour
         }
         else
         {
-            currentPatientIndex++;
+            if (doorController != null)
+                doorController.CloseDoorInstant();
 
+            currentPatientIndex++;
             gameObject.SetActive(false);
 
             if (gameFlowManager != null)
@@ -88,23 +146,36 @@ public class PatientMovement : MonoBehaviour
             return;
         }
 
-        gameObject.SetActive(true);
+        if (doorController != null)
+            doorController.CloseDoorInstant();
 
+        gameObject.SetActive(true);
         SetPatientVisual(currentPatientIndex);
 
         if (startPoint != null && targetPoint != null)
         {
             transform.position = startPoint.position;
             transform.rotation = startPoint.rotation;
-            currentTarget = targetPoint.position;
+
+            walkPath = new Vector3[]
+            {
+                corridorPoint != null ? corridorPoint.position : startPoint.position,
+                doorPoint != null ? doorPoint.position : targetPoint.position,
+                insideDoorPoint != null ? insideDoorPoint.position : targetPoint.position,
+                targetPoint.position
+            };
+
+            pathIndex = 0;
+            LookAtCurrentTarget();
         }
 
         walkingIn = true;
+        doorOpened = false;
+        doorClosedAfterEntry = false;
+        doorClosedAfterExit = false;
+
         canMove = true;
-
         PlayWalk();
-
-        Debug.Log("Hasta içeri yürümeye başladı: " + GetCurrentPatientName());
     }
 
     public void BeginExit()
@@ -120,7 +191,6 @@ public class PatientMovement : MonoBehaviour
         if (startPoint == null)
         {
             HidePatient();
-
             currentPatientIndex++;
 
             if (gameFlowManager != null)
@@ -129,13 +199,37 @@ public class PatientMovement : MonoBehaviour
             return;
         }
 
+        walkPath = new Vector3[]
+        {
+            insideDoorPoint != null ? insideDoorPoint.position : targetPoint.position,
+            doorPoint != null ? doorPoint.position : startPoint.position,
+            corridorPoint != null ? corridorPoint.position : startPoint.position,
+            startPoint.position
+        };
+
+        pathIndex = 0;
         walkingIn = false;
+
+        doorOpened = false;
+        doorClosedAfterEntry = false;
+        doorClosedAfterExit = false;
+
         canMove = true;
-        currentTarget = startPoint.position;
 
+        LookAtCurrentTarget();
         PlayWalk();
+    }
 
-        Debug.Log("Hasta dışarı çıkmaya başladı: " + GetCurrentPatientName());
+    private void LookAtCurrentTarget()
+    {
+        if (walkPath == null || walkPath.Length == 0)
+            return;
+
+        Vector3 direction = walkPath[pathIndex] - transform.position;
+        direction.y = 0f;
+
+        if (direction.sqrMagnitude > 0.001f)
+            transform.forward = direction.normalized;
     }
 
     public void HidePatient()
@@ -170,19 +264,6 @@ public class PatientMovement : MonoBehaviour
         animator = GetComponentInChildren<Animator>();
     }
 
-    private string GetCurrentPatientName()
-    {
-        if (patientVisuals == null || patientVisuals.Length == 0)
-            return "Hasta yok";
-
-        int visualIndex = Mathf.Abs(currentPatientIndex) % patientVisuals.Length;
-
-        if (patientVisuals[visualIndex] == null)
-            return "Boş hasta elementi";
-
-        return patientVisuals[visualIndex].name;
-    }
-
     private void PlayWalk()
     {
         if (animator == null)
@@ -192,10 +273,6 @@ public class PatientMovement : MonoBehaviour
         {
             animator.SetBool("isWalking", true);
             animator.Play("walk", 0, 0f);
-        }
-        else
-        {
-            Debug.LogWarning("Animator bulunamadı!");
         }
     }
 
@@ -208,10 +285,6 @@ public class PatientMovement : MonoBehaviour
         {
             animator.SetBool("isWalking", false);
             animator.Play("Idle 0", 0, 0f);
-        }
-        else
-        {
-            Debug.LogWarning("Animator bulunamadı!");
         }
     }
 }

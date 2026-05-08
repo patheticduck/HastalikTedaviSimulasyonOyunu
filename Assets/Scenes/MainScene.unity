@@ -559,6 +559,11 @@ CanvasRenderer:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 25505289}
   m_CullTransparentMesh: 1
+--- !u!1 &26351190 stripped
+GameObject:
+  m_CorrespondingSourceObject: {fileID: 4801755759578499871, guid: 84217dc05ca79354e970af70b8a59925, type: 3}
+  m_PrefabInstance: {fileID: 1844209360}
+  m_PrefabAsset: {fileID: 0}
 --- !u!1 &36454719
 GameObject:
   m_ObjectHideFlags: 0
@@ -3318,7 +3323,6 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 8607d9c5a7030774db4f74e52570662a, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::WindowClickToggle
-  windowAnimation: {fileID: 0}
 --- !u!4 &196488634 stripped
 Transform:
   m_CorrespondingSourceObject: {fileID: 7273810965948066530, guid: 89cfaf2600805bd4f9562f6e545966f7, type: 3}
@@ -3682,7 +3686,7 @@ Transform:
   m_GameObject: {fileID: 220948019}
   serializedVersion: 2
   m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
-  m_LocalPosition: {x: -5, y: 0.95, z: 7}
+  m_LocalPosition: {x: -5.2, y: 0.95, z: 11.42}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children: []
@@ -9781,6 +9785,37 @@ MonoBehaviour:
   m_ChildScaleWidth: 0
   m_ChildScaleHeight: 0
   m_ReverseArrangement: 0
+--- !u!1 &546144435
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 546144436}
+  m_Layer: 0
+  m_Name: PatientInsideDoorPoint
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!4 &546144436
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 546144435}
+  serializedVersion: 2
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: -3.95, y: 1.202, z: 4.398}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children: []
+  m_Father: {fileID: 801102126}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!4 &551277134 stripped
 Transform:
   m_CorrespondingSourceObject: {fileID: 7846662879051938928, guid: df9f88de9d12591419d0e4016c0ae89c, type: 3}
@@ -12071,9 +12106,14 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::PatientMovement
   startPoint: {fileID: 220948020}
+  corridorPoint: {fileID: 1454771247}
+  doorPoint: {fileID: 1760550264}
+  insideDoorPoint: {fileID: 546144436}
   targetPoint: {fileID: 1953927505}
   moveSpeed: 2
   stopDistance: 0.05
+  doorController: {fileID: 2023412392}
+  doorTriggerDistance: 1.2
   gameFlowManager: {fileID: 117399621}
   patientVisuals:
   - {fileID: 737297822}
@@ -13617,8 +13657,11 @@ Transform:
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children:
-  - {fileID: 1953927505}
   - {fileID: 220948020}
+  - {fileID: 1454771247}
+  - {fileID: 1760550264}
+  - {fileID: 546144436}
+  - {fileID: 1953927505}
   - {fileID: 667541126}
   - {fileID: 1307163726}
   - {fileID: 463817717}
@@ -13632,6 +13675,7 @@ Transform:
   - {fileID: 1469996211}
   - {fileID: 947918184}
   - {fileID: 1161935178}
+  - {fileID: 2023412390}
   - {fileID: 890451507}
   m_Father: {fileID: 0}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
@@ -15119,7 +15163,6 @@ Transform:
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children:
-  - {fileID: 2023412390}
   - {fileID: 1849660101}
   - {fileID: 1395843307}
   - {fileID: 1327358322}
@@ -18901,7 +18944,6 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 8607d9c5a7030774db4f74e52570662a, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::WindowClickToggle
-  windowAnimation: {fileID: 0}
 --- !u!4 &1126271153 stripped
 Transform:
   m_CorrespondingSourceObject: {fileID: -4216859302048453862, guid: ddcc5f437b5dded40b54b31e10578bd6, type: 3}
@@ -24502,6 +24544,37 @@ CanvasRenderer:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 1444327875}
   m_CullTransparentMesh: 1
+--- !u!1 &1454771246
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 1454771247}
+  m_Layer: 0
+  m_Name: PatientCorridorPoint
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!4 &1454771247
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1454771246}
+  serializedVersion: 2
+  m_LocalRotation: {x: 0, y: 0.7071068, z: 0, w: 0.7071068}
+  m_LocalPosition: {x: -5.2, y: 0, z: 9.552}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children: []
+  m_Father: {fileID: 801102126}
+  m_LocalEulerAnglesHint: {x: 0, y: 90, z: 0}
 --- !u!1 &1455434340
 GameObject:
   m_ObjectHideFlags: 0
@@ -28146,11 +28219,6 @@ GameObject:
   m_CorrespondingSourceObject: {fileID: -927199367670048503, guid: ddcc5f437b5dded40b54b31e10578bd6, type: 3}
   m_PrefabInstance: {fileID: 621145888}
   m_PrefabAsset: {fileID: 0}
---- !u!111 &1724822091 stripped
-Animation:
-  m_CorrespondingSourceObject: {fileID: -5716681864270162303, guid: ddcc5f437b5dded40b54b31e10578bd6, type: 3}
-  m_PrefabInstance: {fileID: 621145888}
-  m_PrefabAsset: {fileID: 0}
 --- !u!114 &1724822092
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -28163,7 +28231,6 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 8607d9c5a7030774db4f74e52570662a, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::WindowClickToggle
-  windowAnimation: {fileID: 1724822091}
 --- !u!65 &1724822093
 BoxCollider:
   m_ObjectHideFlags: 0
@@ -28723,6 +28790,37 @@ PrefabInstance:
     m_AddedGameObjects: []
     m_AddedComponents: []
   m_SourcePrefab: {fileID: 100100000, guid: c0be7cafd124b094bbc1b5c8e2ff0fea, type: 3}
+--- !u!1 &1760550263
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 1760550264}
+  m_Layer: 0
+  m_Name: PatientDoorPoint
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!4 &1760550264
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1760550263}
+  serializedVersion: 2
+  m_LocalRotation: {x: 0, y: 1, z: 0, w: 0}
+  m_LocalPosition: {x: -5.2, y: -0.18, z: 8.575}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children: []
+  m_Father: {fileID: 801102126}
+  m_LocalEulerAnglesHint: {x: 0, y: 180, z: 0}
 --- !u!1 &1769566265
 GameObject:
   m_ObjectHideFlags: 0
@@ -30261,11 +30359,11 @@ PrefabInstance:
   serializedVersion: 2
   m_Modification:
     serializedVersion: 3
-    m_TransformParent: {fileID: 890451507}
+    m_TransformParent: {fileID: 801102126}
     m_Modifications:
     - target: {fileID: 83574272883278999, guid: 84217dc05ca79354e970af70b8a59925, type: 3}
       propertyPath: m_PlayAutomatically
-      value: 1
+      value: 0
       objectReference: {fileID: 0}
     - target: {fileID: 1909439090914912024, guid: 84217dc05ca79354e970af70b8a59925, type: 3}
       propertyPath: 'm_Materials.Array.data[0]'
@@ -30307,6 +30405,26 @@ PrefabInstance:
       propertyPath: m_LocalPosition.z
       value: 0.114
       objectReference: {fileID: 0}
+    - target: {fileID: 5589297339398161485, guid: 84217dc05ca79354e970af70b8a59925, type: 3}
+      propertyPath: m_LocalRotation.w
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 5589297339398161485, guid: 84217dc05ca79354e970af70b8a59925, type: 3}
+      propertyPath: m_LocalRotation.x
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 5589297339398161485, guid: 84217dc05ca79354e970af70b8a59925, type: 3}
+      propertyPath: m_LocalRotation.y
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 5589297339398161485, guid: 84217dc05ca79354e970af70b8a59925, type: 3}
+      propertyPath: m_LocalRotation.z
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 5589297339398161485, guid: 84217dc05ca79354e970af70b8a59925, type: 3}
+      propertyPath: m_LocalEulerAnglesHint.y
+      value: 0
+      objectReference: {fileID: 0}
     - target: {fileID: 8428516066313517324, guid: 84217dc05ca79354e970af70b8a59925, type: 3}
       propertyPath: m_LocalScale.x
       value: 1.2
@@ -30337,15 +30455,15 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 8428516066313517324, guid: 84217dc05ca79354e970af70b8a59925, type: 3}
       propertyPath: m_LocalRotation.x
-      value: -0
+      value: 0
       objectReference: {fileID: 0}
     - target: {fileID: 8428516066313517324, guid: 84217dc05ca79354e970af70b8a59925, type: 3}
       propertyPath: m_LocalRotation.y
-      value: -0
+      value: 0
       objectReference: {fileID: 0}
     - target: {fileID: 8428516066313517324, guid: 84217dc05ca79354e970af70b8a59925, type: 3}
       propertyPath: m_LocalRotation.z
-      value: -0
+      value: 0
       objectReference: {fileID: 0}
     - target: {fileID: 8428516066313517324, guid: 84217dc05ca79354e970af70b8a59925, type: 3}
       propertyPath: m_LocalEulerAnglesHint.x
@@ -30365,7 +30483,10 @@ PrefabInstance:
     - targetCorrespondingSourceObject: {fileID: 8428516066313517324, guid: 84217dc05ca79354e970af70b8a59925, type: 3}
       insertIndex: -1
       addedObject: {fileID: 1487172422}
-    m_AddedComponents: []
+    m_AddedComponents:
+    - targetCorrespondingSourceObject: {fileID: 4801755759578499871, guid: 84217dc05ca79354e970af70b8a59925, type: 3}
+      insertIndex: -1
+      addedObject: {fileID: 2023412392}
   m_SourcePrefab: {fileID: 100100000, guid: 84217dc05ca79354e970af70b8a59925, type: 3}
 --- !u!1 &1845209654
 GameObject:
@@ -33996,6 +34117,11 @@ CanvasRenderer:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 1994663115}
   m_CullTransparentMesh: 1
+--- !u!4 &1997614523 stripped
+Transform:
+  m_CorrespondingSourceObject: {fileID: 5589297339398161485, guid: 84217dc05ca79354e970af70b8a59925, type: 3}
+  m_PrefabInstance: {fileID: 1844209360}
+  m_PrefabAsset: {fileID: 0}
 --- !u!4 &2003254648 stripped
 Transform:
   m_CorrespondingSourceObject: {fileID: 8663623731689303714, guid: ebf63587df2ac274180ce82e406ddf54, type: 3}
@@ -34530,6 +34656,22 @@ Transform:
   m_CorrespondingSourceObject: {fileID: 8428516066313517324, guid: 84217dc05ca79354e970af70b8a59925, type: 3}
   m_PrefabInstance: {fileID: 1844209360}
   m_PrefabAsset: {fileID: 0}
+--- !u!114 &2023412392
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 26351190}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: dde2f85708e67af49a302195f7b62129, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::DoorAutoController
+  doorObject: {fileID: 1997614523}
+  closedRotation: {x: 0, y: 0, z: 0}
+  openRotation: {x: 0, y: 90, z: 0}
+  speed: 2
 --- !u!1 &2034759634
 GameObject:
   m_ObjectHideFlags: 0
