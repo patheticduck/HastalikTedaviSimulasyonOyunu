@@ -1519,7 +1519,10 @@ MonoBehaviour:
   - {fileID: 11400000, guid: 33234d14710904b42bbe0af1985e93ea, type: 2}
   - {fileID: 11400000, guid: d2242f30631955d449a6a7b16b4626d4, type: 2}
   - {fileID: 11400000, guid: 175c7d69e22042f4cbc98fb6dc0b982d, type: 2}
-  specialCases: []
+  specialCases:
+  - {fileID: 11400000, guid: 10ee8ad87d4b8d64a9ae43ba1205705d, type: 2}
+  - {fileID: 11400000, guid: 76105bb55a23b744ca31d052096eb053, type: 2}
+  - {fileID: 11400000, guid: f736674a76045e745b598710a6f10829, type: 2}
   gripCase: {fileID: 11400000, guid: dd3ee94c1fe126f4dbbfafbd16fd8000, type: 2}
   coldCase: {fileID: 11400000, guid: 93adac7f142d6c34b96c527365699cb8, type: 2}
   dialoguePanel: {fileID: 1794947422}
