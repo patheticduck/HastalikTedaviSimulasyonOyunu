@@ -30,11 +30,9 @@ MonoBehaviour:
   extraInfo: 
   highlightKeywords:
   - "Hafif burun ak\u0131nt\u0131s\u0131"
-  - "Burun t\u0131kan\u0131kl\u0131\u011F\u0131"
+  - "burun t\u0131kan\u0131kl\u0131\u011F\u0131"
   - "hap\u015F\u0131r\u0131k"
   - "g\xF6z ka\u015F\u0131nt\u0131s\u0131"
-  - "Y\xFCksek ate\u015F"
-  - Alerji
-  - "\u015Eeffaf burun ak\u0131nt\u0131s\u0131"
-  - Hafif halsizlik
-  - "kas a\u011Fr\u0131s\u0131"
+  - "y\xFCksek ate\u015F"
+  - alerji
+  - "burun ak\u0131nt\u0131s\u0131"

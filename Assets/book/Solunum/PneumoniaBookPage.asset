@@ -29,11 +29,13 @@ MonoBehaviour:
   diseaseImage: {fileID: 21300000, guid: 58a7dae3fba1ab9488087258e1ad3e56, type: 3}
   extraInfo: 
   highlightKeywords:
-  - "Nefes darl\u0131\u011F\u0131"
-  - "Pl\xF6ritik a\u011Fr\u0131"
-  - Halsizlik
-  - "Sar\u0131ms\u0131 balgam"
+  - "nefes darl\u0131\u011F\u0131"
+  - "pl\xF6ritik a\u011Fr\u0131"
+  - halsizlik
+  - "sar\u0131ms\u0131 balgam"
   - "g\xF6\u011F\xFCs a\u011Fr\u0131s\u0131"
   - "h\u0131r\u0131lt\u0131"
   - "\xFC\u015F\xFCme"
   - titreme
+  - "infiltratif g\xF6r\xFCn\xFCm"
+  - "L\xF6kosit"

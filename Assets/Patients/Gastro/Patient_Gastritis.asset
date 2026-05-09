@@ -281,25 +281,6 @@ MonoBehaviour:
         score: -2
       - diseaseId: 'GALLBLADDER '
         score: 1
-    - choiceText: 
-      choiceType: 0
-      doctorLine: 
-      patientReply: 
-      assistantReply: 
-      nextNodeId: 
-      returnToHub: 0
-      opensDiagnosisPanel: 0
-      reusable: 0
-      hideAfterUse: 0
-      gainedTags: []
-      requiredTags: []
-      blockedTags: []
-      discoveredSymptoms: []
-      performedTests: []
-      notebookSymptoms: []
-      notebookTests: []
-      notebookNotes: []
-      diseaseEffects: []
     - choiceText: "Gece uyand\u0131ran a\u011Fr\u0131 var m\u0131?"
       choiceType: 0
       doctorLine: "A\u011Fr\u0131 gece uykudan uyand\u0131r\u0131yor mu?\n"
