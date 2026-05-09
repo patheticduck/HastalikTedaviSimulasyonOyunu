@@ -17,6 +17,7 @@ public class PauseMenuController : MonoBehaviour
 
     [Header("Blocking Panels")]
     public GameObject mainMenuPanel;
+    public GameObject doctorSelectionPanel;
     public GameObject settingsPanel;
     public GameObject continueSavePanel;
     public GameObject confirmClearAllContinuePanel;
@@ -74,6 +75,9 @@ public class PauseMenuController : MonoBehaviour
         if (!pausePressed)
             return;
 
+        if (doctorSelectionPanel != null && doctorSelectionPanel.activeSelf)
+            return;
+
         if (settingsPanel != null && settingsPanel.activeSelf)
             return;
 
@@ -100,6 +104,9 @@ public class PauseMenuController : MonoBehaviour
             return false;
 
         if (mainMenuPanel != null && mainMenuPanel.activeSelf)
+            return false;
+
+        if (doctorSelectionPanel != null && doctorSelectionPanel.activeSelf)
             return false;
 
         if (settingsPanel != null && settingsPanel.activeSelf)

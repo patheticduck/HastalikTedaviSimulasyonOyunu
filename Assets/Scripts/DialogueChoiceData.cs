@@ -45,4 +45,21 @@ public class DialogueChoiceData
 
     [Header("Disease Scoring")]
     public List<DiseaseScoreEffect> diseaseEffects = new List<DiseaseScoreEffect>();
+
+    [Header("Test Başarı Şansı")]
+    public bool useTestChance = false;
+
+    [Range(0, 100)]
+    public int baseSuccessChance = 70;
+
+    public DoctorSpecialization bonusSpecialization = DoctorSpecialization.None;
+
+    [Range(0, 100)]
+    public int specializationBonus = 15;
+
+    [Range(0, 100)]
+    public int generalistBonus = 5;
+
+    [TextArea]
+    public string failedTestText = "Testten net sonuç alınamadı. Klinik bulgularla devam etmelisin.";
 }

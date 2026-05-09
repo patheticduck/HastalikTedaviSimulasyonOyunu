@@ -14,6 +14,13 @@ public class MainMenuManager : MonoBehaviour
     public Button newGameButton;
     public Button continueButton;
 
+    [Header("Doctor Selection")]
+    public GameObject doctorSelectionPanel;
+    public Button respiratoryDoctorButton;
+    public Button gastroDoctorButton;
+    public Button generalistDoctorButton;
+    public Button doctorSelectionBackButton;
+
     [Header("Continue Save Panel")]
     public GameObject continueSavePanel;
     public Transform continueSaveContent;
@@ -85,6 +92,36 @@ public class MainMenuManager : MonoBehaviour
 
     private void Start()
     {
+        if (newGameButton != null)
+        {
+            newGameButton.onClick.RemoveAllListeners();
+            newGameButton.onClick.AddListener(OpenDoctorSelectionPanel);
+        }
+
+        if (respiratoryDoctorButton != null)
+        {
+            respiratoryDoctorButton.onClick.RemoveAllListeners();
+            respiratoryDoctorButton.onClick.AddListener(SelectRespiratoryDoctor);
+        }
+
+        if (gastroDoctorButton != null)
+        {
+            gastroDoctorButton.onClick.RemoveAllListeners();
+            gastroDoctorButton.onClick.AddListener(SelectGastroDoctor);
+        }
+
+        if (generalistDoctorButton != null)
+        {
+            generalistDoctorButton.onClick.RemoveAllListeners();
+            generalistDoctorButton.onClick.AddListener(SelectGeneralistDoctor);
+        }
+
+        if (doctorSelectionBackButton != null)
+        {
+            doctorSelectionBackButton.onClick.RemoveAllListeners();
+            doctorSelectionBackButton.onClick.AddListener(CloseDoctorSelectionPanel);
+        }
+
         if (continueButton != null)
         {
             continueButton.onClick.RemoveAllListeners();
@@ -152,6 +189,9 @@ public class MainMenuManager : MonoBehaviour
             confirmDeleteNoButton.onClick.AddListener(CloseConfirmDeleteAllPanel);
         }
 
+        if (doctorSelectionPanel != null)
+            doctorSelectionPanel.SetActive(false);
+
         if (confirmDeleteAllPanel != null)
             confirmDeleteAllPanel.SetActive(false);
 
@@ -175,6 +215,9 @@ public class MainMenuManager : MonoBehaviour
 
         if (mainMenuPanel != null)
             mainMenuPanel.SetActive(true);
+
+        if (doctorSelectionPanel != null)
+            doctorSelectionPanel.SetActive(false);
 
         if (continueSavePanel != null)
             continueSavePanel.SetActive(false);
@@ -224,6 +267,64 @@ public class MainMenuManager : MonoBehaviour
         StartCoroutine(ForceHistoryLayoutRefreshNextFrame());
     }
 
+    public void OpenDoctorSelectionPanel()
+    {
+        if (AudioManager.Instance != null)
+            AudioManager.Instance.PlayClick();
+
+        if (mainMenuPanel != null)
+            mainMenuPanel.SetActive(false);
+
+        if (continueSavePanel != null)
+            continueSavePanel.SetActive(false);
+
+        if (doctorSelectionPanel != null)
+            doctorSelectionPanel.SetActive(true);
+    }
+
+    public void CloseDoctorSelectionPanel()
+    {
+        if (AudioManager.Instance != null)
+            AudioManager.Instance.PlayClick();
+
+        if (doctorSelectionPanel != null)
+            doctorSelectionPanel.SetActive(false);
+
+        if (mainMenuPanel != null)
+            mainMenuPanel.SetActive(true);
+    }
+
+    public void SelectRespiratoryDoctor()
+    {
+        SelectDoctorAndStartGame(DoctorSpecialization.Respiratory);
+    }
+
+    public void SelectGastroDoctor()
+    {
+        SelectDoctorAndStartGame(DoctorSpecialization.Gastro);
+    }
+
+    public void SelectGeneralistDoctor()
+    {
+        SelectDoctorAndStartGame(DoctorSpecialization.Generalist);
+    }
+
+    private void SelectDoctorAndStartGame(DoctorSpecialization specialization)
+    {
+        if (AudioManager.Instance != null)
+            AudioManager.Instance.PlayClick();
+
+        if (DoctorProfileManager.Instance != null)
+            DoctorProfileManager.Instance.SelectSpecialization(specialization);
+        else
+            Debug.LogWarning("DoctorProfileManager bulunamadı!");
+
+        if (doctorSelectionPanel != null)
+            doctorSelectionPanel.SetActive(false);
+
+        StartGameFromMenu();
+    }
+
     public void StartGameFromMenu()
     {
         Time.timeScale = 1f;
@@ -232,6 +333,9 @@ public class MainMenuManager : MonoBehaviour
 
         if (mainMenuPanel != null)
             mainMenuPanel.SetActive(false);
+
+        if (doctorSelectionPanel != null)
+            doctorSelectionPanel.SetActive(false);
 
         if (continueSavePanel != null)
             continueSavePanel.SetActive(false);
@@ -287,6 +391,9 @@ public class MainMenuManager : MonoBehaviour
 
         if (mainMenuPanel != null)
             mainMenuPanel.SetActive(false);
+
+        if (doctorSelectionPanel != null)
+            doctorSelectionPanel.SetActive(false);
 
         if (continueSavePanel != null)
             continueSavePanel.SetActive(true);
@@ -449,6 +556,9 @@ public class MainMenuManager : MonoBehaviour
 
         if (continueSavePanel != null)
             continueSavePanel.SetActive(false);
+
+        if (doctorSelectionPanel != null)
+            doctorSelectionPanel.SetActive(false);
 
         if (confirmClearAllContinuePanel != null)
             confirmClearAllContinuePanel.SetActive(false);

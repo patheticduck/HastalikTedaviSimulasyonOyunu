@@ -33,6 +33,9 @@ public class DialogueOptionButton : MonoBehaviour, IPointerEnterHandler, IPointe
     private void OnDisable()
     {
         ApplyNormalColor();
+
+        if (TestChanceTooltipUI.Instance != null)
+            TestChanceTooltipUI.Instance.Hide();
     }
 
     private void Reset()
@@ -113,6 +116,9 @@ public class DialogueOptionButton : MonoBehaviour, IPointerEnterHandler, IPointe
     {
         Debug.Log("Choice butonuna tıklandı: " + (choiceData != null ? choiceData.choiceText : "NULL"));
 
+        if (TestChanceTooltipUI.Instance != null)
+            TestChanceTooltipUI.Instance.Hide();
+
         if (button != null)
             button.interactable = false;
 
@@ -129,6 +135,9 @@ public class DialogueOptionButton : MonoBehaviour, IPointerEnterHandler, IPointe
     private void OnClickDiagnosisChoice()
     {
         Debug.Log("Diagnosis butonuna tıklandı: " + (diagnosisData != null ? diagnosisData.diagnosisName : "NULL"));
+
+        if (TestChanceTooltipUI.Instance != null)
+            TestChanceTooltipUI.Instance.Hide();
 
         if (button != null)
             button.interactable = false;
@@ -151,11 +160,22 @@ public class DialogueOptionButton : MonoBehaviour, IPointerEnterHandler, IPointe
     public void OnPointerEnter(PointerEventData eventData)
     {
         ApplyHoverColor();
+
+        if (choiceData != null &&
+            choiceData.choiceType == ChoiceType.Test &&
+            choiceData.useTestChance &&
+            TestChanceTooltipUI.Instance != null)
+        {
+            TestChanceTooltipUI.Instance.Show(choiceData);
+        }
     }
 
     public void OnPointerExit(PointerEventData eventData)
     {
         ApplyNormalColor();
+
+        if (TestChanceTooltipUI.Instance != null)
+            TestChanceTooltipUI.Instance.Hide();
     }
 
     private void EnsureReferences()

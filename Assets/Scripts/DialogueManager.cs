@@ -295,6 +295,52 @@ public class DialogueManager : MonoBehaviour
             ));
         }
 
+        if (ShouldRollTestChance(choice))
+        {
+            int finalChance = CalculateFinalTestSuccessChance(choice);
+            int roll = Random.Range(1, 101);
+
+            Debug.Log(
+                "Test Chance Roll -> " +
+                "Choice: " + ResolveDynamicText(choice.choiceText) +
+                " | Final Chance: %" + finalChance +
+                " | Roll: " + roll
+            );
+
+            if (roll > finalChance)
+            {
+                GameObject failedLine = CreateDialogueLineObject();
+
+                string failedText = string.IsNullOrWhiteSpace(choice.failedTestText)
+                    ? "Testten net sonuç alınamadı. Klinik bulgularla devam etmelisin."
+                    : ResolveDynamicText(choice.failedTestText);
+
+                yield return StartCoroutine(TypeDialogueIntoLine(
+                    failedLine,
+                    "SİSTEM",
+                    failedText,
+                    false
+                ));
+
+                if (currentTurnFocusLine == null)
+                    currentTurnFocusLine = failedLine;
+
+                if (choice.hideAfterUse)
+                {
+                    string key = BuildChoiceKey(currentNodeId, choice.choiceText);
+                    usedHiddenChoices.Add(key);
+                }
+
+                Canvas.ForceUpdateCanvases();
+                yield return StartCoroutine(ScrollToConversationFocus(true));
+
+                yield return StartCoroutine(ShowNodeRoutine(currentNodeId, false));
+
+                isBusy = false;
+                yield break;
+            }
+        }
+
         if (!string.IsNullOrEmpty(choice.patientReply))
         {
             GameObject patientLine = CreateDialogueLineObject();
@@ -770,6 +816,38 @@ public class DialogueManager : MonoBehaviour
         }
 
         return result;
+    }
+
+    private bool ShouldRollTestChance(DialogueChoiceData choice)
+    {
+        if (choice == null)
+            return false;
+
+        return choice.choiceType == ChoiceType.Test && choice.useTestChance;
+    }
+
+    private int CalculateFinalTestSuccessChance(DialogueChoiceData choice)
+    {
+        if (choice == null)
+            return 0;
+
+        int finalChance = choice.baseSuccessChance;
+        DoctorSpecialization selectedSpecialization = DoctorSpecialization.None;
+
+        if (DoctorProfileManager.Instance != null)
+            selectedSpecialization = DoctorProfileManager.Instance.GetSelectedSpecialization();
+
+        if (selectedSpecialization == DoctorSpecialization.Generalist)
+        {
+            finalChance += choice.generalistBonus;
+        }
+        else if (choice.bonusSpecialization != DoctorSpecialization.None &&
+                 selectedSpecialization == choice.bonusSpecialization)
+        {
+            finalChance += choice.specializationBonus;
+        }
+
+        return Mathf.Clamp(finalChance, 0, 100);
     }
 
     private void ApplyDiseaseEffects(List<DiseaseScoreEffect> effects)

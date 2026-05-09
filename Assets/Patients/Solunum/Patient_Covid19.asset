@@ -58,6 +58,13 @@ MonoBehaviour:
         score: 0
       - diseaseId: ALLERGIC_RHINITIS
         score: 0
+      useTestChance: 0
+      baseSuccessChance: 70
+      bonusSpecialization: 0
+      specializationBonus: 15
+      generalistBonus: 5
+      failedTestText: "Testten net sonu\xE7 al\u0131namad\u0131. Klinik bulgularla
+        devam etmelisin."
     - choiceText: "Ate\u015Finiz oldu mu?"
       choiceType: 0
       doctorLine: "Ate\u015Finiz oldu mu?\n"
@@ -89,6 +96,13 @@ MonoBehaviour:
         score: 1
       - diseaseId: 'ALLERGIC_RHINITIS '
         score: -2
+      useTestChance: 0
+      baseSuccessChance: 70
+      bonusSpecialization: 0
+      specializationBonus: 15
+      generalistBonus: 5
+      failedTestText: "Testten net sonu\xE7 al\u0131namad\u0131. Klinik bulgularla
+        devam etmelisin."
     - choiceText: "Burnunuz ak\u0131yor mu, t\u0131kal\u0131 m\u0131?"
       choiceType: 0
       doctorLine: "Burun ak\u0131nt\u0131n\u0131z veya t\u0131kan\u0131kl\u0131\u011F\u0131n\u0131z
@@ -124,6 +138,13 @@ MonoBehaviour:
         score: 1
       - diseaseId: 'SINUSITIS '
         score: 1
+      useTestChance: 0
+      baseSuccessChance: 70
+      bonusSpecialization: 0
+      specializationBonus: 15
+      generalistBonus: 5
+      failedTestText: "Testten net sonu\xE7 al\u0131namad\u0131. Klinik bulgularla
+        devam etmelisin."
     - choiceText: "Hap\u015F\u0131r\u0131k veya ka\u015F\u0131nt\u0131 var m\u0131?"
       choiceType: 0
       doctorLine: "Hap\u015F\u0131r\u0131k, burun ya da g\xF6z ka\u015F\u0131nt\u0131s\u0131
@@ -161,6 +182,13 @@ MonoBehaviour:
         score: 1
       - diseaseId: 'SINUSITIS '
         score: 0
+      useTestChance: 0
+      baseSuccessChance: 70
+      bonusSpecialization: 0
+      specializationBonus: 15
+      generalistBonus: 5
+      failedTestText: "Testten net sonu\xE7 al\u0131namad\u0131. Klinik bulgularla
+        devam etmelisin."
     - choiceText: "\xD6ks\xFCr\xFC\u011F\xFCn\xFCz var m\u0131?"
       choiceType: 0
       doctorLine: "\xD6ks\xFCr\xFC\u011F\xFCn\xFCz var m\u0131? Kuru mu balgaml\u0131
@@ -193,6 +221,13 @@ MonoBehaviour:
         score: 0
       - diseaseId: 'SINUSITIS '
         score: 0
+      useTestChance: 0
+      baseSuccessChance: 70
+      bonusSpecialization: 0
+      specializationBonus: 15
+      generalistBonus: 5
+      failedTestText: "Testten net sonu\xE7 al\u0131namad\u0131. Klinik bulgularla
+        devam etmelisin."
     - choiceText: "Bo\u011Faz a\u011Fr\u0131n\u0131z var m\u0131?"
       choiceType: 0
       doctorLine: "Bo\u011Faz a\u011Fr\u0131n\u0131z veya yanma hissiniz var m\u0131?\n"
@@ -223,6 +258,13 @@ MonoBehaviour:
         score: 0
       - diseaseId: 'SINUSITIS '
         score: 0
+      useTestChance: 0
+      baseSuccessChance: 70
+      bonusSpecialization: 0
+      specializationBonus: 15
+      generalistBonus: 5
+      failedTestText: "Testten net sonu\xE7 al\u0131namad\u0131. Klinik bulgularla
+        devam etmelisin."
     - choiceText: "Y\xFCz\xFCn\xFCzde bas\u0131n\xE7 veya a\u011Fr\u0131 var m\u0131?"
       choiceType: 0
       doctorLine: "Al\u0131n, yanak veya g\xF6z \xE7evresinde a\u011Fr\u0131/bas\u0131n\xE7
@@ -257,6 +299,13 @@ MonoBehaviour:
         score: 0
       - diseaseId: 'ALLERGIC_RHINITIS '
         score: 0
+      useTestChance: 0
+      baseSuccessChance: 70
+      bonusSpecialization: 0
+      specializationBonus: 15
+      generalistBonus: 5
+      failedTestText: "Testten net sonu\xE7 al\u0131namad\u0131. Klinik bulgularla
+        devam etmelisin."
     - choiceText: "Koku veya tat de\u011Fi\u015Fikli\u011Fi oldu mu?"
       choiceType: 0
       doctorLine: "Koku veya tat alman\u0131zda de\u011Fi\u015Fiklik fark ettiniz
@@ -290,6 +339,13 @@ MonoBehaviour:
         score: 1
       - diseaseId: 'ALLERGIC_RHINITIS '
         score: 0
+      useTestChance: 0
+      baseSuccessChance: 70
+      bonusSpecialization: 0
+      specializationBonus: 15
+      generalistBonus: 5
+      failedTestText: "Testten net sonu\xE7 al\u0131namad\u0131. Klinik bulgularla
+        devam etmelisin."
     - choiceText: "Yak\u0131n \xE7evrenizde hasta olan var m\u0131?"
       choiceType: 0
       doctorLine: "Son g\xFCnlerde yak\u0131n \xE7evrenizde hasta biri oldu mu?\n"
@@ -321,6 +377,13 @@ MonoBehaviour:
         score: 0
       - diseaseId: 'ALLERGIC_RHINITIS '
         score: -1
+      useTestChance: 0
+      baseSuccessChance: 70
+      bonusSpecialization: 0
+      specializationBonus: 15
+      generalistBonus: 5
+      failedTestText: "Testten net sonu\xE7 al\u0131namad\u0131. Klinik bulgularla
+        devam etmelisin."
     - choiceText: "Halsizlik veya kas a\u011Fr\u0131n\u0131z var m\u0131?"
       choiceType: 0
       doctorLine: "Halsizlik veya kas a\u011Fr\u0131s\u0131 hissediyor musunuz?"
@@ -354,6 +417,13 @@ MonoBehaviour:
         score: 0
       - diseaseId: 'ALLERGIC_RHINITIS '
         score: -1
+      useTestChance: 0
+      baseSuccessChance: 70
+      bonusSpecialization: 0
+      specializationBonus: 15
+      generalistBonus: 5
+      failedTestText: "Testten net sonu\xE7 al\u0131namad\u0131. Klinik bulgularla
+        devam etmelisin."
     - choiceText: " Burun ak\u0131nt\u0131s\u0131n\u0131n rengi nas\u0131l?"
       choiceType: 0
       doctorLine: "Burun ak\u0131nt\u0131n\u0131z \u015Feffaf m\u0131, koyu sar\u0131-ye\u015Fil
@@ -387,6 +457,13 @@ MonoBehaviour:
         score: 1
       - diseaseId: 'COVID19 '
         score: 1
+      useTestChance: 0
+      baseSuccessChance: 70
+      bonusSpecialization: 0
+      specializationBonus: 15
+      generalistBonus: 5
+      failedTestText: "Testten net sonu\xE7 al\u0131namad\u0131. Klinik bulgularla
+        devam etmelisin."
     - choiceText: "\u015Eikayetler mevsimsel mi?"
       choiceType: 0
       doctorLine: "Bu \u015Fikayetler genelde mevsimsel olarak tekrarlar m\u0131?"
@@ -419,6 +496,13 @@ MonoBehaviour:
         score: 1
       - diseaseId: 'SINUSITIS '
         score: 0
+      useTestChance: 0
+      baseSuccessChance: 70
+      bonusSpecialization: 0
+      specializationBonus: 15
+      generalistBonus: 5
+      failedTestText: "Testten net sonu\xE7 al\u0131namad\u0131. Klinik bulgularla
+        devam etmelisin."
     - choiceText: "Burun ve bo\u011Faz muayenesi yap"
       choiceType: 1
       doctorLine: "Burun ve bo\u011Faz\u0131n\u0131za bakal\u0131m.\n"
@@ -457,6 +541,13 @@ MonoBehaviour:
         score: -1
       - diseaseId: 'ALLERGIC_RHINITIS '
         score: 0
+      useTestChance: 0
+      baseSuccessChance: 70
+      bonusSpecialization: 0
+      specializationBonus: 15
+      generalistBonus: 5
+      failedTestText: "Testten net sonu\xE7 al\u0131namad\u0131. Klinik bulgularla
+        devam etmelisin."
     - choiceText: "Vital bulgular\u0131 \xF6l\xE7"
       choiceType: 1
       doctorLine: "Ate\u015F, nab\u0131z ve oksijen de\u011Ferlerinizi \xF6l\xE7elim.\n"
@@ -493,6 +584,13 @@ MonoBehaviour:
         score: 0
       - diseaseId: 'ALLERGIC_RHINITIS '
         score: -1
+      useTestChance: 0
+      baseSuccessChance: 70
+      bonusSpecialization: 0
+      specializationBonus: 15
+      generalistBonus: 5
+      failedTestText: "Testten net sonu\xE7 al\u0131namad\u0131. Klinik bulgularla
+        devam etmelisin."
     - choiceText: "Tam kan say\u0131m\u0131 ve CRP iste"
       choiceType: 1
       doctorLine: "Kan de\u011Ferlerinize bakal\u0131m.\n"
@@ -530,6 +628,13 @@ MonoBehaviour:
         score: 0
       - diseaseId: 'ALLERGIC_RHINITIS '
         score: -1
+      useTestChance: 0
+      baseSuccessChance: 70
+      bonusSpecialization: 0
+      specializationBonus: 15
+      generalistBonus: 5
+      failedTestText: "Testten net sonu\xE7 al\u0131namad\u0131. Klinik bulgularla
+        devam etmelisin."
     - choiceText: "Sin\xFCs De\u011Ferlendirmesi"
       choiceType: 1
       doctorLine: "Sin\xFCs b\xF6lgelerinde hassasiyet var m\u0131 bakal\u0131m.\n"
@@ -566,6 +671,13 @@ MonoBehaviour:
         score: 1
       - diseaseId: 'ALLERGIC_RHINITIS '
         score: 0
+      useTestChance: 0
+      baseSuccessChance: 70
+      bonusSpecialization: 0
+      specializationBonus: 15
+      generalistBonus: 5
+      failedTestText: "Testten net sonu\xE7 al\u0131namad\u0131. Klinik bulgularla
+        devam etmelisin."
     - choiceText: COVID-19 testi iste
       choiceType: 1
       doctorLine: "COVID-19 a\xE7\u0131s\u0131ndan test isteyelim.\n"
@@ -604,6 +716,13 @@ MonoBehaviour:
         score: -2
       - diseaseId: 'ALLERGIC_RHINITIS '
         score: -3
+      useTestChance: 1
+      baseSuccessChance: 25
+      bonusSpecialization: 1
+      specializationBonus: 50
+      generalistBonus: 10
+      failedTestText: "Testten net sonu\xE7 al\u0131namad\u0131. Klinik bulgularla
+        devam etmelisin."
     - choiceText: "Tan\u0131 koy"
       choiceType: 2
       doctorLine: 
@@ -623,6 +742,13 @@ MonoBehaviour:
       notebookTests: []
       notebookNotes: []
       diseaseEffects: []
+      useTestChance: 0
+      baseSuccessChance: 70
+      bonusSpecialization: 0
+      specializationBonus: 15
+      generalistBonus: 5
+      failedTestText: "Testten net sonu\xE7 al\u0131namad\u0131. Klinik bulgularla
+        devam etmelisin."
   diagnosisChoices:
   - diseaseId: COMMON_COLD
     diagnosisName: "So\u011Fuk Alg\u0131nl\u0131\u011F\u0131"
