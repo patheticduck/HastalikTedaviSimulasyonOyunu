@@ -450,6 +450,13 @@ public class GameFlowManager : MonoBehaviour
         currentEnergy = Mathf.Clamp(save.currentEnergy, 0, maxEnergy);
         doctorBookUnlockedForCurrentPatient = save.doctorBookUnlockedForCurrentPatient;
 
+        if (!save.diagnosisSubmittedForCurrentPatient &&
+            save.doctorBookUnlockedForCurrentPatient)
+        {       
+        currentEnergy = Mathf.Clamp(currentEnergy + 1, 0, maxEnergy);
+        doctorBookUnlockedForCurrentPatient = false;
+        }
+
         dayCorrect = save.dayCorrect;
         dayWrong = save.dayWrong;
 

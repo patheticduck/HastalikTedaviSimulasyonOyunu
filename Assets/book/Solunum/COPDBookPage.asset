@@ -1,0 +1,36 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: a34b718b78ce91a4bb6b271059134183, type: 3}
+  m_Name: COPDBookPage
+  m_EditorClassIdentifier: Assembly-CSharp::DiseaseBookPageData
+  diseaseId: copd
+  diseaseName: KOAH
+  generalInfo: "KOAH, hava yollar\u0131nda daralma ile ilerleyen kronik bir solunum
+    yolu hastal\u0131\u011F\u0131d\u0131r. Hastalarda nefes darl\u0131\u011F\u0131,
+    \xF6ks\xFCr\xFCk ve balgam s\u0131k g\xF6r\xFClen belirtilerdendir."
+  symptomsInfo: "Nefes darl\u0131\u011F\u0131 mevcut olmas\u0131, balgaml\u0131 \xF6ks\xFCr\xFCk,
+    hafif h\u0131r\u0131lt\u0131 ve halsizlik mevcut olmas\u0131 KOAH\u2019ta s\u0131k
+    g\xF6r\xFClen belirtilerdendir. Baz\u0131 hastalarda eforla \xF6ks\xFCr\xFCk
+    art\u0131\u015F\u0131 g\xF6r\xFClebilir."
+  diagnosisTips: "Belirgin sigara \xF6yk\xFCs\xFC olmas\u0131, \u015Fikayetlerin
+    yava\u015F artm\u0131\u015F olmas\u0131 ve kronik \xF6ks\xFCr\xFCk bulunmas\u0131
+    KOAH tan\u0131s\u0131n\u0131 destekleyebilir. Solunum seslerinde h\u0131r\u0131lt\u0131
+    duyulabilir."
+  diseaseImage: {fileID: 21300000, guid: 58a7dae3fba1ab9488087258e1ad3e56, type: 3}
+  extraInfo: 
+  highlightKeywords:
+  - "Nefes darl\u0131\u011F\u0131"
+  - "Balgaml\u0131 \xF6ks\xFCr\xFCk"
+  - "Hafif h\u0131r\u0131lt\u0131"
+  - Halsizlik
+  - "Eforla \xF6ks\xFCr\xFCk"
+  - "Kronik \xF6ks\xFCr\xFCk"
