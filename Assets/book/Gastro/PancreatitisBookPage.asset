@@ -12,11 +12,29 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: a34b718b78ce91a4bb6b271059134183, type: 3}
   m_Name: PancreatitisBookPage
   m_EditorClassIdentifier: Assembly-CSharp::DiseaseBookPageData
-  diseaseId: 
-  diseaseName: 
-  generalInfo: 
-  symptomsInfo: 
-  diagnosisTips: 
+  diseaseId: pancreatitis
+  diseaseName: "PANKREAT\u0130T"
+  generalInfo: "Pankreatit, pankreas\u0131n iltihaplanmas\u0131yla geli\u015Fen ciddi
+    bir sindirim sistemi hastal\u0131\u011F\u0131d\u0131r. Hastalarda \xFCst kar\u0131n
+    a\u011Fr\u0131s\u0131, bulant\u0131 ve kusma g\xF6r\xFClebilir."
+  symptomsInfo: "\xDCst kar\u0131n a\u011Fr\u0131s\u0131 var olmas\u0131, bulant\u0131
+    ve kusma, s\u0131rta vuran a\u011Fr\u0131 ve hafif ate\u015F var olmas\u0131
+    pankreatitte s\u0131k g\xF6r\xFClen belirtilerdendir. A\u011Fr\u0131 orta-\u015Fiddetli
+    olabilir."
+  diagnosisTips: "A\u011Fr\u0131 epigastrik b\xF6lgede olmas\u0131, ya\u011Fl\u0131
+    yemek sonras\u0131 art\u0131\u015F ve alkol \xF6yk\xFCs\xFC mevcut olmas\u0131
+    pankreatit lehine \xF6nemli bulgulard\u0131r. Pankreas enzimleri y\xFCksek olmas\u0131
+    tan\u0131y\u0131 destekler."
   diseaseImage: {fileID: 0}
   extraInfo: 
-  highlightKeywords: []
+  highlightKeywords:
+  - "\xDCst kar\u0131n a\u011Fr\u0131s\u0131"
+  - "bulant\u0131"
+  - kusma
+  - "a\u011Fr\u0131"
+  - "hafif ate\u015F"
+  - "orta-\u015Fiddetli"
+  - sindirim sistemi
+  - "ya\u011Fl\u0131 yemek"
+  - alkol
+  - epigastrik

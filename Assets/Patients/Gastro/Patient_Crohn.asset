@@ -59,6 +59,13 @@ MonoBehaviour:
         score: -1
       - diseaseId: 'FOOD_POISONING '
         score: -2
+      useTestChance: 0
+      baseSuccessChance: 70
+      bonusSpecialization: 0
+      specializationBonus: 15
+      generalistBonus: 5
+      failedTestText: "Testten net sonu\xE7 al\u0131namad\u0131. Klinik bulgularla
+        devam etmelisin."
     - choiceText: "Kar\u0131n a\u011Fr\u0131n\u0131z nerede?"
       choiceType: 0
       doctorLine: "A\u011Fr\u0131n\u0131z daha \xE7ok karn\u0131n\u0131z\u0131n neresinde?\n"
@@ -89,6 +96,13 @@ MonoBehaviour:
         score: 0
       - diseaseId: 'FOOD_POISONING '
         score: 0
+      useTestChance: 0
+      baseSuccessChance: 70
+      bonusSpecialization: 0
+      specializationBonus: 15
+      generalistBonus: 5
+      failedTestText: "Testten net sonu\xE7 al\u0131namad\u0131. Klinik bulgularla
+        devam etmelisin."
     - choiceText: "\u0130shaliniz nas\u0131l?"
       choiceType: 0
       doctorLine: "\u0130shaliniz sulu mu, s\u0131k m\u0131 oluyor?\n"
@@ -120,6 +134,13 @@ MonoBehaviour:
         score: 2
       - diseaseId: 'IBS '
         score: 1
+      useTestChance: 0
+      baseSuccessChance: 70
+      bonusSpecialization: 0
+      specializationBonus: 15
+      generalistBonus: 5
+      failedTestText: "Testten net sonu\xE7 al\u0131namad\u0131. Klinik bulgularla
+        devam etmelisin."
     - choiceText: Kusma oldu mu?
       choiceType: 0
       doctorLine: "Kusma veya yo\u011Fun bulant\u0131 oldu mu?\n"
@@ -151,6 +172,13 @@ MonoBehaviour:
         score: 1
       - diseaseId: 'IBS '
         score: 1
+      useTestChance: 0
+      baseSuccessChance: 70
+      bonusSpecialization: 0
+      specializationBonus: 15
+      generalistBonus: 5
+      failedTestText: "Testten net sonu\xE7 al\u0131namad\u0131. Klinik bulgularla
+        devam etmelisin."
     - choiceText: "Ate\u015Finiz oldu mu?"
       choiceType: 0
       doctorLine: "Ate\u015Finiz oldu mu?\n"
@@ -183,6 +211,13 @@ MonoBehaviour:
         score: 0
       - diseaseId: 'IBS '
         score: -1
+      useTestChance: 0
+      baseSuccessChance: 70
+      bonusSpecialization: 0
+      specializationBonus: 15
+      generalistBonus: 5
+      failedTestText: "Testten net sonu\xE7 al\u0131namad\u0131. Klinik bulgularla
+        devam etmelisin."
     - choiceText: "D\u0131\u015Fk\u0131da kan veya mukus var m\u0131?"
       choiceType: 0
       doctorLine: "D\u0131\u015Fk\u0131n\u0131zda kan veya mukus fark ettiniz mi?\n"
@@ -216,6 +251,13 @@ MonoBehaviour:
         score: 1
       - diseaseId: 'FOOD_POISONING '
         score: 0
+      useTestChance: 0
+      baseSuccessChance: 70
+      bonusSpecialization: 0
+      specializationBonus: 15
+      generalistBonus: 5
+      failedTestText: "Testten net sonu\xE7 al\u0131namad\u0131. Klinik bulgularla
+        devam etmelisin."
     - choiceText: "Son g\xFCnlerde \u015F\xFCpheli yemek yediniz mi?"
       choiceType: 0
       doctorLine: "Son g\xFCnlerde d\u0131\u015Far\u0131da yedi\u011Finiz \u015F\xFCpheli
@@ -249,6 +291,13 @@ MonoBehaviour:
         score: 0
       - diseaseId: 'IBS '
         score: 0
+      useTestChance: 0
+      baseSuccessChance: 70
+      bonusSpecialization: 0
+      specializationBonus: 15
+      generalistBonus: 5
+      failedTestText: "Testten net sonu\xE7 al\u0131namad\u0131. Klinik bulgularla
+        devam etmelisin."
     - choiceText: "Ayn\u0131 yemekten yiyenlerde \u015Fikayet oldu mu?"
       choiceType: 0
       doctorLine: "Ayn\u0131 yemekten yiyen ba\u015Fka ki\u015Filerde de \u015Fikayet
@@ -281,6 +330,13 @@ MonoBehaviour:
         score: 0
       - diseaseId: 'IBS '
         score: 0
+      useTestChance: 0
+      baseSuccessChance: 70
+      bonusSpecialization: 0
+      specializationBonus: 15
+      generalistBonus: 5
+      failedTestText: "Testten net sonu\xE7 al\u0131namad\u0131. Klinik bulgularla
+        devam etmelisin."
     - choiceText: "Kilo kayb\u0131n\u0131z oldu mu?"
       choiceType: 0
       doctorLine: "Son haftalarda kilo kayb\u0131n\u0131z oldu mu?\n"
@@ -315,6 +371,13 @@ MonoBehaviour:
         score: -1
       - diseaseId: 'FOOD_POISONING '
         score: -2
+      useTestChance: 0
+      baseSuccessChance: 70
+      bonusSpecialization: 0
+      specializationBonus: 15
+      generalistBonus: 5
+      failedTestText: "Testten net sonu\xE7 al\u0131namad\u0131. Klinik bulgularla
+        devam etmelisin."
     - choiceText: "Tuvaletten sonra a\u011Fr\u0131 azal\u0131yor mu?"
       choiceType: 0
       doctorLine: "Tuvalete \xE7\u0131kt\u0131ktan sonra a\u011Fr\u0131n\u0131z azal\u0131yor
@@ -349,6 +412,13 @@ MonoBehaviour:
         score: 0
       - diseaseId: 'FOOD_POISONING '
         score: 0
+      useTestChance: 0
+      baseSuccessChance: 70
+      bonusSpecialization: 0
+      specializationBonus: 15
+      generalistBonus: 5
+      failedTestText: "Testten net sonu\xE7 al\u0131namad\u0131. Klinik bulgularla
+        devam etmelisin."
     - choiceText: "Stresle art\u0131yor mu?"
       choiceType: 0
       doctorLine: "\u015Eikayetleriniz stresli d\xF6nemlerde art\u0131yor mu?\n"
@@ -382,6 +452,13 @@ MonoBehaviour:
         score: 0
       - diseaseId: 'FOOD_POISONING '
         score: 0
+      useTestChance: 0
+      baseSuccessChance: 70
+      bonusSpecialization: 0
+      specializationBonus: 15
+      generalistBonus: 5
+      failedTestText: "Testten net sonu\xE7 al\u0131namad\u0131. Klinik bulgularla
+        devam etmelisin."
     - choiceText: "Gece tuvalete kalk\u0131yor musunuz?"
       choiceType: 0
       doctorLine: "Gece ishal nedeniyle tuvalete kalk\u0131yor musunuz?\n"
@@ -414,6 +491,13 @@ MonoBehaviour:
         score: 1
       - diseaseId: 'FOOD_POISONING '
         score: 0
+      useTestChance: 0
+      baseSuccessChance: 70
+      bonusSpecialization: 0
+      specializationBonus: 15
+      generalistBonus: 5
+      failedTestText: "Testten net sonu\xE7 al\u0131namad\u0131. Klinik bulgularla
+        devam etmelisin."
     - choiceText: "Kar\u0131n muayenesi yap"
       choiceType: 1
       doctorLine: "Kar\u0131n muayenesi yapaca\u011F\u0131m.\n"
@@ -451,6 +535,13 @@ MonoBehaviour:
         score: 0
       - diseaseId: 'FOOD_POISONING '
         score: 0
+      useTestChance: 0
+      baseSuccessChance: 70
+      bonusSpecialization: 0
+      specializationBonus: 15
+      generalistBonus: 5
+      failedTestText: "Testten net sonu\xE7 al\u0131namad\u0131. Klinik bulgularla
+        devam etmelisin."
     - choiceText: "Tam kan say\u0131m\u0131 ve CRP iste"
       choiceType: 1
       doctorLine: "Kan de\u011Ferlerinize bakal\u0131m.\n"
@@ -490,6 +581,13 @@ MonoBehaviour:
         score: 1
       - diseaseId: 'IBS '
         score: -3
+      useTestChance: 0
+      baseSuccessChance: 70
+      bonusSpecialization: 0
+      specializationBonus: 15
+      generalistBonus: 5
+      failedTestText: "Testten net sonu\xE7 al\u0131namad\u0131. Klinik bulgularla
+        devam etmelisin."
     - choiceText: "D\u0131\u015Fk\u0131 testi iste"
       choiceType: 1
       doctorLine: "D\u0131\u015Fk\u0131 incelemesi isteyelim.\n"
@@ -530,6 +628,13 @@ MonoBehaviour:
         score: -2
       - diseaseId: IBS
         score: -4
+      useTestChance: 0
+      baseSuccessChance: 70
+      bonusSpecialization: 0
+      specializationBonus: 15
+      generalistBonus: 5
+      failedTestText: "Testten net sonu\xE7 al\u0131namad\u0131. Klinik bulgularla
+        devam etmelisin."
     - choiceText: Gastroenterit paneli iste
       choiceType: 1
       doctorLine: "Enfeksiyon etkenleri i\xE7in h\u0131zl\u0131 panel isteyelim.\n"
@@ -569,6 +674,13 @@ MonoBehaviour:
         score: 2
       - diseaseId: 'IBS '
         score: 0
+      useTestChance: 0
+      baseSuccessChance: 70
+      bonusSpecialization: 0
+      specializationBonus: 15
+      generalistBonus: 5
+      failedTestText: "Testten net sonu\xE7 al\u0131namad\u0131. Klinik bulgularla
+        devam etmelisin."
     - choiceText: Kolonoskopi iste
       choiceType: 1
       doctorLine: "Ba\u011F\u0131rsak i\xE7 y\xFCzeyini de\u011Ferlendirmek i\xE7in
@@ -609,6 +721,13 @@ MonoBehaviour:
         score: -2
       - diseaseId: 'FOOD_POISONING '
         score: -2
+      useTestChance: 1
+      baseSuccessChance: 25
+      bonusSpecialization: 2
+      specializationBonus: 50
+      generalistBonus: 10
+      failedTestText: "Testten net sonu\xE7 al\u0131namad\u0131. Klinik bulgularla
+        devam etmelisin."
     - choiceText: "Tan\u0131 koy"
       choiceType: 2
       doctorLine: 
@@ -628,6 +747,13 @@ MonoBehaviour:
       notebookTests: []
       notebookNotes: []
       diseaseEffects: []
+      useTestChance: 0
+      baseSuccessChance: 70
+      bonusSpecialization: 0
+      specializationBonus: 15
+      generalistBonus: 5
+      failedTestText: "Testten net sonu\xE7 al\u0131namad\u0131. Klinik bulgularla
+        devam etmelisin."
   diagnosisChoices:
   - diseaseId: GASTROENTERITIS
     diagnosisName: Gastroenterit

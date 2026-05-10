@@ -12,11 +12,30 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: a34b718b78ce91a4bb6b271059134183, type: 3}
   m_Name: CrohnBookPage
   m_EditorClassIdentifier: Assembly-CSharp::DiseaseBookPageData
-  diseaseId: 
-  diseaseName: 
-  generalInfo: 
-  symptomsInfo: 
-  diagnosisTips: 
+  diseaseId: crohn
+  diseaseName: "CROHN HASTALI\u011EI"
+  generalInfo: "Crohn hastal\u0131\u011F\u0131, sindirim sisteminde kronik inflamasyon
+    ile seyreden bir ba\u011F\u0131rsak hastal\u0131\u011F\u0131d\u0131r. Hastalarda
+    kar\u0131n a\u011Fr\u0131s\u0131, ishal ve kilo kayb\u0131 g\xF6r\xFClebilir."
+  symptomsInfo: "Uzun s\xFCren ishal, sa\u011F alt kar\u0131n a\u011Fr\u0131s\u0131,
+    mukuslu d\u0131\u015Fk\u0131 ve son haftalarda kilo kayb\u0131 var olmas\u0131
+    Crohn hastal\u0131\u011F\u0131nda s\u0131k g\xF6r\xFClen belirtilerdendir. Baz\u0131
+    hastalarda hafif ate\u015F mevcut olabilir."
+  diagnosisTips: "S\xFCre akut de\u011Fil olmas\u0131, gece ishal nedeniyle uyan\u0131yor
+    olmas\u0131 ve kalprotektin y\xFCksek olmas\u0131 inflamatuar ba\u011F\u0131rsak
+    hastal\u0131\u011F\u0131 lehine \xF6nemli bulgulard\u0131r. Sa\u011F alt kadranda
+    hassasiyet var olmas\u0131 tan\u0131y\u0131 destekleyebilir."
   diseaseImage: {fileID: 0}
   extraInfo: 
-  highlightKeywords: []
+  highlightKeywords:
+  - "Uzun s\xFCren"
+  - ishal
+  - "kar\u0131n a\u011Fr\u0131s\u0131"
+  - "mukuslu d\u0131\u015Fk\u0131"
+  - "kilo kayb\u0131"
+  - "hafif ate\u015F"
+  - akut
+  - kalprotektin
+  - inflamatuar
+  - hassasiyet
+  - "ba\u011F\u0131rsak"
