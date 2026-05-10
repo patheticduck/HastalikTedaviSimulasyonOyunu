@@ -35,4 +35,27 @@ public class DoctorProfileManager : MonoBehaviour
     {
         return selectedSpecialization == specialization;
     }
+
+    public string GetSelectedDoctorDisplayName()
+    {
+        return GetDoctorDisplayName(selectedSpecialization);
+    }
+
+    public static string GetDoctorDisplayName(DoctorSpecialization specialization)
+    {
+        switch (specialization)
+        {
+            case DoctorSpecialization.Respiratory:
+                return "Solunum Uzmanı";
+
+            case DoctorSpecialization.Gastro:
+                return "Gastro Uzmanı";
+
+            case DoctorSpecialization.Generalist:
+                return "Genel Hekim";
+
+            default:
+                return "Seçilmedi";
+        }
+    }
 }

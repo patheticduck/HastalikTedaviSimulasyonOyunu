@@ -298,11 +298,24 @@ public class PauseMenuController : MonoBehaviour
         if (resultText == null || gameFlowManager == null)
             return;
 
-        int patientInDay = ((gameFlowManager.currentPatientNumber - 1) % gameFlowManager.patientsPerDay) + 1;
+        int patientInDay =
+            ((gameFlowManager.currentPatientNumber - 1)
+            % gameFlowManager.patientsPerDay) + 1;
+
+        string selectedDoctorText = "Seçilmedi";
+
+        if (DoctorProfileManager.Instance != null)
+        {
+            selectedDoctorText =
+                DoctorProfileManager.Instance.GetSelectedDoctorDisplayName();
+        }
 
         resultText.text =
+            "Doktor: " + selectedDoctorText + "\n" +
             "Gün: " + gameFlowManager.currentDay + "\n" +
-            "Hasta: " + patientInDay + " (" + gameFlowManager.currentPatientNumber + "/" + gameFlowManager.totalPatientsInRun + ")\n" +
+            "Hasta: " + patientInDay + " (" +
+            gameFlowManager.currentPatientNumber + "/" +
+            gameFlowManager.totalPatientsInRun + ")\n" +
             "Doğru: " + gameFlowManager.totalCorrect + "\n" +
             "Yanlış: " + gameFlowManager.totalWrong + "\n" +
             "Kalan Hak: " + gameFlowManager.remainingHearts;

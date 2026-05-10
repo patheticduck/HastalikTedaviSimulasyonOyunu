@@ -513,10 +513,12 @@ public class MainMenuManager : MonoBehaviour
         }
 
         int patientInDay = ((save.currentPatientNumber - 1) % patientsPerDay) + 1;
+        string selectedDoctorText = DoctorProfileManager.GetDoctorDisplayName(save.selectedDoctorSpecialization);
 
         return
             "Seçilen Devam Kaydı\n\n" +
             "Kayıt Tarihi: " + (string.IsNullOrEmpty(save.savedDateText) ? "Bilinmiyor" : save.savedDateText) + "\n" +
+            "Seçilen Doktor: " + selectedDoctorText + "\n" +
             "Gün: " + save.currentDay + "\n" +
             "Hasta: " + patientInDay + " (" + save.currentPatientNumber + "/" + totalPatients + ")\n" +
             "Toplam Doğru: " + save.totalCorrect + "\n" +

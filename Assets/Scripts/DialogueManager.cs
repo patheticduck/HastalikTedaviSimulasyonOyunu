@@ -39,6 +39,9 @@ public class DialogueManager : MonoBehaviour
     [Header("Case")]
     public PatientCaseData currentCase;
 
+    [Header("Notification")]
+    public DialogueNotificationUI notificationUI;
+
     private GameObject currentOptionsGroup;
 
     private Transform questionsContainer;
@@ -89,6 +92,21 @@ public class DialogueManager : MonoBehaviour
         if (interactionModeManager == null)
             interactionModeManager = FindFirstObjectByType<PlayerInteractionModeManager>();
     }
+
+    private void ResolveNotificationUI()
+    {
+        if (notificationUI != null)
+            return;
+
+        GameObject notificationButtonObj = GameObject.Find("NotificationButton");
+
+        if (notificationButtonObj != null)
+            notificationUI = notificationButtonObj.GetComponent<DialogueNotificationUI>();
+
+        if (notificationUI == null)
+            Debug.LogWarning("DialogueManager -> NotificationButton üzerinde DialogueNotificationUI bulunamadı!");
+    }
+
 
     private void Update()
     {
@@ -182,6 +200,11 @@ public class DialogueManager : MonoBehaviour
 
         dialoguePanel.SetActive(true);
 
+        ResolveNotificationUI();
+
+        if (notificationUI != null)
+            notificationUI.ResetNotificationState();
+            
         discoveredTags.Clear();
         usedHiddenChoices.Clear();
         discoveredSymptoms.Clear();
@@ -603,6 +626,19 @@ public class DialogueManager : MonoBehaviour
         CreateReturnFromDiagnosisButton();
 
         yield return StartCoroutine(ScrollToConversationFocus(false));
+        
+        Debug.Log("DialogueManager -> Yeni soru/test/tanı seçenekleri oluşturuldu. Notification tetikleniyor.");
+
+        ResolveNotificationUI();
+
+        if (notificationUI != null)
+        {
+            notificationUI.NotifyNewOptions();
+        }
+        else
+        {
+            Debug.LogWarning("DialogueManager -> notificationUI NULL!");
+        }
     }
 
     private void CreateReturnFromDiagnosisButton()
@@ -748,8 +784,20 @@ public class DialogueManager : MonoBehaviour
         }
 
         yield return StartCoroutine(ScrollToConversationFocus(false));
-    }
 
+        Debug.Log("DialogueManager -> Yeni soru/test/tanı seçenekleri oluşturuldu. Notification tetikleniyor.");
+
+        ResolveNotificationUI();
+
+        if (notificationUI != null)
+        {
+            notificationUI.NotifyNewOptions();
+        }
+        else
+        {
+            Debug.LogWarning("DialogueManager -> notificationUI NULL!");
+        }
+    }
     private IEnumerator CreateChoiceButtonRoutine(DialogueChoiceData choice, Transform parent)
     {
         GameObject optionObj = Instantiate(optionButtonPrefab, parent);

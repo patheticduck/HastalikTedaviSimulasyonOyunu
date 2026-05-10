@@ -423,8 +423,17 @@ public class GameFlowManager : MonoBehaviour
         save.pendingLoseGameOver = pendingLoseGameOver;
         save.hasSave = true;
         save.runId = currentRunId;
-        save.patientAnalysisHistory = ClonePatientAnalysisHistory();
 
+        if (DoctorProfileManager.Instance != null)
+        {
+            save.selectedDoctorSpecialization = DoctorProfileManager.Instance.GetSelectedSpecialization();
+        }
+        else
+        {
+            save.selectedDoctorSpecialization = DoctorSpecialization.None;
+        }
+
+        save.patientAnalysisHistory = ClonePatientAnalysisHistory();
         save.plannedPatientCaseIds = new List<string>(plannedPatientCaseIds);
 
         return save;
@@ -434,6 +443,9 @@ public class GameFlowManager : MonoBehaviour
     {
         if (save == null)
             return;
+
+        if (DoctorProfileManager.Instance != null)
+            DoctorProfileManager.Instance.SelectSpecialization(save.selectedDoctorSpecialization);
 
         currentRunId = save.runId;
 
@@ -768,6 +780,14 @@ public class GameFlowManager : MonoBehaviour
         sb.AppendLine();
         sb.AppendLine("Toplam Doğru: " + totalCorrect);
         sb.AppendLine("Toplam Yanlış: " + totalWrong);
+        sb.AppendLine();
+
+        string doctorName = "Belirsiz";
+
+        if (DoctorProfileManager.Instance != null)
+            doctorName = DoctorProfileManager.Instance.GetSelectedDoctorDisplayName();
+
+        sb.AppendLine("Seçilen Doktor: " + doctorName);
         sb.AppendLine();
 
         if (patientAnalysisHistory.Count == 0)

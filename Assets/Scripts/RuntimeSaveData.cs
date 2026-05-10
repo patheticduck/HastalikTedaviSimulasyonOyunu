@@ -27,6 +27,8 @@ public class RuntimeSaveData
 
     public bool hasSave;
 
+    public DoctorSpecialization selectedDoctorSpecialization = DoctorSpecialization.None;
+
     // Aynı oyun döngüsünü ayırt etmek için kullanılır.
     public string runId;
 

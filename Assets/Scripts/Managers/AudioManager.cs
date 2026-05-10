@@ -19,6 +19,7 @@ public class AudioManager : MonoBehaviour
     public AudioClip loseSound;
     public AudioClip bookOpenCloseSound;
     public AudioClip pageTurnSound;
+    public AudioClip notificationSound;
 
     [Header("Volume Values")]
     [Range(0f, 1f)] public float mainMenuVolume = 1f;
@@ -145,6 +146,11 @@ public class AudioManager : MonoBehaviour
     public void PlayPageTurn()
     {
         PlaySFX(pageTurnSound);
+    }
+
+    public void PlayNotification()
+    {
+        PlaySFX(notificationSound);
     }
 
     private void PlaySFX(AudioClip clip)

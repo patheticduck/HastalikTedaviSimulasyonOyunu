@@ -337,6 +337,7 @@ public class RuntimeSaveManager : MonoBehaviour
         clone.pendingLoseGameOver = source.pendingLoseGameOver;
 
         clone.hasSave = source.hasSave;
+        clone.selectedDoctorSpecialization = source.selectedDoctorSpecialization;
 
         clone.runId = source.runId;
 
