@@ -25,7 +25,7 @@ MonoBehaviour:
     olmas\u0131 ve kalprotektin y\xFCksek olmas\u0131 inflamatuar ba\u011F\u0131rsak
     hastal\u0131\u011F\u0131 lehine \xF6nemli bulgulard\u0131r. Sa\u011F alt kadranda
     hassasiyet var olmas\u0131 tan\u0131y\u0131 destekleyebilir."
-  diseaseImage: {fileID: 0}
+  diseaseImage: {fileID: 21300000, guid: 8073dcd92aa942e44a658623960ea007, type: 3}
   extraInfo: 
   highlightKeywords:
   - "Uzun s\xFCren"

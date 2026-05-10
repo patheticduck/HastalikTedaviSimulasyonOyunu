@@ -25,7 +25,7 @@ MonoBehaviour:
     1 ayd\u0131r var olmas\u0131 ve NSA\u0130\u0130 \xF6yk\xFCs\xFC mevcut olmas\u0131
     peptik \xFClser lehine \xF6nemli bulgulard\u0131r. H. pylori antijen: Pozitif
     olmas\u0131 tan\u0131y\u0131 destekleyebilir."
-  diseaseImage: {fileID: 0}
+  diseaseImage: {fileID: 21300000, guid: 191aac3ac38f4d343babb8a63a313415, type: 3}
   extraInfo: 
   highlightKeywords:
   - "mide a\u011Fr\u0131s\u0131"

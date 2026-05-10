@@ -26,7 +26,7 @@ MonoBehaviour:
     olmamas\u0131 ve stres etkisi var olmas\u0131 IBS lehine \xF6nemli bulgulard\u0131r.
     Gece ishal nedeniyle uyan\u0131yor olmamas\u0131 ay\u0131r\u0131c\u0131 tan\u0131da
     yard\u0131mc\u0131 olabilir."
-  diseaseImage: {fileID: 0}
+  diseaseImage: {fileID: 21300000, guid: 58a7dae3fba1ab9488087258e1ad3e56, type: 3}
   extraInfo: 
   highlightKeywords:
   - "Kar\u0131n a\u011Fr\u0131s\u0131"

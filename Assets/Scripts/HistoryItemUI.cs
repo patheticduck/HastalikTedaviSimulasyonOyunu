@@ -201,7 +201,7 @@ public class HistoryItemUI : MonoBehaviour,
         {
             if (AudioManager.Instance != null)
                 AudioManager.Instance.PlayClick();
-                
+
             onDeleteClicked?.Invoke(historyIndex);
         });
 
@@ -396,6 +396,12 @@ public class HistoryItemUI : MonoBehaviour,
 
         sb.AppendLine("Toplam Doğru: " + sessionData.TotalCorrect());
         sb.AppendLine("Toplam Yanlış: " + sessionData.TotalWrong());
+
+        if (!string.IsNullOrEmpty(sessionData.selectedDoctorName))
+        {
+            sb.AppendLine();
+            sb.AppendLine("Seçilen Doktor: " + sessionData.selectedDoctorName);
+        }
 
         return sb.ToString();
     }

@@ -23,7 +23,7 @@ MonoBehaviour:
     hissi"
   diagnosisTips: "So\u011Fuk alg\u0131nl\u0131\u011F\u0131 genellikle gripten daha
     hafif seyreder. Y\xFCksek ate\u015F ve yo\u011Fun kas a\u011Fr\u0131s\u0131 beklenmez."
-  diseaseImage: {fileID: 21300000, guid: 58a7dae3fba1ab9488087258e1ad3e56, type: 3}
+  diseaseImage: {fileID: 21300000, guid: 6b496cc2780456942b043bf7a6c6e5d8, type: 3}
   extraInfo: 
   highlightKeywords:
   - "burun ak\u0131nt\u0131s\u0131 "

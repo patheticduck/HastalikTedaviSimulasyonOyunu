@@ -25,7 +25,7 @@ MonoBehaviour:
     yak\u0131nma bulunmas\u0131 ve sol ayakta hafif duyu kusuru mevcut olmas\u0131
     Multiple Skleroz lehine \xF6nemli bulgulard\u0131r. Periventrik\xFCler birka\xE7
     k\xFC\xE7\xFCk nonspesifik odak izlenmesi tan\u0131y\u0131 destekleyebilir."
-  diseaseImage: {fileID: 0}
+  diseaseImage: {fileID: 21300000, guid: 8073dcd92aa942e44a658623960ea007, type: 3}
   extraInfo: 
   highlightKeywords:
   - "Elde ve ayakta uyu\u015Fma"

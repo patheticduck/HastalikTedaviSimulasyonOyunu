@@ -25,7 +25,7 @@ MonoBehaviour:
   diagnosisTips: "Yanma retrosternal b\xF6lgede ba\u015Fl\u0131yor ve bo\u011Faza
     do\u011Fru yay\u0131l\u0131yor olmas\u0131 refl\xFC lehine \xF6nemli bir bulgudur.
     Antiasit ile rahatlama tan\u0131y\u0131 destekleyebilir."
-  diseaseImage: {fileID: 0}
+  diseaseImage: {fileID: 21300000, guid: 07d6bbffec94977488c952420a7255f6, type: 3}
   extraInfo: 
   highlightKeywords:
   - yanma

@@ -18,22 +18,26 @@ public class DayHistoryData
     public int TotalCorrect()
     {
         int count = 0;
+
         foreach (var patient in patients)
         {
             if (patient.isCorrect)
                 count++;
         }
+
         return count;
     }
 
     public int TotalWrong()
     {
         int count = 0;
+
         foreach (var patient in patients)
         {
             if (!patient.isCorrect)
                 count++;
         }
+
         return count;
     }
 }
@@ -45,25 +49,31 @@ public class SessionHistoryData
     public string relativeTimeText;
     public long completedAtTicks;
 
+    public string selectedDoctorName;
+
     public List<DayHistoryData> days = new List<DayHistoryData>();
 
     public int TotalCorrect()
     {
         int total = 0;
+
         foreach (var day in days)
         {
             total += day.TotalCorrect();
         }
+
         return total;
     }
 
     public int TotalWrong()
     {
         int total = 0;
+
         foreach (var day in days)
         {
             total += day.TotalWrong();
         }
+
         return total;
     }
 }

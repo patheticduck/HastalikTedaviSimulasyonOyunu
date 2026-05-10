@@ -25,7 +25,7 @@ MonoBehaviour:
     mevcut olmas\u0131 ve akut kar\u0131n bulgusu yok olmas\u0131 gastrit lehine
     \xF6nemli bulgulard\u0131r. H. pylori antijen: Pozitif olmas\u0131 tan\u0131y\u0131
     destekleyebilir."
-  diseaseImage: {fileID: 0}
+  diseaseImage: {fileID: 21300000, guid: 191aac3ac38f4d343babb8a63a313415, type: 3}
   extraInfo: 
   highlightKeywords:
   - "mide b\xF6lgesinde a\u011Fr\u0131"

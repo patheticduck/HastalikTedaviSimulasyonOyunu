@@ -849,6 +849,12 @@ public class GameFlowManager : MonoBehaviour
         session.completedAtTicks = now.Ticks;
         session.relativeTimeText = "";
 
+        if (DoctorProfileManager.Instance != null)
+            session.selectedDoctorName =
+            DoctorProfileManager.Instance.GetSelectedDoctorDisplayName();
+        else
+            session.selectedDoctorName = "Belirsiz";
+
         if (patientAnalysisHistory == null || patientAnalysisHistory.Count == 0)
             return session;
 

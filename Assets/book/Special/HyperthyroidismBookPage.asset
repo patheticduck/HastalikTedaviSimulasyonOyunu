@@ -25,7 +25,7 @@ MonoBehaviour:
     metabolik bulgu olabilir olmas\u0131 ve boyunda hafif dolgunluk var olmas\u0131
     hipertiroidi lehine \xF6nemli bulgulard\u0131r. TSH: 0.01 mIU/L olmas\u0131 tan\u0131y\u0131
     destekler."
-  diseaseImage: {fileID: 0}
+  diseaseImage: {fileID: 21300000, guid: 6b496cc2780456942b043bf7a6c6e5d8, type: 3}
   extraInfo: 
   highlightKeywords:
   - "\xE7arp\u0131nt\u0131"

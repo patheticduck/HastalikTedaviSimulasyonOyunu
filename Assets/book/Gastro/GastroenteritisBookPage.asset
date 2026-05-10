@@ -24,7 +24,7 @@ MonoBehaviour:
     mevcut olmas\u0131 ve ishal mevcut olmas\u0131 enfeksiy\xF6z gastroenterit lehine
     \xF6nemli bulgulard\u0131r. Belirgin kronik inflamasyon bulgusu olmamas\u0131
     ay\u0131r\u0131c\u0131 tan\u0131da yard\u0131mc\u0131 olabilir."
-  diseaseImage: {fileID: 0}
+  diseaseImage: {fileID: 21300000, guid: 07d6bbffec94977488c952420a7255f6, type: 3}
   extraInfo: 
   highlightKeywords:
   - ishal

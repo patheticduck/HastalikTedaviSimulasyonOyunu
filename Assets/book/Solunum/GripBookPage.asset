@@ -24,7 +24,7 @@ MonoBehaviour:
   diagnosisTips: "Grip, so\u011Fuk alg\u0131nl\u0131\u011F\u0131na g\xF6re daha ani
     ba\u015Flar ve genellikle daha a\u011F\u0131r seyreder. Y\xFCksek ate\u015F ve
     yayg\u0131n kas a\u011Fr\u0131s\u0131 grip lehine \xF6nemli ipu\xE7lar\u0131d\u0131r."
-  diseaseImage: {fileID: 21300000, guid: 191aac3ac38f4d343babb8a63a313415, type: 3}
+  diseaseImage: {fileID: 21300000, guid: 8073dcd92aa942e44a658623960ea007, type: 3}
   extraInfo: 
   highlightKeywords:
   - "Y\xFCksek ate\u015F "

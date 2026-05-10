@@ -26,7 +26,7 @@ MonoBehaviour:
     hassasiyet mevcut olmas\u0131 ve Murphy testi pozitif olmas\u0131 safra kesesi
     hastal\u0131\u011F\u0131 lehine \xF6nemli bulgulard\u0131r. Safra kesesinde \xE7oklu
     ta\u015F izlendi bulgusu tan\u0131y\u0131 destekler."
-  diseaseImage: {fileID: 0}
+  diseaseImage: {fileID: 21300000, guid: 3497590acd6e7dc43a215cb7beaac728, type: 3}
   extraInfo: 
   highlightKeywords:
   - "\xDCst kar\u0131n a\u011Fr\u0131s\u0131"
