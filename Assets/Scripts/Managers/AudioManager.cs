@@ -26,6 +26,9 @@ public class AudioManager : MonoBehaviour
     [Range(0f, 1f)] public float gameplayVolume = 1f;
     [Range(0f, 1f)] public float sfxVolume = 1f;
 
+    // Sadece sayfa çevirme sesi için ekstra volume çarpanı
+    [Range(0f, 1f)] public float pageTurnVolumeMultiplier = 0.5f;
+
     private Coroutine gameplayRoutine;
     private bool isMainMenuMusicPlaying = false;
     private bool isGameplayMusicPlaying = false;
@@ -145,7 +148,7 @@ public class AudioManager : MonoBehaviour
 
     public void PlayPageTurn()
     {
-        PlaySFX(pageTurnSound);
+        PlaySFX(pageTurnSound, pageTurnVolumeMultiplier);
     }
 
     public void PlayNotification()
@@ -153,13 +156,13 @@ public class AudioManager : MonoBehaviour
         PlaySFX(notificationSound);
     }
 
-    private void PlaySFX(AudioClip clip)
+    private void PlaySFX(AudioClip clip, float volumeMultiplier = 1f)
     {
         if (clip == null || sfxSource == null)
             return;
 
         sfxSource.volume = sfxVolume;
-        sfxSource.PlayOneShot(clip);
+        sfxSource.PlayOneShot(clip, volumeMultiplier);
     }
 
     public void SetMainMenuVolume(float value)

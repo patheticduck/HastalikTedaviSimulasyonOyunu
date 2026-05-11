@@ -6,8 +6,8 @@ public class ChoiceTextHover : MonoBehaviour, IPointerEnterHandler, IPointerExit
 {
     [SerializeField] private TextMeshProUGUI label;
 
-    [SerializeField] private Color normalColor = new Color32(212, 122, 50, 255);
-    [SerializeField] private Color hoverColor = new Color32(148, 78, 28, 255);
+    private readonly Color normalColor = new Color32(176, 216, 242, 255);
+    private readonly Color hoverColor = new Color32(70, 130, 180, 255);
 
     private void Reset()
     {

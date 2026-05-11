@@ -74,8 +74,8 @@ MonoBehaviour:
   m_fontMaterials: []
   m_fontColor32:
     serializedVersion: 2
-    rgba: 4281167550
-  m_fontColor: {r: 0.74509805, g: 0.43137255, b: 0.1764706, a: 1}
+    rgba: 4283075273
+  m_fontColor: {r: 0.7882353, g: 0.5411765, b: 0.2901961, a: 1}
   m_enableVertexGradient: 0
   m_colorMode: 3
   m_fontColorGradient:
@@ -294,8 +294,8 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::DialogueOptionButton
   buttonText: {fileID: 5548848511023187691}
-  normalColor: {r: 0.74509805, g: 0.43137255, b: 0.1764706, a: 1}
-  hoverColor: {r: 0.54901963, g: 0.29411766, b: 0.09803922, a: 1}
+  normalColor: {r: 0.6901961, g: 0.84705883, b: 0.9490196, a: 1}
+  hoverColor: {r: 0.27450982, g: 0.50980395, b: 0.7058824, a: 1}
   choiceData:
     choiceText: 
     choiceType: 0
@@ -312,7 +312,17 @@ MonoBehaviour:
     blockedTags: []
     discoveredSymptoms: []
     performedTests: []
+    notebookSymptoms: []
+    notebookTests: []
+    notebookNotes: []
     diseaseEffects: []
+    useTestChance: 0
+    baseSuccessChance: 70
+    bonusSpecialization: 0
+    specializationBonus: 15
+    generalistBonus: 5
+    failedTestText: "Testten net sonu\xE7 al\u0131namad\u0131. Klinik bulgularla
+      devam etmelisin."
   diagnosisData:
     diseaseId: 
     diagnosisName: 
