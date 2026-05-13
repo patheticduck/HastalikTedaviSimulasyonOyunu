@@ -54,6 +54,13 @@ MonoBehaviour:
         score: 0
       - diseaseId: PHARYNGITIS
         score: -2
+      useTestChance: 0
+      baseSuccessChance: 70
+      bonusSpecialization: 0
+      specializationBonus: 15
+      generalistBonus: 5
+      failedTestText: "Testten net sonu\xE7 al\u0131namad\u0131. Klinik bulgularla
+        devam etmelisin."
     - choiceText: "\u015Eikayetleriniz ne zaman ba\u015Flad\u0131? "
       choiceType: 0
       doctorLine: "\u015Eikayetleriniz ne zaman ba\u015Flad\u0131?\n"
@@ -85,6 +92,13 @@ MonoBehaviour:
         score: 1
       - diseaseId: PHARYNGITIS
         score: 0
+      useTestChance: 0
+      baseSuccessChance: 70
+      bonusSpecialization: 0
+      specializationBonus: 15
+      generalistBonus: 5
+      failedTestText: "Testten net sonu\xE7 al\u0131namad\u0131. Klinik bulgularla
+        devam etmelisin."
     - choiceText: Yanma tam olarak nerede oluyor?
       choiceType: 0
       doctorLine: Yanma tam olarak nerede oluyor?
@@ -120,6 +134,13 @@ MonoBehaviour:
         score: 0
       - diseaseId: PHARYNGITIS
         score: 1
+      useTestChance: 0
+      baseSuccessChance: 70
+      bonusSpecialization: 0
+      specializationBonus: 15
+      generalistBonus: 5
+      failedTestText: "Testten net sonu\xE7 al\u0131namad\u0131. Klinik bulgularla
+        devam etmelisin."
     - choiceText: "Mide b\xF6lgenizde a\u011Fr\u0131 var m\u0131?"
       choiceType: 0
       doctorLine: "Mide b\xF6lgenizde a\u011Fr\u0131 var m\u0131?"
@@ -151,6 +172,13 @@ MonoBehaviour:
         score: 1
       - diseaseId: PHARYNGITIS
         score: -1
+      useTestChance: 0
+      baseSuccessChance: 70
+      bonusSpecialization: 0
+      specializationBonus: 15
+      generalistBonus: 5
+      failedTestText: "Testten net sonu\xE7 al\u0131namad\u0131. Klinik bulgularla
+        devam etmelisin."
     - choiceText: "Bulant\u0131n\u0131z var m\u0131?"
       choiceType: 0
       doctorLine: "Bulant\u0131n\u0131z var m\u0131?"
@@ -181,6 +209,13 @@ MonoBehaviour:
         score: 1
       - diseaseId: PHARYNGITIS
         score: -1
+      useTestChance: 0
+      baseSuccessChance: 70
+      bonusSpecialization: 0
+      specializationBonus: 15
+      generalistBonus: 5
+      failedTestText: "Testten net sonu\xE7 al\u0131namad\u0131. Klinik bulgularla
+        devam etmelisin."
     - choiceText: "Yemeklerden sonra art\u0131yor mu? "
       choiceType: 0
       doctorLine: "\u015Eikayetleriniz yemeklerden sonra art\u0131yor mu?\n"
@@ -213,6 +248,13 @@ MonoBehaviour:
         score: 0
       - diseaseId: PHARYNGITIS
         score: -1
+      useTestChance: 0
+      baseSuccessChance: 70
+      bonusSpecialization: 0
+      specializationBonus: 15
+      generalistBonus: 5
+      failedTestText: "Testten net sonu\xE7 al\u0131namad\u0131. Klinik bulgularla
+        devam etmelisin."
     - choiceText: "A\xE7ken mi tokken mi daha k\xF6t\xFC? "
       choiceType: 0
       doctorLine: "\u015Eikayetiniz a\xE7ken mi daha k\xF6t\xFC oluyor, tokken mi?"
@@ -245,6 +287,13 @@ MonoBehaviour:
         score: -2
       - diseaseId: PHARYNGITIS
         score: 0
+      useTestChance: 0
+      baseSuccessChance: 70
+      bonusSpecialization: 0
+      specializationBonus: 15
+      generalistBonus: 5
+      failedTestText: "Testten net sonu\xE7 al\u0131namad\u0131. Klinik bulgularla
+        devam etmelisin."
     - choiceText: "Yat\u0131nca art\u0131yor mu? "
       choiceType: 0
       doctorLine: "Uzan\u0131nca veya yat\u0131nca yanma art\u0131yor mu?\n"
@@ -278,6 +327,13 @@ MonoBehaviour:
         score: 0
       - diseaseId: PHARYNGITIS
         score: -1
+      useTestChance: 0
+      baseSuccessChance: 70
+      bonusSpecialization: 0
+      specializationBonus: 15
+      generalistBonus: 5
+      failedTestText: "Testten net sonu\xE7 al\u0131namad\u0131. Klinik bulgularla
+        devam etmelisin."
     - choiceText: "A\u011Fz\u0131n\u0131za ek\u015Fi veya ac\u0131 su geliyor mu?"
       choiceType: 0
       doctorLine: "A\u011Fz\u0131n\u0131za ek\u015Fi ya da ac\u0131 bir s\u0131v\u0131
@@ -311,6 +367,13 @@ MonoBehaviour:
         score: -1
       - diseaseId: PHARYNGITIS
         score: -1
+      useTestChance: 0
+      baseSuccessChance: 70
+      bonusSpecialization: 0
+      specializationBonus: 15
+      generalistBonus: 5
+      failedTestText: "Testten net sonu\xE7 al\u0131namad\u0131. Klinik bulgularla
+        devam etmelisin."
     - choiceText: "Yutkunurken a\u011Fr\u0131 art\u0131yor mu? "
       choiceType: 0
       doctorLine: "Yutkunurken bo\u011Faz\u0131n\u0131zda a\u011Fr\u0131 art\u0131yor
@@ -343,6 +406,13 @@ MonoBehaviour:
         score: 0
       - diseaseId: PHARYNGITIS
         score: -3
+      useTestChance: 0
+      baseSuccessChance: 70
+      bonusSpecialization: 0
+      specializationBonus: 15
+      generalistBonus: 5
+      failedTestText: "Testten net sonu\xE7 al\u0131namad\u0131. Klinik bulgularla
+        devam etmelisin."
     - choiceText: "Sabahlar\u0131 ses k\u0131s\u0131kl\u0131\u011F\u0131 oluyor mu?"
       choiceType: 0
       doctorLine: "Sabahlar\u0131 sesinizde k\u0131s\u0131kl\u0131k veya bo\u011Faz
@@ -378,6 +448,13 @@ MonoBehaviour:
         score: 0
       - diseaseId: PHARYNGITIS
         score: 1
+      useTestChance: 0
+      baseSuccessChance: 70
+      bonusSpecialization: 0
+      specializationBonus: 15
+      generalistBonus: 5
+      failedTestText: "Testten net sonu\xE7 al\u0131namad\u0131. Klinik bulgularla
+        devam etmelisin."
     - choiceText: "D\u0131\u015Fk\u0131n\u0131zda siyahl\u0131k g\xF6rd\xFCn\xFCz
         m\xFC?"
       choiceType: 0
@@ -412,6 +489,13 @@ MonoBehaviour:
         score: -2
       - diseaseId: PHARYNGITIS
         score: 0
+      useTestChance: 0
+      baseSuccessChance: 70
+      bonusSpecialization: 0
+      specializationBonus: 15
+      generalistBonus: 5
+      failedTestText: "Testten net sonu\xE7 al\u0131namad\u0131. Klinik bulgularla
+        devam etmelisin."
     - choiceText: "Baharatl\u0131 yiyecekler?"
       choiceType: 0
       doctorLine: "Baharatl\u0131, ya\u011Fl\u0131 yemekler \u015Fikayetinizi art\u0131r\u0131yor
@@ -445,6 +529,13 @@ MonoBehaviour:
         score: 0
       - diseaseId: 
         score: 0
+      useTestChance: 0
+      baseSuccessChance: 70
+      bonusSpecialization: 0
+      specializationBonus: 15
+      generalistBonus: 5
+      failedTestText: "Testten net sonu\xE7 al\u0131namad\u0131. Klinik bulgularla
+        devam etmelisin."
     - choiceText: "Bo\u011Faz muayenesi yap "
       choiceType: 1
       doctorLine: "Bo\u011Faz\u0131n\u0131z\u0131 muayene edece\u011Fim."
@@ -481,6 +572,13 @@ MonoBehaviour:
         score: 0
       - diseaseId: PHARYNGITIS
         score: -3
+      useTestChance: 0
+      baseSuccessChance: 70
+      bonusSpecialization: 0
+      specializationBonus: 15
+      generalistBonus: 5
+      failedTestText: "Testten net sonu\xE7 al\u0131namad\u0131. Klinik bulgularla
+        devam etmelisin."
     - choiceText: "Tam kan say\u0131m\u0131 iste "
       choiceType: 1
       doctorLine: "Tam kan say\u0131m\u0131 isteyelim.\n"
@@ -519,6 +617,13 @@ MonoBehaviour:
         score: -1
       - diseaseId: PHARYNGITIS
         score: -1
+      useTestChance: 0
+      baseSuccessChance: 70
+      bonusSpecialization: 0
+      specializationBonus: 15
+      generalistBonus: 5
+      failedTestText: "Testten net sonu\xE7 al\u0131namad\u0131. Klinik bulgularla
+        devam etmelisin."
     - choiceText: 'CRP testi iste '
       choiceType: 1
       doctorLine: CRP testi isteyelim.
@@ -554,6 +659,13 @@ MonoBehaviour:
         score: 0
       - diseaseId: PHARYNGITIS
         score: -2
+      useTestChance: 0
+      baseSuccessChance: 70
+      bonusSpecialization: 0
+      specializationBonus: 15
+      generalistBonus: 5
+      failedTestText: "Testten net sonu\xE7 al\u0131namad\u0131. Klinik bulgularla
+        devam etmelisin."
     - choiceText: 'H. pylori testi iste '
       choiceType: 1
       doctorLine: H. pylori antijen testi isteyelim.
@@ -588,6 +700,13 @@ MonoBehaviour:
         score: -2
       - diseaseId: PHARYNGITIS
         score: 0
+      useTestChance: 0
+      baseSuccessChance: 70
+      bonusSpecialization: 0
+      specializationBonus: 15
+      generalistBonus: 5
+      failedTestText: "Testten net sonu\xE7 al\u0131namad\u0131. Klinik bulgularla
+        devam etmelisin."
     - choiceText: "Antiasit yan\u0131t testi yap "
       choiceType: 1
       doctorLine: "K\u0131sa s\xFCreli antiasit deneyelim."
@@ -624,6 +743,13 @@ MonoBehaviour:
         score: 1
       - diseaseId: PHARYNGITIS
         score: -1
+      useTestChance: 1
+      baseSuccessChance: 25
+      bonusSpecialization: 2
+      specializationBonus: 50
+      generalistBonus: 10
+      failedTestText: "Testten net sonu\xE7 al\u0131namad\u0131. Klinik bulgularla
+        devam etmelisin."
     - choiceText: "\xDCst G\u0130S endoskopi iste "
       choiceType: 1
       doctorLine: "\xDCst gastrointestinal sistem endoskopisi isteyelim.\n"
@@ -662,6 +788,13 @@ MonoBehaviour:
         score: -3
       - diseaseId: PHARYNGITIS
         score: 0
+      useTestChance: 1
+      baseSuccessChance: 25
+      bonusSpecialization: 2
+      specializationBonus: 50
+      generalistBonus: 10
+      failedTestText: "Testten net sonu\xE7 al\u0131namad\u0131. Klinik bulgularla
+        devam etmelisin."
     - choiceText: "Tan\u0131 koy "
       choiceType: 2
       doctorLine: 
@@ -681,6 +814,13 @@ MonoBehaviour:
       notebookTests: []
       notebookNotes: []
       diseaseEffects: []
+      useTestChance: 0
+      baseSuccessChance: 70
+      bonusSpecialization: 0
+      specializationBonus: 15
+      generalistBonus: 5
+      failedTestText: "Testten net sonu\xE7 al\u0131namad\u0131. Klinik bulgularla
+        devam etmelisin."
   diagnosisChoices:
   - diseaseId: GASTRITIS
     diagnosisName: Gastrit

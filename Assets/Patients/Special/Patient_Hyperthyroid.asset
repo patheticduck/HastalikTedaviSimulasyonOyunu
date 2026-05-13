@@ -56,6 +56,13 @@ MonoBehaviour:
         score: 1
       - diseaseId: 'PANIC_ATTACK '
         score: 1
+      useTestChance: 0
+      baseSuccessChance: 70
+      bonusSpecialization: 0
+      specializationBonus: 15
+      generalistBonus: 5
+      failedTestText: "Testten net sonu\xE7 al\u0131namad\u0131. Klinik bulgularla
+        devam etmelisin."
     - choiceText: "\xC7arp\u0131nt\u0131 oluyor mu?"
       choiceType: 0
       doctorLine: "\xC7arp\u0131nt\u0131n\u0131z ne s\u0131kl\u0131kla oluyor?\n"
@@ -88,6 +95,13 @@ MonoBehaviour:
         score: 0
       - diseaseId: 'IBS '
         score: 0
+      useTestChance: 0
+      baseSuccessChance: 70
+      bonusSpecialization: 0
+      specializationBonus: 15
+      generalistBonus: 5
+      failedTestText: "Testten net sonu\xE7 al\u0131namad\u0131. Klinik bulgularla
+        devam etmelisin."
     - choiceText: "Kilo de\u011Fi\u015Fikli\u011Fi oldu mu?"
       choiceType: 0
       doctorLine: "Son d\xF6nemde kilo de\u011Fi\u015Fikli\u011Finiz oldu mu?\n"
@@ -120,6 +134,13 @@ MonoBehaviour:
         score: 1
       - diseaseId: 'FIBROMYALGIA '
         score: -1
+      useTestChance: 0
+      baseSuccessChance: 70
+      bonusSpecialization: 0
+      specializationBonus: 15
+      generalistBonus: 5
+      failedTestText: "Testten net sonu\xE7 al\u0131namad\u0131. Klinik bulgularla
+        devam etmelisin."
     - choiceText: "Terleme veya s\u0131cak basmas\u0131 var m\u0131?"
       choiceType: 0
       doctorLine: "Terleme, s\u0131cak basmas\u0131 veya s\u0131ca\u011Fa tahamm\xFCls\xFCzl\xFCk
@@ -153,6 +174,13 @@ MonoBehaviour:
         score: 0
       - diseaseId: 'IBS '
         score: 0
+      useTestChance: 0
+      baseSuccessChance: 70
+      bonusSpecialization: 0
+      specializationBonus: 15
+      generalistBonus: 5
+      failedTestText: "Testten net sonu\xE7 al\u0131namad\u0131. Klinik bulgularla
+        devam etmelisin."
     - choiceText: "Kayg\u0131 veya panik hissi oluyor mu?"
       choiceType: 0
       doctorLine: "\xC7arp\u0131nt\u0131yla birlikte yo\u011Fun kayg\u0131 veya panik
@@ -186,6 +214,13 @@ MonoBehaviour:
         score: 0
       - diseaseId: 'IBS '
         score: 0
+      useTestChance: 0
+      baseSuccessChance: 70
+      bonusSpecialization: 0
+      specializationBonus: 15
+      generalistBonus: 5
+      failedTestText: "Testten net sonu\xE7 al\u0131namad\u0131. Klinik bulgularla
+        devam etmelisin."
     - choiceText: Titreme oluyor mu?
       choiceType: 0
       doctorLine: 'Ellerinizde titreme oluyor mu?
@@ -220,6 +255,13 @@ MonoBehaviour:
         score: -1
       - diseaseId: 'IBS '
         score: 0
+      useTestChance: 0
+      baseSuccessChance: 70
+      bonusSpecialization: 0
+      specializationBonus: 15
+      generalistBonus: 5
+      failedTestText: "Testten net sonu\xE7 al\u0131namad\u0131. Klinik bulgularla
+        devam etmelisin."
     - choiceText: "Uyku d\xFCzeniniz nas\u0131l?"
       choiceType: 0
       doctorLine: "Uykuya dalma veya gece uyanma sorununuz var m\u0131?\n"
@@ -253,6 +295,13 @@ MonoBehaviour:
         score: 1
       - diseaseId: 'IBS '
         score: 0
+      useTestChance: 0
+      baseSuccessChance: 70
+      bonusSpecialization: 0
+      specializationBonus: 15
+      generalistBonus: 5
+      failedTestText: "Testten net sonu\xE7 al\u0131namad\u0131. Klinik bulgularla
+        devam etmelisin."
     - choiceText: "Kas a\u011Fr\u0131s\u0131 veya yayg\u0131n a\u011Fr\u0131 var
         m\u0131?"
       choiceType: 0
@@ -287,6 +336,13 @@ MonoBehaviour:
         score: 0
       - diseaseId: 'IBS '
         score: 0
+      useTestChance: 0
+      baseSuccessChance: 70
+      bonusSpecialization: 0
+      specializationBonus: 15
+      generalistBonus: 5
+      failedTestText: "Testten net sonu\xE7 al\u0131namad\u0131. Klinik bulgularla
+        devam etmelisin."
     - choiceText: "Ba\u011F\u0131rsak d\xFCzeniniz de\u011Fi\u015Fti mi?"
       choiceType: 0
       doctorLine: "\u0130shal, s\u0131k tuvalete \xE7\u0131kma veya kar\u0131n kramplar\u0131
@@ -319,6 +375,13 @@ MonoBehaviour:
         score: 0
       - diseaseId: 'FIBROMYALGIA '
         score: 0
+      useTestChance: 0
+      baseSuccessChance: 70
+      bonusSpecialization: 0
+      specializationBonus: 15
+      generalistBonus: 5
+      failedTestText: "Testten net sonu\xE7 al\u0131namad\u0131. Klinik bulgularla
+        devam etmelisin."
     - choiceText: "Stresle art\u0131yor mu?"
       choiceType: 0
       doctorLine: "Kar\u0131n \u015Fikayetleri stresle art\u0131yor mu?\n"
@@ -353,6 +416,13 @@ MonoBehaviour:
         score: 1
       - diseaseId: 'FIBROMYALGIA '
         score: 0
+      useTestChance: 0
+      baseSuccessChance: 70
+      bonusSpecialization: 0
+      specializationBonus: 15
+      generalistBonus: 5
+      failedTestText: "Testten net sonu\xE7 al\u0131namad\u0131. Klinik bulgularla
+        devam etmelisin."
     - choiceText: "G\xF6zlerde belirginlik veya boyunda \u015Fi\u015Flik?"
       choiceType: 0
       doctorLine: "G\xF6zlerinizde belirginle\u015Fme ya da boynunuzda \u015Fi\u015Flik
@@ -388,6 +458,13 @@ MonoBehaviour:
         score: 0
       - diseaseId: 'IBS '
         score: 0
+      useTestChance: 0
+      baseSuccessChance: 70
+      bonusSpecialization: 0
+      specializationBonus: 15
+      generalistBonus: 5
+      failedTestText: "Testten net sonu\xE7 al\u0131namad\u0131. Klinik bulgularla
+        devam etmelisin."
     - choiceText: "Adet d\xFCzeni veya g\xFC\xE7s\xFCzl\xFCk de\u011Fi\u015Fti mi?"
       choiceType: 0
       doctorLine: "Son d\xF6nemde adet d\xFCzeninizde de\u011Fi\u015Fiklik veya kas
@@ -424,6 +501,13 @@ MonoBehaviour:
         score: 0
       - diseaseId: 'IBS '
         score: 0
+      useTestChance: 0
+      baseSuccessChance: 70
+      bonusSpecialization: 0
+      specializationBonus: 15
+      generalistBonus: 5
+      failedTestText: "Testten net sonu\xE7 al\u0131namad\u0131. Klinik bulgularla
+        devam etmelisin."
     - choiceText: "Vital bulgular\u0131 \xF6l\xE7"
       choiceType: 1
       doctorLine: "Nab\u0131z, tansiyon ve ate\u015Finizi \xF6l\xE7elim.\n"
@@ -462,6 +546,13 @@ MonoBehaviour:
         score: -1
       - diseaseId: 'IBS '
         score: 0
+      useTestChance: 0
+      baseSuccessChance: 70
+      bonusSpecialization: 0
+      specializationBonus: 15
+      generalistBonus: 5
+      failedTestText: "Testten net sonu\xE7 al\u0131namad\u0131. Klinik bulgularla
+        devam etmelisin."
     - choiceText: "EKG \xE7ek"
       choiceType: 1
       doctorLine: "\xC7arp\u0131nt\u0131 i\xE7in EKG \xE7ekelim.\n"
@@ -498,6 +589,13 @@ MonoBehaviour:
         score: 0
       - diseaseId: 'IBS '
         score: 0
+      useTestChance: 0
+      baseSuccessChance: 70
+      bonusSpecialization: 0
+      specializationBonus: 15
+      generalistBonus: 5
+      failedTestText: "Testten net sonu\xE7 al\u0131namad\u0131. Klinik bulgularla
+        devam etmelisin."
     - choiceText: Tiroid muayenesi yap
       choiceType: 1
       doctorLine: "Boyun b\xF6lgesini ve tiroid bezinizi muayene edece\u011Fim.\n"
@@ -534,6 +632,13 @@ MonoBehaviour:
         score: -2
       - diseaseId: 'IBS '
         score: -1
+      useTestChance: 1
+      baseSuccessChance: 25
+      bonusSpecialization: 0
+      specializationBonus: 0
+      generalistBonus: 10
+      failedTestText: "Testten net sonu\xE7 al\u0131namad\u0131. Klinik bulgularla
+        devam etmelisin."
     - choiceText: "Tam kan say\u0131m\u0131, CRP ve glukoz iste"
       choiceType: 1
       doctorLine: "Genel kan de\u011Ferlerine bakal\u0131m.\n"
@@ -576,6 +681,13 @@ MonoBehaviour:
         score: 1
       - diseaseId: 'PANIC_ATTACK '
         score: 0
+      useTestChance: 0
+      baseSuccessChance: 70
+      bonusSpecialization: 0
+      specializationBonus: 15
+      generalistBonus: 5
+      failedTestText: "Testten net sonu\xE7 al\u0131namad\u0131. Klinik bulgularla
+        devam etmelisin."
     - choiceText: Tiroid fonksiyon testleri iste
       choiceType: 1
       doctorLine: "TSH, fT4 ve fT3 de\u011Ferlerine bakal\u0131m.\n"
@@ -623,6 +735,13 @@ MonoBehaviour:
         score: -3
       - diseaseId: 'IBS '
         score: -2
+      useTestChance: 0
+      baseSuccessChance: 25
+      bonusSpecialization: 0
+      specializationBonus: 0
+      generalistBonus: 10
+      failedTestText: "Testten net sonu\xE7 al\u0131namad\u0131. Klinik bulgularla
+        devam etmelisin."
     - choiceText: "Tan\u0131 koy"
       choiceType: 2
       doctorLine: 
@@ -642,6 +761,13 @@ MonoBehaviour:
       notebookTests: []
       notebookNotes: []
       diseaseEffects: []
+      useTestChance: 0
+      baseSuccessChance: 70
+      bonusSpecialization: 0
+      specializationBonus: 15
+      generalistBonus: 5
+      failedTestText: "Testten net sonu\xE7 al\u0131namad\u0131. Klinik bulgularla
+        devam etmelisin."
   diagnosisChoices:
   - diseaseId: HYPERTHYROIDISM
     diagnosisName: Hipertiroidi

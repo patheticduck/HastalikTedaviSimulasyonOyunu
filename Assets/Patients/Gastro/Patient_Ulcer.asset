@@ -55,6 +55,13 @@ MonoBehaviour:
         score: 0
       - diseaseId: 'CROHN '
         score: 0
+      useTestChance: 0
+      baseSuccessChance: 70
+      bonusSpecialization: 0
+      specializationBonus: 15
+      generalistBonus: 5
+      failedTestText: "Testten net sonu\xE7 al\u0131namad\u0131. Klinik bulgularla
+        devam etmelisin."
     - choiceText: "A\u011Fr\u0131 ne zamand\u0131r var?"
       choiceType: 0
       doctorLine: "Bu \u015Fikayetleriniz ne zamand\u0131r s\xFCr\xFCyor?\n"
@@ -85,6 +92,13 @@ MonoBehaviour:
         score: 1
       - diseaseId: 'CROHN '
         score: 1
+      useTestChance: 0
+      baseSuccessChance: 70
+      bonusSpecialization: 0
+      specializationBonus: 15
+      generalistBonus: 5
+      failedTestText: "Testten net sonu\xE7 al\u0131namad\u0131. Klinik bulgularla
+        devam etmelisin."
     - choiceText: "A\xE7ken mi tokken mi art\u0131yor?"
       choiceType: 0
       doctorLine: "A\u011Fr\u0131n\u0131z a\xE7ken mi yoksa yemekten sonra m\u0131
@@ -119,6 +133,13 @@ MonoBehaviour:
         score: 0
       - diseaseId: 'CROHN '
         score: 0
+      useTestChance: 0
+      baseSuccessChance: 70
+      bonusSpecialization: 0
+      specializationBonus: 15
+      generalistBonus: 5
+      failedTestText: "Testten net sonu\xE7 al\u0131namad\u0131. Klinik bulgularla
+        devam etmelisin."
     - choiceText: " Bulant\u0131 veya kusma var m\u0131?"
       choiceType: 0
       doctorLine: "Bulant\u0131 veya kusma oluyor mu?\n"
@@ -151,6 +172,13 @@ MonoBehaviour:
         score: 0
       - diseaseId: 'IBS '
         score: 0
+      useTestChance: 0
+      baseSuccessChance: 70
+      bonusSpecialization: 0
+      specializationBonus: 15
+      generalistBonus: 5
+      failedTestText: "Testten net sonu\xE7 al\u0131namad\u0131. Klinik bulgularla
+        devam etmelisin."
     - choiceText: "Gece a\u011Fr\u0131s\u0131 oluyor mu?"
       choiceType: 0
       doctorLine: "Gece a\u011Fr\u0131yla uyand\u0131\u011F\u0131n\u0131z oluyor
@@ -183,6 +211,13 @@ MonoBehaviour:
         score: -1
       - diseaseId: 'CROHN '
         score: 0
+      useTestChance: 0
+      baseSuccessChance: 70
+      bonusSpecialization: 0
+      specializationBonus: 15
+      generalistBonus: 5
+      failedTestText: "Testten net sonu\xE7 al\u0131namad\u0131. Klinik bulgularla
+        devam etmelisin."
     - choiceText: "\u015Ei\u015Fkinlik oluyor mu?"
       choiceType: 0
       doctorLine: "\u015Ei\u015Fkinlik veya gaz hissi oluyor mu?\n"
@@ -213,6 +248,13 @@ MonoBehaviour:
         score: 1
       - diseaseId: 'CROHN '
         score: 0
+      useTestChance: 0
+      baseSuccessChance: 70
+      bonusSpecialization: 0
+      specializationBonus: 15
+      generalistBonus: 5
+      failedTestText: "Testten net sonu\xE7 al\u0131namad\u0131. Klinik bulgularla
+        devam etmelisin."
     - choiceText: "D\u0131\u015Fk\u0131 d\xFCzeniniz de\u011Fi\u015Fti mi?"
       choiceType: 0
       doctorLine: "\u0130shal veya kab\u0131zl\u0131k gibi de\u011Fi\u015Fiklik oldu
@@ -245,6 +287,13 @@ MonoBehaviour:
         score: 0
       - diseaseId: 'GASTRITIS '
         score: 0
+      useTestChance: 0
+      baseSuccessChance: 70
+      bonusSpecialization: 0
+      specializationBonus: 15
+      generalistBonus: 5
+      failedTestText: "Testten net sonu\xE7 al\u0131namad\u0131. Klinik bulgularla
+        devam etmelisin."
     - choiceText: "Kilo kayb\u0131n\u0131z oldu mu?"
       choiceType: 0
       doctorLine: "Son d\xF6nemde kilo kayb\u0131n\u0131z oldu mu?\n"
@@ -279,6 +328,13 @@ MonoBehaviour:
         score: -2
       - diseaseId: 'IBS '
         score: 0
+      useTestChance: 0
+      baseSuccessChance: 70
+      bonusSpecialization: 0
+      specializationBonus: 15
+      generalistBonus: 5
+      failedTestText: "Testten net sonu\xE7 al\u0131namad\u0131. Klinik bulgularla
+        devam etmelisin."
     - choiceText: "Stresle art\u0131yor mu?"
       choiceType: 0
       doctorLine: "\u015Eikayetleriniz stresli zamanlarda art\u0131yor mu?\n"
@@ -311,6 +367,13 @@ MonoBehaviour:
         score: 0
       - diseaseId: 'CROHN '
         score: 0
+      useTestChance: 0
+      baseSuccessChance: 70
+      bonusSpecialization: 0
+      specializationBonus: 15
+      generalistBonus: 5
+      failedTestText: "Testten net sonu\xE7 al\u0131namad\u0131. Klinik bulgularla
+        devam etmelisin."
     - choiceText: "A\u011Fr\u0131 kesici kullan\u0131yor musunuz?"
       choiceType: 0
       doctorLine: "Son d\xF6nemde s\u0131k a\u011Fr\u0131 kesici kulland\u0131n\u0131z
@@ -345,6 +408,13 @@ MonoBehaviour:
         score: 0
       - diseaseId: 'CROHN '
         score: 0
+      useTestChance: 0
+      baseSuccessChance: 70
+      bonusSpecialization: 0
+      specializationBonus: 15
+      generalistBonus: 5
+      failedTestText: "Testten net sonu\xE7 al\u0131namad\u0131. Klinik bulgularla
+        devam etmelisin."
     - choiceText: "D\u0131\u015Fk\u0131da siyahl\u0131k oldu mu?"
       choiceType: 0
       doctorLine: "D\u0131\u015Fk\u0131n\u0131zda koyu siyah renk fark ettiniz mi?\n"
@@ -377,6 +447,13 @@ MonoBehaviour:
         score: 0
       - diseaseId: 'IBS '
         score: -2
+      useTestChance: 0
+      baseSuccessChance: 70
+      bonusSpecialization: 0
+      specializationBonus: 15
+      generalistBonus: 5
+      failedTestText: "Testten net sonu\xE7 al\u0131namad\u0131. Klinik bulgularla
+        devam etmelisin."
     - choiceText: "Kar\u0131n muayenesi yap"
       choiceType: 1
       doctorLine: "Kar\u0131n muayenesi yapaca\u011F\u0131m.\n"
@@ -417,6 +494,13 @@ MonoBehaviour:
         score: 0
       - diseaseId: 'CROHN '
         score: 0
+      useTestChance: 0
+      baseSuccessChance: 70
+      bonusSpecialization: 0
+      specializationBonus: 15
+      generalistBonus: 5
+      failedTestText: "Testten net sonu\xE7 al\u0131namad\u0131. Klinik bulgularla
+        devam etmelisin."
     - choiceText: "Tam kan say\u0131m\u0131 ve CRP iste"
       choiceType: 1
       doctorLine: "Kan de\u011Ferlerinize bakal\u0131m.\n"
@@ -456,6 +540,13 @@ MonoBehaviour:
         score: 1
       - diseaseId: 'IBS '
         score: -2
+      useTestChance: 0
+      baseSuccessChance: 70
+      bonusSpecialization: 0
+      specializationBonus: 15
+      generalistBonus: 5
+      failedTestText: "Testten net sonu\xE7 al\u0131namad\u0131. Klinik bulgularla
+        devam etmelisin."
     - choiceText: Gaita gizli kan testi iste
       choiceType: 1
       doctorLine: "D\u0131\u015Fk\u0131da gizli kan a\xE7\u0131s\u0131ndan test isteyelim.\n"
@@ -493,6 +584,13 @@ MonoBehaviour:
         score: 1
       - diseaseId: 'IBS '
         score: -3
+      useTestChance: 1
+      baseSuccessChance: 25
+      bonusSpecialization: 2
+      specializationBonus: 50
+      generalistBonus: 10
+      failedTestText: "Testten net sonu\xE7 al\u0131namad\u0131. Klinik bulgularla
+        devam etmelisin."
     - choiceText: H. pylori testi iste
       choiceType: 1
       doctorLine: "H. pylori a\xE7\u0131s\u0131ndan test isteyelim.\n"
@@ -530,6 +628,13 @@ MonoBehaviour:
         score: 0
       - diseaseId: 'CROHN '
         score: 0
+      useTestChance: 0
+      baseSuccessChance: 70
+      bonusSpecialization: 0
+      specializationBonus: 15
+      generalistBonus: 5
+      failedTestText: "Testten net sonu\xE7 al\u0131namad\u0131. Klinik bulgularla
+        devam etmelisin."
     - choiceText: "D\u0131\u015Fk\u0131 incelemesi iste"
       choiceType: 1
       doctorLine: "Ba\u011F\u0131rsak kaynakl\u0131 durumlar\u0131 de\u011Ferlendirmek
@@ -570,6 +675,13 @@ MonoBehaviour:
         score: 1
       - diseaseId: 'GASTRITIS '
         score: 0
+      useTestChance: 0
+      baseSuccessChance: 70
+      bonusSpecialization: 0
+      specializationBonus: 15
+      generalistBonus: 5
+      failedTestText: "Testten net sonu\xE7 al\u0131namad\u0131. Klinik bulgularla
+        devam etmelisin."
     - choiceText: "\xDCst G\u0130S endoskopi iste"
       choiceType: 1
       doctorLine: "Mideyi de\u011Ferlendirmek i\xE7in endoskopi isteyelim.\n"
@@ -608,6 +720,13 @@ MonoBehaviour:
         score: -2
       - diseaseId: 'IBS '
         score: -2
+      useTestChance: 1
+      baseSuccessChance: 25
+      bonusSpecialization: 2
+      specializationBonus: 50
+      generalistBonus: 10
+      failedTestText: "Testten net sonu\xE7 al\u0131namad\u0131. Klinik bulgularla
+        devam etmelisin."
     - choiceText: "Tan\u0131 koy"
       choiceType: 2
       doctorLine: 
@@ -627,6 +746,13 @@ MonoBehaviour:
       notebookTests: []
       notebookNotes: []
       diseaseEffects: []
+      useTestChance: 0
+      baseSuccessChance: 70
+      bonusSpecialization: 0
+      specializationBonus: 15
+      generalistBonus: 5
+      failedTestText: "Testten net sonu\xE7 al\u0131namad\u0131. Klinik bulgularla
+        devam etmelisin."
   diagnosisChoices:
   - diseaseId: IBS
     diagnosisName: "IBS (Huzursuz Ba\u011F\u0131rsak)"

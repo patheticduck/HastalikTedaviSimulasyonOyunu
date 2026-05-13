@@ -56,6 +56,13 @@ MonoBehaviour:
         score: 1
       - diseaseId: 'GALLBLADDER '
         score: 1
+      useTestChance: 0
+      baseSuccessChance: 70
+      bonusSpecialization: 0
+      specializationBonus: 15
+      generalistBonus: 5
+      failedTestText: "Testten net sonu\xE7 al\u0131namad\u0131. Klinik bulgularla
+        devam etmelisin."
     - choiceText: "A\u011Fr\u0131 ne zaman ba\u015Flad\u0131?"
       choiceType: 0
       doctorLine: "A\u011Fr\u0131n\u0131z ne zaman ba\u015Flad\u0131?\n"
@@ -87,6 +94,13 @@ MonoBehaviour:
         score: 1
       - diseaseId: 'GERD '
         score: 0
+      useTestChance: 0
+      baseSuccessChance: 70
+      bonusSpecialization: 0
+      specializationBonus: 15
+      generalistBonus: 5
+      failedTestText: "Testten net sonu\xE7 al\u0131namad\u0131. Klinik bulgularla
+        devam etmelisin."
     - choiceText: "A\u011Fr\u0131 ne kadar \u015Fiddetli?"
       choiceType: 0
       doctorLine: "A\u011Fr\u0131n\u0131z hafif mi, \u015Fiddetli mi?\n"
@@ -118,6 +132,13 @@ MonoBehaviour:
         score: 0
       - diseaseId: 'GERD '
         score: -1
+      useTestChance: 0
+      baseSuccessChance: 70
+      bonusSpecialization: 0
+      specializationBonus: 15
+      generalistBonus: 5
+      failedTestText: "Testten net sonu\xE7 al\u0131namad\u0131. Klinik bulgularla
+        devam etmelisin."
     - choiceText: "Yemekten sonra art\u0131yor mu?"
       choiceType: 0
       doctorLine: "A\u011Fr\u0131n\u0131z yemeklerden sonra art\u0131yor mu?\n"
@@ -149,6 +170,13 @@ MonoBehaviour:
         score: 1
       - diseaseId: 'GERD '
         score: 1
+      useTestChance: 0
+      baseSuccessChance: 70
+      bonusSpecialization: 0
+      specializationBonus: 15
+      generalistBonus: 5
+      failedTestText: "Testten net sonu\xE7 al\u0131namad\u0131. Klinik bulgularla
+        devam etmelisin."
     - choiceText: "Bulant\u0131 veya kusma var m\u0131?"
       choiceType: 0
       doctorLine: "Bulant\u0131 veya kusma oldu mu?\n"
@@ -180,6 +208,13 @@ MonoBehaviour:
         score: 1
       - diseaseId: 'GERD '
         score: 0
+      useTestChance: 0
+      baseSuccessChance: 70
+      bonusSpecialization: 0
+      specializationBonus: 15
+      generalistBonus: 5
+      failedTestText: "Testten net sonu\xE7 al\u0131namad\u0131. Klinik bulgularla
+        devam etmelisin."
     - choiceText: "A\u011Fr\u0131 s\u0131rta vuruyor mu?"
       choiceType: 0
       doctorLine: "A\u011Fr\u0131 s\u0131rt\u0131n\u0131za vuruyor mu?\n"
@@ -212,6 +247,13 @@ MonoBehaviour:
         score: -1
       - diseaseId: 'GERD '
         score: -1
+      useTestChance: 0
+      baseSuccessChance: 70
+      bonusSpecialization: 0
+      specializationBonus: 15
+      generalistBonus: 5
+      failedTestText: "Testten net sonu\xE7 al\u0131namad\u0131. Klinik bulgularla
+        devam etmelisin."
     - choiceText: "Sa\u011F \xFCst kar\u0131nda m\u0131 daha fazla?"
       choiceType: 0
       doctorLine: "A\u011Fr\u0131 sa\u011F \xFCst kar\u0131n taraf\u0131nda m\u0131
@@ -246,6 +288,13 @@ MonoBehaviour:
         score: 1
       - diseaseId: 'GERD '
         score: 0
+      useTestChance: 0
+      baseSuccessChance: 70
+      bonusSpecialization: 0
+      specializationBonus: 15
+      generalistBonus: 5
+      failedTestText: "Testten net sonu\xE7 al\u0131namad\u0131. Klinik bulgularla
+        devam etmelisin."
     - choiceText: "G\xF6\u011Fse yanma veya ek\u015Fi su var m\u0131?"
       choiceType: 0
       doctorLine: "G\xF6\u011Fse do\u011Fru yanma veya a\u011Fza ek\u015Fi su gelmesi
@@ -279,6 +328,13 @@ MonoBehaviour:
         score: 1
       - diseaseId: 'GALLBLADDER '
         score: 0
+      useTestChance: 0
+      baseSuccessChance: 70
+      bonusSpecialization: 0
+      specializationBonus: 15
+      generalistBonus: 5
+      failedTestText: "Testten net sonu\xE7 al\u0131namad\u0131. Klinik bulgularla
+        devam etmelisin."
     - choiceText: "A\u011Fr\u0131 kesici veya alkol kullan\u0131m\u0131 oldu mu?"
       choiceType: 0
       doctorLine: "Son g\xFCnlerde alkol veya fazla a\u011Fr\u0131 kesici kulland\u0131n\u0131z
@@ -313,6 +369,13 @@ MonoBehaviour:
         score: 0
       - diseaseId: 'GALLBLADDER '
         score: 0
+      useTestChance: 0
+      baseSuccessChance: 70
+      bonusSpecialization: 0
+      specializationBonus: 15
+      generalistBonus: 5
+      failedTestText: "Testten net sonu\xE7 al\u0131namad\u0131. Klinik bulgularla
+        devam etmelisin."
     - choiceText: "Ate\u015Finiz oldu mu?"
       choiceType: 0
       doctorLine: "Ate\u015Finiz oldu mu?\n"
@@ -345,6 +408,13 @@ MonoBehaviour:
         score: 0
       - diseaseId: 'GERD '
         score: -1
+      useTestChance: 0
+      baseSuccessChance: 70
+      bonusSpecialization: 0
+      specializationBonus: 15
+      generalistBonus: 5
+      failedTestText: "Testten net sonu\xE7 al\u0131namad\u0131. Klinik bulgularla
+        devam etmelisin."
     - choiceText: "Sar\u0131l\u0131k veya idrar koyula\u015Fmas\u0131 var m\u0131?"
       choiceType: 0
       doctorLine: "G\xF6zlerde sararma veya idrarda koyula\u015Fma fark ettiniz mi?\n"
@@ -377,6 +447,13 @@ MonoBehaviour:
         score: 0
       - diseaseId: 'GERD '
         score: 0
+      useTestChance: 0
+      baseSuccessChance: 70
+      bonusSpecialization: 0
+      specializationBonus: 15
+      generalistBonus: 5
+      failedTestText: "Testten net sonu\xE7 al\u0131namad\u0131. Klinik bulgularla
+        devam etmelisin."
     - choiceText: "D\u0131\u015Fk\u0131 renginiz de\u011Fi\u015Fti mi?"
       choiceType: 0
       doctorLine: "D\u0131\u015Fk\u0131n\u0131zda siyahl\u0131k veya renk a\xE7\u0131lmas\u0131
@@ -409,6 +486,13 @@ MonoBehaviour:
         score: 0
       - diseaseId: 'GERD '
         score: 0
+      useTestChance: 0
+      baseSuccessChance: 70
+      bonusSpecialization: 0
+      specializationBonus: 15
+      generalistBonus: 5
+      failedTestText: "Testten net sonu\xE7 al\u0131namad\u0131. Klinik bulgularla
+        devam etmelisin."
     - choiceText: "Kar\u0131n muayenesi yap"
       choiceType: 1
       doctorLine: "Kar\u0131n muayenesi yapaca\u011F\u0131m.\n"
@@ -448,6 +532,13 @@ MonoBehaviour:
         score: 1
       - diseaseId: 'GERD '
         score: 0
+      useTestChance: 0
+      baseSuccessChance: 70
+      bonusSpecialization: 0
+      specializationBonus: 15
+      generalistBonus: 5
+      failedTestText: "Testten net sonu\xE7 al\u0131namad\u0131. Klinik bulgularla
+        devam etmelisin."
     - choiceText: "Tam kan say\u0131m\u0131 ve CRP iste"
       choiceType: 1
       doctorLine: "Kan de\u011Ferlerine bakal\u0131m.\n"
@@ -487,6 +578,13 @@ MonoBehaviour:
         score: 1
       - diseaseId: 'GERD '
         score: -1
+      useTestChance: 0
+      baseSuccessChance: 70
+      bonusSpecialization: 0
+      specializationBonus: 15
+      generalistBonus: 5
+      failedTestText: "Testten net sonu\xE7 al\u0131namad\u0131. Klinik bulgularla
+        devam etmelisin."
     - choiceText: Amilaz ve lipaz iste
       choiceType: 1
       doctorLine: "Pankreas enzimlerine bakal\u0131m.\n"
@@ -526,6 +624,13 @@ MonoBehaviour:
         score: -2
       - diseaseId: 'GERD '
         score: -2
+      useTestChance: 1
+      baseSuccessChance: 25
+      bonusSpecialization: 2
+      specializationBonus: 50
+      generalistBonus: 10
+      failedTestText: "Testten net sonu\xE7 al\u0131namad\u0131. Klinik bulgularla
+        devam etmelisin."
     - choiceText: "Kar\u0131n ultrasonu iste"
       choiceType: 1
       doctorLine: "Safra kesesi ve kar\u0131n i\xE7i yap\u0131lar\u0131na ultrasonla
@@ -564,6 +669,13 @@ MonoBehaviour:
         score: 0
       - diseaseId: 'GERD '
         score: 0
+      useTestChance: 1
+      baseSuccessChance: 25
+      bonusSpecialization: 2
+      specializationBonus: 50
+      generalistBonus: 10
+      failedTestText: "Testten net sonu\xE7 al\u0131namad\u0131. Klinik bulgularla
+        devam etmelisin."
     - choiceText: "\xDCst G\u0130S endoskopi d\xFC\u015F\xFCn "
       choiceType: 1
       doctorLine: "Mide kaynakl\u0131 nedenleri d\u0131\u015Flamak i\xE7in endoskopi
@@ -606,6 +718,13 @@ MonoBehaviour:
         score: -2
       - diseaseId: 'GALLBLADDER '
         score: 0
+      useTestChance: 0
+      baseSuccessChance: 70
+      bonusSpecialization: 0
+      specializationBonus: 15
+      generalistBonus: 5
+      failedTestText: "Testten net sonu\xE7 al\u0131namad\u0131. Klinik bulgularla
+        devam etmelisin."
     - choiceText: "Tan\u0131 koy"
       choiceType: 2
       doctorLine: 
@@ -625,6 +744,13 @@ MonoBehaviour:
       notebookTests: []
       notebookNotes: []
       diseaseEffects: []
+      useTestChance: 0
+      baseSuccessChance: 70
+      bonusSpecialization: 0
+      specializationBonus: 15
+      generalistBonus: 5
+      failedTestText: "Testten net sonu\xE7 al\u0131namad\u0131. Klinik bulgularla
+        devam etmelisin."
   diagnosisChoices:
   - diseaseId: PANCREATITIS
     diagnosisName: Pankreatit
