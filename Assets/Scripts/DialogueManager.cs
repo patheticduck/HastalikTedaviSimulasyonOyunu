@@ -61,6 +61,7 @@ public class DialogueManager : MonoBehaviour
     private readonly HashSet<string> notebookSymptoms = new HashSet<string>();
     private readonly HashSet<string> notebookTests = new HashSet<string>();
     private readonly HashSet<string> notebookNotes = new HashSet<string>();
+    private readonly HashSet<string> aiFeatures = new HashSet<string>();
 
     private readonly Dictionary<string, string> runtimeTextValues = new Dictionary<string, string>();
     private readonly Dictionary<string, int> diseaseScores = new Dictionary<string, int>();
@@ -204,7 +205,7 @@ public class DialogueManager : MonoBehaviour
 
         if (notificationUI != null)
             notificationUI.ResetNotificationState();
-            
+
         discoveredTags.Clear();
         usedHiddenChoices.Clear();
         discoveredSymptoms.Clear();
@@ -215,6 +216,9 @@ public class DialogueManager : MonoBehaviour
         notebookSymptoms.Clear();
         notebookTests.Clear();
         notebookNotes.Clear();
+
+        // Yeni hasta başladığında önceki hastadan kalan AI verilerini temizle.
+        aiFeatures.Clear();
 
         runtimeTextValues.Clear();
 
@@ -457,6 +461,26 @@ public class DialogueManager : MonoBehaviour
             "NotebookTests: [" + string.Join(", ", notebookTests) + "] | " +
             "NotebookNotes: [" + string.Join(", ", notebookNotes) + "]"
         );
+        // AI için choice verilerini ayrıca kaydet
+        if (choice.gainedTags != null)
+            aiFeatures.UnionWith(choice.gainedTags);
+
+        if (choice.discoveredSymptoms != null)
+            aiFeatures.UnionWith(choice.discoveredSymptoms);
+
+        if (choice.performedTests != null)
+            aiFeatures.UnionWith(choice.performedTests);
+
+        if (choice.notebookSymptoms != null)
+            aiFeatures.UnionWith(choice.notebookSymptoms);
+
+        if (choice.notebookTests != null)
+            aiFeatures.UnionWith(choice.notebookTests);
+
+        if (choice.notebookNotes != null)
+            aiFeatures.UnionWith(choice.notebookNotes);
+
+        Debug.Log("AI Features Updated -> " + string.Join(", ", aiFeatures));
 
         if (notebookUIManager != null)
         {
@@ -626,7 +650,7 @@ public class DialogueManager : MonoBehaviour
         CreateReturnFromDiagnosisButton();
 
         yield return StartCoroutine(ScrollToConversationFocus(false));
-        
+
         Debug.Log("DialogueManager -> Yeni soru/test/tanı seçenekleri oluşturuldu. Notification tetikleniyor.");
 
         ResolveNotificationUI();
@@ -1134,6 +1158,26 @@ public class DialogueManager : MonoBehaviour
     public HashSet<string> GetPerformedTests()
     {
         return new HashSet<string>(performedTests);
+    }
+    public List<string> GetAIFeatures()
+    {
+        HashSet<string> mergedFeatures = new HashSet<string>();
+
+        mergedFeatures.UnionWith(aiFeatures);
+        mergedFeatures.UnionWith(discoveredTags);
+        mergedFeatures.UnionWith(discoveredSymptoms);
+        mergedFeatures.UnionWith(performedTests);
+
+        List<string> cleanFeatures = mergedFeatures
+            .Where(x => !string.IsNullOrWhiteSpace(x))
+            .Select(x => ResolveDynamicText(x).Trim())
+            .Distinct()
+            .ToList();
+
+        Debug.Log("AI Features Count: " + cleanFeatures.Count);
+        Debug.Log("AI Features: " + string.Join(", ", cleanFeatures));
+
+        return cleanFeatures;
     }
 
     public HashSet<string> GetNotebookSymptoms()
