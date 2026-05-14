@@ -1,48 +1,44 @@
+using System;
 using System.Collections.Generic;
 using System.Text;
 using TMPro;
 using UnityEngine;
 using UnityEngine.UI;
-using UnityEngine.InputSystem;
 
 public class AIAnalysisUIManager : MonoBehaviour
 {
     [Header("Panel")]
     public GameObject aiPanel;
     public TMP_Text resultText;
-    public Button analyzeButton;
     public Button closeButton;
 
     [Header("References")]
     public DiagnosisAI diagnosisAI;
     public DialogueManager dialogueManager;
 
+    private Action externalCloseAction;
+
     private void Start()
     {
         if (diagnosisAI == null)
             diagnosisAI = FindFirstObjectByType<DiagnosisAI>();
 
-        dialogueManager = FindFirstObjectByType<DialogueManager>();
+        if (dialogueManager == null)
+            dialogueManager = FindFirstObjectByType<DialogueManager>();
 
         if (aiPanel != null)
             aiPanel.SetActive(false);
 
-        if (analyzeButton != null)
-            analyzeButton.onClick.AddListener(AnalyzeCurrentPatient);
-
         if (closeButton != null)
+        {
+            closeButton.onClick.RemoveListener(ClosePanel);
             closeButton.onClick.AddListener(ClosePanel);
+        }
     }
 
-    private void Update()
+    public void SetExternalCloseAction(Action closeAction)
     {
-        if (Keyboard.current != null && Keyboard.current.yKey.wasPressedThisFrame)
-        {
-            if (aiPanel != null && aiPanel.activeSelf)
-                ClosePanel();
-            else
-                OpenPanel();
-        }
+        externalCloseAction = closeAction;
     }
 
     public void OpenPanel()
@@ -54,6 +50,17 @@ public class AIAnalysisUIManager : MonoBehaviour
     }
 
     public void ClosePanel()
+    {
+        if (externalCloseAction != null)
+        {
+            externalCloseAction.Invoke();
+            return;
+        }
+
+        ClosePanelOnly();
+    }
+
+    public void ClosePanelOnly()
     {
         if (aiPanel != null)
             aiPanel.SetActive(false);

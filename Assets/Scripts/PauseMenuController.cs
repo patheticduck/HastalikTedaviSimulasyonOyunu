@@ -28,6 +28,7 @@ public class PauseMenuController : MonoBehaviour
     public PlayerInteractionModeManager interactionModeManager;
     public NotebookInteractable notebookInteractable;
     public DoctorBookInteractable doctorBookInteractable;
+    public AIComputerCameraController aiComputerCameraController;
 
     private bool isPaused = false;
     private bool wasDialogueModeActiveBeforePause = false;
@@ -57,6 +58,9 @@ public class PauseMenuController : MonoBehaviour
 
         if (interactionModeManager == null)
             interactionModeManager = FindFirstObjectByType<PlayerInteractionModeManager>();
+
+        if (aiComputerCameraController == null)
+            aiComputerCameraController = FindFirstObjectByType<AIComputerCameraController>();
     }
 
     private void Update()
@@ -142,6 +146,21 @@ public class PauseMenuController : MonoBehaviour
         Time.timeScale = 0f;
 
         RefreshPauseInfo();
+
+        if (aiComputerCameraController == null)
+            aiComputerCameraController = FindFirstObjectByType<AIComputerCameraController>();
+
+        if (aiComputerCameraController != null)
+        {
+            if (aiComputerCameraController.IsMovingToComputer())
+            {
+                aiComputerCameraController.ForceCompleteComputerMoveForPause();
+            }
+            else if (aiComputerCameraController.IsMovingToGameplay())
+            {
+                aiComputerCameraController.ForceCompleteGameplayMoveForPause();
+            }
+        }
 
         bool interruptedBookAnimation = false;
 
@@ -242,6 +261,7 @@ public class PauseMenuController : MonoBehaviour
         }
 
         RuntimeSaveManager.Instance.SaveGame(gameFlowManager);
+
         Debug.Log("Pause panelinden oyun kaydedildi.");
     }
 
@@ -249,6 +269,12 @@ public class PauseMenuController : MonoBehaviour
     {
         if (gameFlowManager != null)
             gameFlowManager.ForceStopAllGameplay();
+
+        if (aiComputerCameraController == null)
+            aiComputerCameraController = FindFirstObjectByType<AIComputerCameraController>();
+
+        if (aiComputerCameraController != null)
+            aiComputerCameraController.ForceResetToGameplayCamera();
 
         if (notebookInteractable != null)
             notebookInteractable.ForceCloseNotebookImmediate();

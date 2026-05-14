@@ -13,6 +13,7 @@ public class CrosshairController : MonoBehaviour
     public GameObject EndDayPanel;
     public GameObject DayTransitionPanel;
     public GameObject GameOverPanel;
+    public GameObject AIAnalysisPanel;
 
     void Update()
     {
@@ -23,7 +24,8 @@ public class CrosshairController : MonoBehaviour
             IsOpen(PatientResultPanel) ||
             IsOpen(EndDayPanel) ||
             IsOpen(DayTransitionPanel) ||
-            IsOpen(GameOverPanel);
+            IsOpen(GameOverPanel) ||
+            IsOpen(AIAnalysisPanel);
 
         if (crosshair != null)
             crosshair.SetActive(!shouldHide);

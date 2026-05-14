@@ -10,8 +10,13 @@ public class EnergyUIManager : MonoBehaviour
 
     [Header("Buttons")]
     public Button useEnergyButton;
-    public Button yesButton;
+
+    public Button doctorBookButton;
+    public Button aiAnalysisButton;
     public Button noButton;
+
+    [Header("Texts")]
+    public TextMeshProUGUI confirmText;
 
     [Header("Energy Icons")]
     public Image[] energyIcons;
@@ -33,10 +38,16 @@ public class EnergyUIManager : MonoBehaviour
             useEnergyButton.onClick.AddListener(OnClickUseEnergy);
         }
 
-        if (yesButton != null)
+        if (doctorBookButton != null)
         {
-            yesButton.onClick.RemoveListener(OnConfirmYes);
-            yesButton.onClick.AddListener(OnConfirmYes);
+            doctorBookButton.onClick.RemoveListener(OnDoctorBookButton);
+            doctorBookButton.onClick.AddListener(OnDoctorBookButton);
+        }
+
+        if (aiAnalysisButton != null)
+        {
+            aiAnalysisButton.onClick.RemoveListener(OnAIAnalysisButton);
+            aiAnalysisButton.onClick.AddListener(OnAIAnalysisButton);
         }
 
         if (noButton != null)
@@ -63,7 +74,7 @@ public class EnergyUIManager : MonoBehaviour
 
         UpdateEnergyUI();
 
-        if (!gameFlowManager.CanUseEnergyForDoctorBook())
+        if (!gameFlowManager.CanOpenHintPanel())
             return;
 
         if (confirmPanel != null)
@@ -72,14 +83,29 @@ public class EnergyUIManager : MonoBehaviour
             confirmPanel.transform.SetAsLastSibling();
         }
 
+        if (confirmText != null)
+        {
+            confirmText.text =
+                "1 enerji harcayarak ipucu kullanmak istediğinize emin misiniz?";
+        }
+
         Cursor.lockState = CursorLockMode.None;
         Cursor.visible = true;
     }
 
-    public void OnConfirmYes()
+    public void OnDoctorBookButton()
     {
         if (gameFlowManager != null)
             gameFlowManager.TryUseEnergyForDoctorBook();
+
+        CloseConfirmPanel();
+        UpdateEnergyUI();
+    }
+
+    public void OnAIAnalysisButton()
+    {
+        if (gameFlowManager != null)
+            gameFlowManager.TryUseEnergyForAIAnalysis();
 
         CloseConfirmPanel();
         UpdateEnergyUI();
@@ -110,7 +136,9 @@ public class EnergyUIManager : MonoBehaviour
         if (gameFlowManager == null)
             gameFlowManager = FindFirstObjectByType<GameFlowManager>();
 
-        int currentEnergy = gameFlowManager != null ? gameFlowManager.currentEnergy : 0;
+        int currentEnergy = gameFlowManager != null
+            ? gameFlowManager.currentEnergy
+            : 0;
 
         if (energyIcons != null)
         {
@@ -122,9 +150,11 @@ public class EnergyUIManager : MonoBehaviour
         }
 
         if (useEnergyButton != null && gameFlowManager != null)
-            useEnergyButton.interactable = gameFlowManager.CanUseEnergyForDoctorBook();
+            useEnergyButton.interactable =
+                gameFlowManager.CanOpenHintPanel();
 
         if (energyInfoText != null && gameFlowManager != null)
-            energyInfoText.text = currentEnergy + " / " + gameFlowManager.maxEnergy;
+            energyInfoText.text =
+                currentEnergy + " / " + gameFlowManager.maxEnergy;
     }
 }

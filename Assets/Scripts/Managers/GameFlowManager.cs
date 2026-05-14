@@ -88,6 +88,8 @@ public class GameFlowManager : MonoBehaviour
     public int currentEnergy = 5;
 
     private bool doctorBookUnlockedForCurrentPatient = false;
+    private bool aiAnalysisUnlockedForCurrentPatient = false;
+    private bool aiAnalysisUsedForCurrentPatient = false;
 
     [Header("Notebook Access")]
     [SerializeField] private bool blockNotebookInteraction = true;
@@ -163,6 +165,7 @@ public class GameFlowManager : MonoBehaviour
         remainingHearts = maxHearts;
         currentEnergy = maxEnergy;
         ResetDoctorBookForNewPatient();
+        aiAnalysisUsedForCurrentPatient = false;
 
         totalCorrect = 0;
         totalWrong = 0;
@@ -352,6 +355,7 @@ public class GameFlowManager : MonoBehaviour
         diagnosisSubmittedForCurrentPatient = false;
         currentPatientDiagnosisResolved = false;
         ResetDoctorBookForNewPatient();
+        aiAnalysisUsedForCurrentPatient = false;
         patientTransitionInProgress = true;
         diagnosisFlowInProgress = false;
 
@@ -412,6 +416,12 @@ public class GameFlowManager : MonoBehaviour
         save.remainingHearts = remainingHearts;
         save.maxEnergy = maxEnergy;
         save.currentEnergy = currentEnergy;
+
+        if (!diagnosisSubmittedForCurrentPatient && aiAnalysisUsedForCurrentPatient)
+        {
+            save.currentEnergy = Mathf.Clamp(save.currentEnergy + 1, 0, maxEnergy);
+        }
+
         save.doctorBookUnlockedForCurrentPatient = doctorBookUnlockedForCurrentPatient;
         save.dayCorrect = dayCorrect;
         save.dayWrong = dayWrong;
@@ -464,10 +474,13 @@ public class GameFlowManager : MonoBehaviour
 
         if (!save.diagnosisSubmittedForCurrentPatient &&
             save.doctorBookUnlockedForCurrentPatient)
-        {       
-        currentEnergy = Mathf.Clamp(currentEnergy + 1, 0, maxEnergy);
-        doctorBookUnlockedForCurrentPatient = false;
+        {
+            currentEnergy = Mathf.Clamp(currentEnergy + 1, 0, maxEnergy);
+            doctorBookUnlockedForCurrentPatient = false;
         }
+
+        aiAnalysisUnlockedForCurrentPatient = false;
+        aiAnalysisUsedForCurrentPatient = false;
 
         dayCorrect = save.dayCorrect;
         dayWrong = save.dayWrong;
@@ -1160,6 +1173,8 @@ public class GameFlowManager : MonoBehaviour
     public void ResetDoctorBookForNewPatient()
     {
         doctorBookUnlockedForCurrentPatient = false;
+        aiAnalysisUnlockedForCurrentPatient = false;
+        aiAnalysisUsedForCurrentPatient = false;
         UpdateEnergyUI();
     }
 
@@ -1172,6 +1187,115 @@ public class GameFlowManager : MonoBehaviour
             return false;
 
         return currentEnergy > 0;
+    }
+
+    public bool CanOpenHintPanel()
+    {
+        if (gameEnded)
+            return false;
+
+        if (patientTransitionInProgress)
+            return false;
+
+        if (diagnosisFlowInProgress)
+            return false;
+
+        if (waitingForPatientResultContinue)
+            return false;
+
+        if (waitingForDayContinue)
+            return false;
+
+        if (currentPatientDiagnosisResolved)
+            return false;
+
+        if (patientResultPanel != null && patientResultPanel.activeSelf)
+            return false;
+
+        if (endDayPanel != null && endDayPanel.activeSelf)
+            return false;
+
+        if (gameOverPanel != null && gameOverPanel.activeSelf)
+            return false;
+
+        if (dayTransitionPanel != null && dayTransitionPanel.activeSelf)
+            return false;
+
+        if (doctorBookUnlockedForCurrentPatient && aiAnalysisUnlockedForCurrentPatient)
+            return false;
+
+        return currentEnergy > 0;
+    }
+
+    public bool CanOpenAIAnalysisPanel()
+    {
+        if (gameEnded)
+            return false;
+
+        if (!aiAnalysisUnlockedForCurrentPatient)
+            return false;
+
+        if (patientTransitionInProgress)
+            return false;
+
+        if (diagnosisFlowInProgress)
+            return false;
+
+        if (waitingForPatientResultContinue)
+            return false;
+
+        if (waitingForDayContinue)
+            return false;
+
+        if (currentPatientDiagnosisResolved)
+            return false;
+
+        if (patientResultPanel != null && patientResultPanel.activeSelf)
+            return false;
+
+        if (endDayPanel != null && endDayPanel.activeSelf)
+            return false;
+
+        if (gameOverPanel != null && gameOverPanel.activeSelf)
+            return false;
+
+        if (dayTransitionPanel != null && dayTransitionPanel.activeSelf)
+            return false;
+
+        return true;
+    }
+
+    public bool TryUseEnergyForAIAnalysis()
+    {
+        if (gameEnded)
+            return false;
+
+        if (aiAnalysisUsedForCurrentPatient)
+        {
+            aiAnalysisUnlockedForCurrentPatient = true;
+            return true;
+        }
+
+        if (currentEnergy <= 0)
+        {
+            Debug.Log("Enerji kalmadı.");
+            return false;
+        }
+
+        currentEnergy--;
+        aiAnalysisUsedForCurrentPatient = true;
+        aiAnalysisUnlockedForCurrentPatient = true;
+
+        UpdateEnergyUI();
+
+        Debug.Log("AI analizi için 1 enerji harcandı. Kalan enerji: " + currentEnergy);
+
+        return true;
+    }
+
+    public bool IsAIAnalysisUnlockedForCurrentPatient()
+    {
+        return aiAnalysisUnlockedForCurrentPatient;
     }
 
     private void SetEnergyPanelVisible(bool visible)

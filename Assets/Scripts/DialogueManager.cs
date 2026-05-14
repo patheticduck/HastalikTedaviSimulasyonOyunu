@@ -53,6 +53,7 @@ public class DialogueManager : MonoBehaviour
 
     private readonly HashSet<string> discoveredTags = new HashSet<string>();
     private readonly HashSet<string> usedHiddenChoices = new HashSet<string>();
+    private readonly HashSet<string> notifiedQuestionTestKeys = new HashSet<string>();
 
     private readonly HashSet<string> discoveredSymptoms = new HashSet<string>();
     private readonly HashSet<string> performedTests = new HashSet<string>();
@@ -208,6 +209,7 @@ public class DialogueManager : MonoBehaviour
 
         discoveredTags.Clear();
         usedHiddenChoices.Clear();
+        notifiedQuestionTestKeys.Clear();
         discoveredSymptoms.Clear();
         performedTests.Clear();
         shownAssistantHints.Clear();
@@ -651,18 +653,7 @@ public class DialogueManager : MonoBehaviour
 
         yield return StartCoroutine(ScrollToConversationFocus(false));
 
-        Debug.Log("DialogueManager -> Yeni soru/test/tanı seçenekleri oluşturuldu. Notification tetikleniyor.");
-
-        ResolveNotificationUI();
-
-        if (notificationUI != null)
-        {
-            notificationUI.NotifyNewOptions();
-        }
-        else
-        {
-            Debug.LogWarning("DialogueManager -> notificationUI NULL!");
-        }
+        Debug.Log("DialogueManager -> Tanı seçenekleri oluşturuldu. Notification tetiklenmedi.");
     }
 
     private void CreateReturnFromDiagnosisButton()
@@ -809,17 +800,21 @@ public class DialogueManager : MonoBehaviour
 
         yield return StartCoroutine(ScrollToConversationFocus(false));
 
-        Debug.Log("DialogueManager -> Yeni soru/test/tanı seçenekleri oluşturuldu. Notification tetikleniyor.");
+        Debug.Log("DialogueManager -> Yeni soru/test/tanı seçenekleri oluşturuldu. Notification kontrol ediliyor.");
 
         ResolveNotificationUI();
 
-        if (notificationUI != null)
+        if (notificationUI != null && HasNewQuestionOrTestOptions(availableChoices, node.nodeId))
         {
             notificationUI.NotifyNewOptions();
         }
-        else
+        else if (notificationUI == null)
         {
             Debug.LogWarning("DialogueManager -> notificationUI NULL!");
+        }
+        else
+        {
+            Debug.Log("DialogueManager -> Yeni soru/test yok, notification tetiklenmedi.");
         }
     }
     private IEnumerator CreateChoiceButtonRoutine(DialogueChoiceData choice, Transform parent)
@@ -838,6 +833,34 @@ public class DialogueManager : MonoBehaviour
         }
 
         yield return null;
+    }
+
+    private bool HasNewQuestionOrTestOptions(List<DialogueChoiceData> choices, string nodeId)
+    {
+        if (choices == null || choices.Count == 0)
+            return false;
+
+        bool hasNew = false;
+
+        foreach (DialogueChoiceData choice in choices)
+        {
+            if (choice == null)
+                continue;
+
+            if (choice.choiceType != ChoiceType.Question &&
+                choice.choiceType != ChoiceType.Test)
+                continue;
+
+            string key = BuildChoiceKey(nodeId, choice.choiceText);
+
+            if (!notifiedQuestionTestKeys.Contains(key))
+            {
+                notifiedQuestionTestKeys.Add(key);
+                hasNew = true;
+            }
+        }
+
+        return hasNew;
     }
 
     private void SetOptionButtonTextInstant(DialogueOptionButton optionScript, string fullText)
