@@ -14,7 +14,7 @@ public class AIComputerCameraController : MonoBehaviour
     public PauseMenuController pauseMenuController;
 
     [Header("Settings")]
-    public Key toggleKey = Key.Y;
+    public Key toggleKey = Key.None;
     public float moveDuration = 0.45f;
 
     private Vector3 startPosition;
@@ -57,6 +57,11 @@ public class AIComputerCameraController : MonoBehaviour
         if (pauseMenuController != null && pauseMenuController.IsPaused())
             return;
 
+        // Toggle Key None ise hiçbir tuş kontrolü yapma.
+        // Artık bilgisayar Monitor üzerindeki AIComputerInteractable ile E tuşundan açılıyor.
+        if (toggleKey == Key.None)
+            return;
+
         if (Keyboard.current[toggleKey].wasPressedThisFrame)
         {
             if (isMoving)
@@ -72,6 +77,9 @@ public class AIComputerCameraController : MonoBehaviour
     public void OpenComputerMode()
     {
         if (mainCamera == null || aiComputerCameraPoint == null || aiAnalysisUIManager == null)
+            return;
+
+        if (isMoving || isComputerModeActive)
             return;
 
         if (pauseMenuController != null && pauseMenuController.IsPaused())
@@ -128,6 +136,26 @@ public class AIComputerCameraController : MonoBehaviour
             startRotation,
             false
         ));
+    }
+
+    public bool IsComputerModeActive()
+    {
+        return isComputerModeActive;
+    }
+
+    public bool IsMoving()
+    {
+        return isMoving;
+    }
+
+    public bool IsMovingToComputer()
+    {
+        return movingToComputer;
+    }
+
+    public bool IsMovingToGameplay()
+    {
+        return movingToGameplay;
     }
 
     public void ForceCompleteComputerMoveForPause()
@@ -239,7 +267,8 @@ public class AIComputerCameraController : MonoBehaviour
 
         if (openPanelAfterMove)
         {
-            aiAnalysisUIManager.OpenPanel();
+            if (aiAnalysisUIManager != null)
+                aiAnalysisUIManager.OpenPanel();
         }
         else
         {
@@ -247,26 +276,11 @@ public class AIComputerCameraController : MonoBehaviour
 
             if (interactionModeManager != null)
                 interactionModeManager.ExitUIMode();
+
+            if (gameFlowManager != null)
+                gameFlowManager.NotifyFreeLookStateEntered();
         }
-    }
 
-    public bool IsComputerModeActive()
-    {
-        return isComputerModeActive;
-    }
-
-    public bool IsMoving()
-    {
-        return isMoving;
-    }
-
-    public bool IsMovingToComputer()
-    {
-        return movingToComputer;
-    }
-
-    public bool IsMovingToGameplay()
-    {
-        return movingToGameplay;
+        moveRoutine = null;
     }
 }
