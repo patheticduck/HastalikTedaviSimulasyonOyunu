@@ -11,6 +11,9 @@ public class DialogueNotificationUI : MonoBehaviour
     public Image notificationButtonImage;
     public TextMeshProUGUI notificationText;
 
+    [Header("Linked Panels")]
+    public GameObject dialoguePanel;
+
     [Header("Text")]
     [TextArea]
     public string message =
@@ -48,6 +51,21 @@ public class DialogueNotificationUI : MonoBehaviour
             notificationButton.transform.localScale = Vector3.one;
     }
 
+    private void Update()
+    {
+        if (!IsDialogueContextActive())
+        {
+            if (notificationInfoPanel != null &&
+                notificationInfoPanel.activeSelf)
+            {
+                notificationInfoPanel.SetActive(false);
+            }
+
+            if (isBlinking)
+                StopNotification();
+        }
+    }
+
     public void NotifyNewOptions()
     {
         Debug.Log("DialogueNotificationUI -> NotifyNewOptions çağrıldı.");
@@ -57,6 +75,9 @@ public class DialogueNotificationUI : MonoBehaviour
             Debug.LogWarning("DialogueNotificationUI -> Obje aktif değil, bildirim başlatılmadı.");
             return;
         }
+
+        if (!IsDialogueContextActive())
+            return;
 
         if (isBlinking)
         {
@@ -105,10 +126,22 @@ public class DialogueNotificationUI : MonoBehaviour
         if (notificationInfoPanel == null)
             return;
 
+        if (!IsDialogueContextActive())
+        {
+            notificationInfoPanel.SetActive(false);
+            return;
+        }
+
         bool nextState = !notificationInfoPanel.activeSelf;
         notificationInfoPanel.SetActive(nextState);
 
         StopNotification();
+    }
+
+    private bool IsDialogueContextActive()
+    {
+        return dialoguePanel != null &&
+               dialoguePanel.activeInHierarchy;
     }
 
     private IEnumerator BlinkRoutine()

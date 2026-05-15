@@ -83,6 +83,8 @@ public class EnergyUIManager : MonoBehaviour
             confirmPanel.transform.SetAsLastSibling();
         }
 
+        UpdateHintButtons();
+
         if (confirmText != null)
         {
             confirmText.text =
@@ -156,5 +158,29 @@ public class EnergyUIManager : MonoBehaviour
         if (energyInfoText != null && gameFlowManager != null)
             energyInfoText.text =
                 currentEnergy + " / " + gameFlowManager.maxEnergy;
+
+        UpdateHintButtons();
+    }
+
+    private void UpdateHintButtons()
+    {
+        if (gameFlowManager == null)
+            return;
+
+        bool hasEnergy = gameFlowManager.currentEnergy > 0;
+
+        if (doctorBookButton != null)
+        {
+            doctorBookButton.interactable =
+                hasEnergy &&
+                !gameFlowManager.IsDoctorBookUnlockedForCurrentPatient();
+        }
+
+        if (aiAnalysisButton != null)
+        {
+            aiAnalysisButton.interactable =
+                hasEnergy &&
+                !gameFlowManager.IsAIAnalysisUnlockedForCurrentPatient();
+        }
     }
 }

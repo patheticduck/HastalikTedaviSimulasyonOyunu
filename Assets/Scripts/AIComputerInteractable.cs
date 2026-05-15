@@ -43,7 +43,13 @@ public class AIComputerInteractable : MonoBehaviour
         if (Keyboard.current == null)
             return;
 
-        if (PauseMenuController.Instance != null && PauseMenuController.Instance.IsPaused())
+        if (PauseMenuController.Instance != null &&
+            PauseMenuController.Instance.IsPaused())
+            return;
+
+        // Kamera hareket ederken hiçbir interaction çalışmasın
+        if (aiComputerController != null &&
+            aiComputerController.IsMoving())
             return;
 
         // Bilgisayar açıksa E ile kapat
@@ -60,7 +66,8 @@ public class AIComputerInteractable : MonoBehaviour
         if (isLookingAt)
             RefreshInteractionVisuals();
 
-        if (isLookingAt && Keyboard.current.eKey.wasPressedThisFrame)
+        if (isLookingAt &&
+            Keyboard.current.eKey.wasPressedThisFrame)
         {
             TryOpenComputer();
         }
@@ -71,7 +78,10 @@ public class AIComputerInteractable : MonoBehaviour
         if (playerCamera == null)
             return;
 
-        Ray ray = new Ray(playerCamera.transform.position, playerCamera.transform.forward);
+        Ray ray = new Ray(
+            playerCamera.transform.position,
+            playerCamera.transform.forward
+        );
 
         bool hitComputer = false;
 
@@ -104,11 +114,14 @@ public class AIComputerInteractable : MonoBehaviour
 
             if (canShow)
             {
-                TextMeshProUGUI tmp = interactText.GetComponent<TextMeshProUGUI>();
+                TextMeshProUGUI tmp =
+                    interactText.GetComponent<TextMeshProUGUI>();
 
                 if (tmp != null)
                 {
-                    tmp.text = IsAIUnlocked() ? unlockedText : lockedText;
+                    tmp.text = IsAIUnlocked()
+                        ? unlockedText
+                        : lockedText;
                 }
             }
         }
@@ -125,8 +138,9 @@ public class AIComputerInteractable : MonoBehaviour
         if (interactionManager.IsInForcedUIMode())
             return false;
 
-        // Hasta masaya gelmeden Notebook gibi görünmesin
-        if (gameFlowManager != null && !gameFlowManager.CanOpenNotebook())
+        // Hasta masaya gelmeden görünmesin
+        if (gameFlowManager != null &&
+            !gameFlowManager.CanOpenNotebook())
             return false;
 
         return true;
@@ -137,7 +151,7 @@ public class AIComputerInteractable : MonoBehaviour
         if (!CanShowInteractionPrompt())
             return;
 
-        // Kilitliyse hiçbir şeyi kapatma, yanıp sönme olmasın.
+        // Kilitliyse açma
         if (!IsAIUnlocked())
             return;
 

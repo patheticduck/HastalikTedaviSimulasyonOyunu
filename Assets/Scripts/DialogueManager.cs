@@ -100,13 +100,10 @@ public class DialogueManager : MonoBehaviour
         if (notificationUI != null)
             return;
 
-        GameObject notificationButtonObj = GameObject.Find("NotificationButton");
-
-        if (notificationButtonObj != null)
-            notificationUI = notificationButtonObj.GetComponent<DialogueNotificationUI>();
+        notificationUI = FindFirstObjectByType<DialogueNotificationUI>();
 
         if (notificationUI == null)
-            Debug.LogWarning("DialogueManager -> NotificationButton üzerinde DialogueNotificationUI bulunamadı!");
+            Debug.LogWarning("DialogueManager -> DialogueNotificationUI bulunamadı!");
     }
 
 
