@@ -14,6 +14,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: Assembly-CSharp::PatientCaseData
   caseId: PATIENT_ULCER_01
   trueDiseaseId: PEPTIC_ULCER
+  patientVisualIndex: 11
   rootNodeId: root
   startText: "Merhaba doktor, bir s\xFCredir midemde a\u011Fr\u0131 oluyor. Son g\xFCnlerde
     daha rahats\u0131z edici hale geldi."

@@ -14,6 +14,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: Assembly-CSharp::PatientCaseData
   caseId: PATIENT_LYME_01
   trueDiseaseId: LYME
+  patientVisualIndex: 14
   rootNodeId: root
   startText: "Merhaba doktor, son haftalarda halsizlik, kas a\u011Fr\u0131lar\u0131
     ve ara ara uyu\u015Fmalar\u0131m oluyor. Tam olarak ne oldu\u011Funu anlayamad\u0131m."

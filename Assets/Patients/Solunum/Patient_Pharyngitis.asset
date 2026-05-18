@@ -14,6 +14,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: Assembly-CSharp::PatientCaseData
   caseId: DAY1_PATIENT3_PHARYNGITIS
   trueDiseaseId: 'PHARYNGITIS '
+  patientVisualIndex: 4
   rootNodeId: root
   startText: "Merhaba doktor, birka\xE7 g\xFCnd\xFCr bo\u011Faz\u0131m rahats\u0131z.
     Biraz ate\u015Fim var gibi ve ara ara \xF6ks\xFCr\xFCyorum.\n"

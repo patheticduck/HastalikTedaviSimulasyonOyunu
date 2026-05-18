@@ -14,6 +14,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: Assembly-CSharp::PatientCaseData
   caseId: PATIENT_PANCREATITIS_01
   trueDiseaseId: PANCREATITIS
+  patientVisualIndex: 10
   rootNodeId: root
   startText: "Merhaba doktor, karn\u0131m\u0131n \xFCst k\u0131sm\u0131nda a\u011Fr\u0131
     ve bulant\u0131m var."

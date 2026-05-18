@@ -398,9 +398,15 @@ public class GameFlowManager : MonoBehaviour
         if (selectedCase != null)
         {
             dialogueManager.currentCase = selectedCase;
-            Debug.Log("Atanan vaka: " + selectedCase.name);
-            return;
+
+        if (patientMovement != null)
+        {
+        patientMovement.SetPatientVisual(selectedCase.patientVisualIndex);
         }
+
+        Debug.Log("Atanan vaka: " + selectedCase.name);
+        return;
+    }
 
         Debug.LogWarning("Planlanan hasta bulunamadı. Vaka atanamadı.");
     }

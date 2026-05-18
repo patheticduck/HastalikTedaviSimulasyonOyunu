@@ -14,6 +14,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: Assembly-CSharp::PatientCaseData
   caseId: DAY1_PATIENT1_GRIP
   trueDiseaseId: GRIP
+  patientVisualIndex: 3
   rootNodeId: root
   startText: "Merhaba doktor, iki g\xFCnd\xFCr kendimi olduk\xE7a k\xF6t\xFC hissediyorum."
   startAssistantText: "Halsizlik. bir \xE7ok hastal\u0131k belirtisi olabilir."
@@ -51,6 +52,13 @@ MonoBehaviour:
         score: 2
       - diseaseId: COLD
         score: -1
+      useTestChance: 0
+      baseSuccessChance: 70
+      bonusSpecialization: 0
+      specializationBonus: 15
+      generalistBonus: 5
+      failedTestText: "Testten net sonu\xE7 al\u0131namad\u0131. Klinik bulgularla
+        devam etmelisin."
     - choiceText: "\u015Eikayetleriniz ne zaman ba\u015Flad\u0131?"
       choiceType: 0
       doctorLine: "\u015Eikayetleriniz ne zaman ba\u015Flad\u0131?"
@@ -76,6 +84,13 @@ MonoBehaviour:
         score: 2
       - diseaseId: COLD
         score: -1
+      useTestChance: 0
+      baseSuccessChance: 70
+      bonusSpecialization: 0
+      specializationBonus: 15
+      generalistBonus: 5
+      failedTestText: "Testten net sonu\xE7 al\u0131namad\u0131. Klinik bulgularla
+        devam etmelisin."
     - choiceText: Halsizlik hissediyor musunuz?
       choiceType: 0
       doctorLine: Halsizlik hissediyor musunuz?
@@ -100,6 +115,13 @@ MonoBehaviour:
       diseaseEffects:
       - diseaseId: GRIP
         score: 2
+      useTestChance: 0
+      baseSuccessChance: 70
+      bonusSpecialization: 0
+      specializationBonus: 15
+      generalistBonus: 5
+      failedTestText: "Testten net sonu\xE7 al\u0131namad\u0131. Klinik bulgularla
+        devam etmelisin."
     - choiceText: "Kas a\u011Fr\u0131n\u0131z var m\u0131?"
       choiceType: 0
       doctorLine: "Kas a\u011Fr\u0131n\u0131z var m\u0131?"
@@ -128,6 +150,13 @@ MonoBehaviour:
         score: 3
       - diseaseId: COLD
         score: -1
+      useTestChance: 0
+      baseSuccessChance: 70
+      bonusSpecialization: 0
+      specializationBonus: 15
+      generalistBonus: 5
+      failedTestText: "Testten net sonu\xE7 al\u0131namad\u0131. Klinik bulgularla
+        devam etmelisin."
     - choiceText: "Bo\u011Faz\u0131n\u0131z a\u011Fr\u0131yor mu?"
       choiceType: 0
       doctorLine: "Bo\u011Faz\u0131n\u0131z a\u011Fr\u0131yor mu?"
@@ -157,6 +186,13 @@ MonoBehaviour:
         score: 1
       - diseaseId: PHARYNGITIS
         score: 2
+      useTestChance: 0
+      baseSuccessChance: 70
+      bonusSpecialization: 0
+      specializationBonus: 15
+      generalistBonus: 5
+      failedTestText: "Testten net sonu\xE7 al\u0131namad\u0131. Klinik bulgularla
+        devam etmelisin."
     - choiceText: "\xD6ks\xFCr\xFCyor musunuz?"
       choiceType: 0
       doctorLine: "\xD6ks\xFCr\xFCyor musunuz?"
@@ -183,6 +219,13 @@ MonoBehaviour:
       diseaseEffects:
       - diseaseId: GRIP
         score: 1
+      useTestChance: 0
+      baseSuccessChance: 70
+      bonusSpecialization: 0
+      specializationBonus: 15
+      generalistBonus: 5
+      failedTestText: "Testten net sonu\xE7 al\u0131namad\u0131. Klinik bulgularla
+        devam etmelisin."
     - choiceText: "Burun ak\u0131nt\u0131n\u0131z var m\u0131?"
       choiceType: 0
       doctorLine: "Burun ak\u0131nt\u0131n\u0131z var m\u0131?"
@@ -211,6 +254,13 @@ MonoBehaviour:
         score: 1
       - diseaseId: GRIP
         score: -1
+      useTestChance: 0
+      baseSuccessChance: 70
+      bonusSpecialization: 0
+      specializationBonus: 15
+      generalistBonus: 5
+      failedTestText: "Testten net sonu\xE7 al\u0131namad\u0131. Klinik bulgularla
+        devam etmelisin."
     - choiceText: "Ate\u015Finiz ka\xE7 dereceye kadar \xE7\u0131kt\u0131?"
       choiceType: 0
       doctorLine: "Ate\u015Finiz ka\xE7 dereceye kadar \xE7\u0131kt\u0131?"
@@ -239,6 +289,13 @@ MonoBehaviour:
         score: -1
       - diseaseId: GRIP
         score: 2
+      useTestChance: 0
+      baseSuccessChance: 70
+      bonusSpecialization: 0
+      specializationBonus: 15
+      generalistBonus: 5
+      failedTestText: "Testten net sonu\xE7 al\u0131namad\u0131. Klinik bulgularla
+        devam etmelisin."
     - choiceText: "Ate\u015Fle birlikte \xFC\u015F\xFCme veya titreme oldu mu?"
       choiceType: 0
       doctorLine: "Ate\u015Fle birlikte \xFC\u015F\xFCme veya titreme oldu mu?"
@@ -266,6 +323,13 @@ MonoBehaviour:
       diseaseEffects:
       - diseaseId: GRIP
         score: 2
+      useTestChance: 0
+      baseSuccessChance: 70
+      bonusSpecialization: 0
+      specializationBonus: 15
+      generalistBonus: 5
+      failedTestText: "Testten net sonu\xE7 al\u0131namad\u0131. Klinik bulgularla
+        devam etmelisin."
     - choiceText: "\xD6ks\xFCr\xFC\u011F\xFCn\xFCz kuru mu, balgaml\u0131 m\u0131?"
       choiceType: 0
       doctorLine: "\xD6ks\xFCr\xFC\u011F\xFCn\xFCz kuru mu, balgaml\u0131 m\u0131?"
@@ -295,6 +359,13 @@ MonoBehaviour:
         score: 2
       - diseaseId: e
         score: -1
+      useTestChance: 0
+      baseSuccessChance: 70
+      bonusSpecialization: 0
+      specializationBonus: 15
+      generalistBonus: 5
+      failedTestText: "Testten net sonu\xE7 al\u0131namad\u0131. Klinik bulgularla
+        devam etmelisin."
     - choiceText: "\xD6ks\xFCr\xFCk g\xF6\u011Fs\xFCn\xFCzden mi geliyor?"
       choiceType: 0
       doctorLine: "\xD6ks\xFCr\xFCk g\xF6\u011Fs\xFCn\xFCzden mi geliyor yoksa daha
@@ -323,6 +394,13 @@ MonoBehaviour:
       diseaseEffects:
       - diseaseId: GRIP
         score: 1
+      useTestChance: 0
+      baseSuccessChance: 70
+      bonusSpecialization: 0
+      specializationBonus: 15
+      generalistBonus: 5
+      failedTestText: "Testten net sonu\xE7 al\u0131namad\u0131. Klinik bulgularla
+        devam etmelisin."
     - choiceText: "Yutkunurken a\u011Fr\u0131 art\u0131yor mu?"
       choiceType: 0
       doctorLine: "Yutkunurken a\u011Fr\u0131 art\u0131yor mu?"
@@ -350,6 +428,13 @@ MonoBehaviour:
         score: 1
       - diseaseId: PHARYNGITIS
         score: 2
+      useTestChance: 0
+      baseSuccessChance: 70
+      bonusSpecialization: 0
+      specializationBonus: 15
+      generalistBonus: 5
+      failedTestText: "Testten net sonu\xE7 al\u0131namad\u0131. Klinik bulgularla
+        devam etmelisin."
     - choiceText: "Bo\u011Fazda yanma m\u0131 daha bask\u0131n, a\u011Fr\u0131 m\u0131?"
       choiceType: 0
       doctorLine: "Bo\u011Fazda yanma m\u0131 daha bask\u0131n, a\u011Fr\u0131 m\u0131?"
@@ -376,6 +461,13 @@ MonoBehaviour:
       diseaseEffects:
       - diseaseId: GRIP
         score: 1
+      useTestChance: 0
+      baseSuccessChance: 70
+      bonusSpecialization: 0
+      specializationBonus: 15
+      generalistBonus: 5
+      failedTestText: "Testten net sonu\xE7 al\u0131namad\u0131. Klinik bulgularla
+        devam etmelisin."
     - choiceText: "Ate\u015F \xF6l\xE7\xFCm\xFC yap"
       choiceType: 1
       doctorLine: "Ate\u015Finizi \xF6l\xE7elim."
@@ -406,6 +498,13 @@ MonoBehaviour:
         score: 3
       - diseaseId: COLD
         score: -2
+      useTestChance: 0
+      baseSuccessChance: 70
+      bonusSpecialization: 0
+      specializationBonus: 15
+      generalistBonus: 5
+      failedTestText: "Testten net sonu\xE7 al\u0131namad\u0131. Klinik bulgularla
+        devam etmelisin."
     - choiceText: "Bo\u011Faz muayenesi yap"
       choiceType: 1
       doctorLine: "Bo\u011Faz\u0131n\u0131z\u0131 muayene edece\u011Fim. A\u011Fz\u0131n\u0131z\u0131
@@ -438,6 +537,13 @@ MonoBehaviour:
         score: 1
       - diseaseId: PHARYNGITIS
         score: 2
+      useTestChance: 0
+      baseSuccessChance: 70
+      bonusSpecialization: 0
+      specializationBonus: 15
+      generalistBonus: 5
+      failedTestText: "Testten net sonu\xE7 al\u0131namad\u0131. Klinik bulgularla
+        devam etmelisin."
     - choiceText: "Bademciklerde iltihap g\xF6r\xFCld\xFC m\xFC?"
       choiceType: 0
       doctorLine: "Muayenede bademciklerde beyazl\u0131k ya da belirgin iltihap g\xF6r\xFCld\xFC
@@ -466,6 +572,13 @@ MonoBehaviour:
         score: 1
       - diseaseId: PHARYNGITIS
         score: -2
+      useTestChance: 0
+      baseSuccessChance: 70
+      bonusSpecialization: 0
+      specializationBonus: 15
+      generalistBonus: 5
+      failedTestText: "Testten net sonu\xE7 al\u0131namad\u0131. Klinik bulgularla
+        devam etmelisin."
     - choiceText: Solunum seslerini dinle
       choiceType: 1
       doctorLine: "Solunum seslerinizi dinleyece\u011Fim, derin nefes al\u0131p verir
@@ -496,6 +609,13 @@ MonoBehaviour:
       diseaseEffects:
       - diseaseId: GRIP
         score: 1
+      useTestChance: 0
+      baseSuccessChance: 70
+      bonusSpecialization: 0
+      specializationBonus: 15
+      generalistBonus: 5
+      failedTestText: "Testten net sonu\xE7 al\u0131namad\u0131. Klinik bulgularla
+        devam etmelisin."
     - choiceText: "Ate\u015F y\xFCkseldi\u011Finde halsizli\u011Finiz art\u0131yor
         mu?"
       choiceType: 0
@@ -524,6 +644,13 @@ MonoBehaviour:
       diseaseEffects:
       - diseaseId: GRIP
         score: 2
+      useTestChance: 0
+      baseSuccessChance: 70
+      bonusSpecialization: 0
+      specializationBonus: 15
+      generalistBonus: 5
+      failedTestText: "Testten net sonu\xE7 al\u0131namad\u0131. Klinik bulgularla
+        devam etmelisin."
     - choiceText: "Kuru \xF6ks\xFCr\xFC\u011F\xFCn\xFCz \xF6zellikle geceleri mi
         art\u0131yor?"
       choiceType: 0
@@ -551,6 +678,13 @@ MonoBehaviour:
       diseaseEffects:
       - diseaseId: GRIP
         score: 1
+      useTestChance: 0
+      baseSuccessChance: 70
+      bonusSpecialization: 0
+      specializationBonus: 15
+      generalistBonus: 5
+      failedTestText: "Testten net sonu\xE7 al\u0131namad\u0131. Klinik bulgularla
+        devam etmelisin."
     - choiceText: "Tan\u0131 koy"
       choiceType: 2
       doctorLine: 
@@ -570,6 +704,13 @@ MonoBehaviour:
       notebookTests: []
       notebookNotes: []
       diseaseEffects: []
+      useTestChance: 0
+      baseSuccessChance: 70
+      bonusSpecialization: 0
+      specializationBonus: 15
+      generalistBonus: 5
+      failedTestText: "Testten net sonu\xE7 al\u0131namad\u0131. Klinik bulgularla
+        devam etmelisin."
   diagnosisChoices:
   - diseaseId: GRIP
     diagnosisName: Grip

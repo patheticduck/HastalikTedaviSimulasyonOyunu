@@ -14,6 +14,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: Assembly-CSharp::PatientCaseData
   caseId: PATIENT_HYPERTHYROID_01
   trueDiseaseId: HYPERTHYROIDISM
+  patientVisualIndex: 12
   rootNodeId: root
   startText: "Merhaba doktor, son haftalarda \xE7arp\u0131nt\u0131m, terlemem ve
     halsizli\u011Fim oluyor. Bir de midem s\u0131k s\u0131k rahats\u0131z."

@@ -14,6 +14,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: Assembly-CSharp::PatientCaseData
   caseId: PATIENT_CROHN_01
   trueDiseaseId: CROHN
+  patientVisualIndex: 6
   rootNodeId: root
   startText: "Merhaba doktor, bir s\xFCredir kar\u0131n a\u011Fr\u0131m ve ishalim
     var. Son g\xFCnlerde biraz artt\u0131."

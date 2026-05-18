@@ -14,6 +14,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: Assembly-CSharp::PatientCaseData
   caseId: DAY1_PATIENT2_COLD
   trueDiseaseId: COLD
+  patientVisualIndex: 1
   rootNodeId: root
   startText: "Merhaba doktor, birka\xE7 g\xFCnd\xFCr burnum ak\u0131yor ve bo\u011Faz\u0131m
     hafif rahats\u0131z ediyor."
@@ -51,6 +52,13 @@ MonoBehaviour:
         score: 2
       - diseaseId: GRIP
         score: -1
+      useTestChance: 0
+      baseSuccessChance: 70
+      bonusSpecialization: 0
+      specializationBonus: 15
+      generalistBonus: 5
+      failedTestText: "Testten net sonu\xE7 al\u0131namad\u0131. Klinik bulgularla
+        devam etmelisin."
     - choiceText: "\u015Eikayetleriniz ne zaman ba\u015Flad\u0131?"
       choiceType: 0
       doctorLine: "\u015Eikayetleriniz ne zaman ba\u015Flad\u0131?"
@@ -79,6 +87,13 @@ MonoBehaviour:
         score: 2
       - diseaseId: GRIP
         score: -1
+      useTestChance: 0
+      baseSuccessChance: 70
+      bonusSpecialization: 0
+      specializationBonus: 15
+      generalistBonus: 5
+      failedTestText: "Testten net sonu\xE7 al\u0131namad\u0131. Klinik bulgularla
+        devam etmelisin."
     - choiceText: Halsizlik hissediyor musunuz?
       choiceType: 0
       doctorLine: Halsizlik hissediyor musunuz?
@@ -106,6 +121,13 @@ MonoBehaviour:
         score: 1
       - diseaseId: GRIP
         score: 0
+      useTestChance: 0
+      baseSuccessChance: 70
+      bonusSpecialization: 0
+      specializationBonus: 15
+      generalistBonus: 5
+      failedTestText: "Testten net sonu\xE7 al\u0131namad\u0131. Klinik bulgularla
+        devam etmelisin."
     - choiceText: "Kas a\u011Fr\u0131n\u0131z var m\u0131?"
       choiceType: 0
       doctorLine: "Kas a\u011Fr\u0131n\u0131z var m\u0131?"
@@ -131,6 +153,13 @@ MonoBehaviour:
         score: 1
       - diseaseId: GRIP
         score: -2
+      useTestChance: 0
+      baseSuccessChance: 70
+      bonusSpecialization: 0
+      specializationBonus: 15
+      generalistBonus: 5
+      failedTestText: "Testten net sonu\xE7 al\u0131namad\u0131. Klinik bulgularla
+        devam etmelisin."
     - choiceText: "Bo\u011Faz\u0131n\u0131z a\u011Fr\u0131yor mu?"
       choiceType: 0
       doctorLine: "Bo\u011Faz\u0131n\u0131z a\u011Fr\u0131yor mu?"
@@ -158,6 +187,13 @@ MonoBehaviour:
         score: 2
       - diseaseId: PHARYNGITIS
         score: 1
+      useTestChance: 0
+      baseSuccessChance: 70
+      bonusSpecialization: 0
+      specializationBonus: 15
+      generalistBonus: 5
+      failedTestText: "Testten net sonu\xE7 al\u0131namad\u0131. Klinik bulgularla
+        devam etmelisin."
     - choiceText: "\xD6ks\xFCr\xFCyor musunuz?"
       choiceType: 0
       doctorLine: "\xD6ks\xFCr\xFCyor musunuz?"
@@ -184,6 +220,13 @@ MonoBehaviour:
         score: 1
       - diseaseId: BRONCHITIS
         score: 0
+      useTestChance: 0
+      baseSuccessChance: 70
+      bonusSpecialization: 0
+      specializationBonus: 15
+      generalistBonus: 5
+      failedTestText: "Testten net sonu\xE7 al\u0131namad\u0131. Klinik bulgularla
+        devam etmelisin."
     - choiceText: "Burun ak\u0131nt\u0131n\u0131z var m\u0131?"
       choiceType: 0
       doctorLine: "Burun ak\u0131nt\u0131n\u0131z var m\u0131?"
@@ -218,6 +261,13 @@ MonoBehaviour:
         score: 0
       - diseaseId: PHARYNGITIS
         score: -1
+      useTestChance: 0
+      baseSuccessChance: 70
+      bonusSpecialization: 0
+      specializationBonus: 15
+      generalistBonus: 5
+      failedTestText: "Testten net sonu\xE7 al\u0131namad\u0131. Klinik bulgularla
+        devam etmelisin."
     - choiceText: "Hap\u015F\u0131r\u0131\u011F\u0131n\u0131z var m\u0131?"
       choiceType: 0
       doctorLine: "Hap\u015F\u0131r\u0131\u011F\u0131n\u0131z var m\u0131?"
@@ -245,6 +295,13 @@ MonoBehaviour:
         score: 2
       - diseaseId: GRIP
         score: 0
+      useTestChance: 0
+      baseSuccessChance: 70
+      bonusSpecialization: 0
+      specializationBonus: 15
+      generalistBonus: 5
+      failedTestText: "Testten net sonu\xE7 al\u0131namad\u0131. Klinik bulgularla
+        devam etmelisin."
     - choiceText: "Ate\u015Finiz ka\xE7 dereceye kadar \xE7\u0131kt\u0131?"
       choiceType: 0
       doctorLine: "Ate\u015Finiz ka\xE7 dereceye kadar \xE7\u0131kt\u0131?"
@@ -271,6 +328,13 @@ MonoBehaviour:
         score: 2
       - diseaseId: GRIP
         score: -2
+      useTestChance: 0
+      baseSuccessChance: 70
+      bonusSpecialization: 0
+      specializationBonus: 15
+      generalistBonus: 5
+      failedTestText: "Testten net sonu\xE7 al\u0131namad\u0131. Klinik bulgularla
+        devam etmelisin."
     - choiceText: "Burun ak\u0131nt\u0131n\u0131z \u015Feffaf m\u0131?"
       choiceType: 0
       doctorLine: "Burun ak\u0131nt\u0131n\u0131z \u015Feffaf m\u0131?"
@@ -298,6 +362,13 @@ MonoBehaviour:
         score: 2
       - diseaseId: SINUSITIS
         score: 0
+      useTestChance: 0
+      baseSuccessChance: 70
+      bonusSpecialization: 0
+      specializationBonus: 15
+      generalistBonus: 5
+      failedTestText: "Testten net sonu\xE7 al\u0131namad\u0131. Klinik bulgularla
+        devam etmelisin."
     - choiceText: "Bo\u011Fazdaki rahats\u0131zl\u0131k yutkunurken \xE7ok art\u0131yor
         mu?"
       choiceType: 0
@@ -328,6 +399,13 @@ MonoBehaviour:
         score: 1
       - diseaseId: PHARYNGITIS
         score: -2
+      useTestChance: 0
+      baseSuccessChance: 70
+      bonusSpecialization: 0
+      specializationBonus: 15
+      generalistBonus: 5
+      failedTestText: "Testten net sonu\xE7 al\u0131namad\u0131. Klinik bulgularla
+        devam etmelisin."
     - choiceText: "\xD6ks\xFCr\xFC\u011F\xFCn\xFCz kuru mu"
       choiceType: 0
       doctorLine: "\xD6ks\xFCr\xFC\u011F\xFCn\xFCz kuru mu"
@@ -354,6 +432,13 @@ MonoBehaviour:
         score: 1
       - diseaseId: BRONCHITIS
         score: -1
+      useTestChance: 0
+      baseSuccessChance: 70
+      bonusSpecialization: 0
+      specializationBonus: 15
+      generalistBonus: 5
+      failedTestText: "Testten net sonu\xE7 al\u0131namad\u0131. Klinik bulgularla
+        devam etmelisin."
     - choiceText: "G\xFCnl\xFCk hayatta a\u011F\u0131r k\u0131rg\u0131nl\u0131k var
         m\u0131"
       choiceType: 0
@@ -383,6 +468,13 @@ MonoBehaviour:
         score: 2
       - diseaseId: GRIP
         score: -2
+      useTestChance: 0
+      baseSuccessChance: 70
+      bonusSpecialization: 0
+      specializationBonus: 15
+      generalistBonus: 5
+      failedTestText: "Testten net sonu\xE7 al\u0131namad\u0131. Klinik bulgularla
+        devam etmelisin."
     - choiceText: "Ate\u015F \xF6l\xE7\xFCm\xFC yap"
       choiceType: 1
       doctorLine: "Ate\u015F \xF6l\xE7\xFCm\xFC yapal\u0131m."
@@ -411,6 +503,13 @@ MonoBehaviour:
         score: 2
       - diseaseId: GRIP
         score: -2
+      useTestChance: 0
+      baseSuccessChance: 70
+      bonusSpecialization: 0
+      specializationBonus: 15
+      generalistBonus: 5
+      failedTestText: "Testten net sonu\xE7 al\u0131namad\u0131. Klinik bulgularla
+        devam etmelisin."
     - choiceText: "Bo\u011Faz muayenesi yap"
       choiceType: 1
       doctorLine: "Bo\u011Faz\u0131n\u0131za bakal\u0131m."
@@ -442,6 +541,13 @@ MonoBehaviour:
         score: -1
       - diseaseId: TONSILLITIS
         score: -2
+      useTestChance: 0
+      baseSuccessChance: 70
+      bonusSpecialization: 0
+      specializationBonus: 15
+      generalistBonus: 5
+      failedTestText: "Testten net sonu\xE7 al\u0131namad\u0131. Klinik bulgularla
+        devam etmelisin."
     - choiceText: Solunum seslerini dinle
       choiceType: 1
       doctorLine: "S\u0131rt\u0131n\u0131z a\xE7\u0131n."
@@ -470,6 +576,13 @@ MonoBehaviour:
         score: 1
       - diseaseId: BRONCHITIS
         score: -2
+      useTestChance: 0
+      baseSuccessChance: 70
+      bonusSpecialization: 0
+      specializationBonus: 15
+      generalistBonus: 5
+      failedTestText: "Testten net sonu\xE7 al\u0131namad\u0131. Klinik bulgularla
+        devam etmelisin."
     - choiceText: Burun muayenesi yap
       choiceType: 1
       doctorLine: "Burun ve \xFCst solunum yolunu muayene edelim."
@@ -499,6 +612,13 @@ MonoBehaviour:
         score: 2
       - diseaseId: SINUSITIS
         score: 1
+      useTestChance: 0
+      baseSuccessChance: 70
+      bonusSpecialization: 0
+      specializationBonus: 15
+      generalistBonus: 5
+      failedTestText: "Testten net sonu\xE7 al\u0131namad\u0131. Klinik bulgularla
+        devam etmelisin."
     - choiceText: "Tan\u0131 koy"
       choiceType: 2
       doctorLine: 
@@ -518,6 +638,13 @@ MonoBehaviour:
       notebookTests: []
       notebookNotes: []
       diseaseEffects: []
+      useTestChance: 0
+      baseSuccessChance: 70
+      bonusSpecialization: 0
+      specializationBonus: 15
+      generalistBonus: 5
+      failedTestText: "Testten net sonu\xE7 al\u0131namad\u0131. Klinik bulgularla
+        devam etmelisin."
   diagnosisChoices:
   - diseaseId: COLD
     diagnosisName: "So\u011Fuk Alg\u0131nl\u0131\u011F\u0131"

@@ -14,7 +14,6 @@ public class PatientCough : MonoBehaviour
     {
         audioSource = GetComponent<AudioSource>();
 
-        // Animator bu objede yoksa child objelerde arar
         animator = GetComponent<Animator>();
 
         if (animator == null)
@@ -25,7 +24,6 @@ public class PatientCough : MonoBehaviour
 
     void Update()
     {
-        // AudioManager'daki SFX ses seviyesine bağlanır
         if (audioSource != null && AudioManager.Instance != null)
         {
             audioSource.volume = AudioManager.Instance.sfxVolume;
@@ -48,11 +46,36 @@ public class PatientCough : MonoBehaviour
                 audioSource.Play();
             }
 
+            if (animator == null)
+            {
+                animator = GetComponentInChildren<Animator>();
+            }
+
             if (animator != null)
             {
                 animator.ResetTrigger("Cough");
                 animator.SetTrigger("Cough");
             }
+        }
+    }
+
+    public void ResetCough()
+    {
+        hasCoughed = false;
+
+        if (audioSource != null)
+        {
+            audioSource.Stop();
+        }
+
+        if (animator == null)
+        {
+            animator = GetComponentInChildren<Animator>();
+        }
+
+        if (animator != null)
+        {
+            animator.ResetTrigger("Cough");
         }
     }
 }

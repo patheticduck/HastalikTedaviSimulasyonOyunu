@@ -8,6 +8,9 @@ public class PatientCaseData : ScriptableObject
     public string caseId;
     public string trueDiseaseId;
 
+    [Header("Patient Visual")]
+    public int patientVisualIndex;
+
     [Header("Start")]
     public string rootNodeId;
 

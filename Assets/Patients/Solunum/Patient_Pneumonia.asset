@@ -14,6 +14,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: Assembly-CSharp::PatientCaseData
   caseId: DAY2_PATIENT2_PNEUMONIA
   trueDiseaseId: PNEUMONIA
+  patientVisualIndex: 5
   rootNodeId: root
   startText: "Merhaba doktor, birka\xE7 g\xFCnd\xFCr \xF6ks\xFCr\xFCyorum ve nefesim
     biraz daral\u0131yor. G\xF6\u011Fs\xFCmde de rahats\u0131z edici bir a\u011Fr\u0131

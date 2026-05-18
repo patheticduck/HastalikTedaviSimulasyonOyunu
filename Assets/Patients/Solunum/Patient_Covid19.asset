@@ -14,6 +14,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: Assembly-CSharp::PatientCaseData
   caseId: PATIENT_COVID_01
   trueDiseaseId: COVID19
+  patientVisualIndex: 2
   rootNodeId: root
   startText: "Merhaba doktor, birka\xE7 g\xFCnd\xFCr burnum t\u0131kal\u0131, biraz
     \xF6ks\xFCr\xFCyorum ve halsizim."

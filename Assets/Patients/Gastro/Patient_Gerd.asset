@@ -14,6 +14,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: Assembly-CSharp::PatientCaseData
   caseId: DAY2_PATIENT1_GERD
   trueDiseaseId: GERD
+  patientVisualIndex: 9
   rootNodeId: root
   startText: "Merhaba doktor, birka\xE7 g\xFCnd\xFCr g\xF6\u011Fs\xFCmde ve bo\u011Faz\u0131ma
     do\u011Fru gelen bir yanma hissi var."

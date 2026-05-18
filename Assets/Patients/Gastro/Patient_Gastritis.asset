@@ -14,6 +14,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: Assembly-CSharp::PatientCaseData
   caseId: PATIENT_GASTRITIS_01
   trueDiseaseId: GASTRITIS
+  patientVisualIndex: 8
   rootNodeId: root
   startText: "Merhaba doktor, birka\xE7 g\xFCnd\xFCr midemde yanma ve bulant\u0131
     oluyor."

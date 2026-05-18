@@ -20,7 +20,6 @@ public class PatientMovement : MonoBehaviour
 
     [Header("Patient Visuals")]
     public GameObject[] patientVisuals;
-    private int currentPatientIndex = 0;
 
     private Animator animator;
     private bool canMove = false;
@@ -34,7 +33,7 @@ public class PatientMovement : MonoBehaviour
 
     void OnEnable()
     {
-        SetPatientVisual(currentPatientIndex);
+        animator = GetComponentInChildren<Animator>();
     }
 
     void Update()
@@ -130,7 +129,6 @@ public class PatientMovement : MonoBehaviour
             if (doorController != null)
                 doorController.CloseDoorInstant();
 
-            currentPatientIndex++;
             gameObject.SetActive(false);
 
             if (gameFlowManager != null)
@@ -140,17 +138,14 @@ public class PatientMovement : MonoBehaviour
 
     public void BeginWalk()
     {
-        if (patientVisuals == null || patientVisuals.Length == 0)
-        {
-            Debug.LogWarning("Patient Visuals boş!");
-            return;
-        }
-
         if (doorController != null)
             doorController.CloseDoorInstant();
 
         gameObject.SetActive(true);
-        SetPatientVisual(currentPatientIndex);
+
+        ResetPatientBehaviours();
+
+        animator = GetComponentInChildren<Animator>();
 
         if (startPoint != null && targetPoint != null)
         {
@@ -180,18 +175,11 @@ public class PatientMovement : MonoBehaviour
 
     public void BeginExit()
     {
-        if (patientVisuals == null || patientVisuals.Length == 0)
-        {
-            Debug.LogWarning("Patient Visuals boş!");
-            return;
-        }
-
-        SetPatientVisual(currentPatientIndex);
+        animator = GetComponentInChildren<Animator>();
 
         if (startPoint == null)
         {
             HidePatient();
-            currentPatientIndex++;
 
             if (gameFlowManager != null)
                 gameFlowManager.OnPatientExited();
@@ -218,6 +206,17 @@ public class PatientMovement : MonoBehaviour
 
         LookAtCurrentTarget();
         PlayWalk();
+    }
+
+    private void ResetPatientBehaviours()
+    {
+        PatientCough[] coughScripts = GetComponentsInChildren<PatientCough>(true);
+
+        foreach (PatientCough cough in coughScripts)
+        {
+            if (cough != null)
+                cough.ResetCough();
+        }
     }
 
     private void LookAtCurrentTarget()
