@@ -4329,7 +4329,7 @@ Animator:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 226545700}
   m_Enabled: 1
-  m_Avatar: {fileID: 9000000, guid: 288ec6a2dd1730c47a7a5f26fff99ce4, type: 3}
+  m_Avatar: {fileID: 9000000, guid: 3c9352e3d45060d478f77c108bca671d, type: 3}
   m_Controller: {fileID: 9100000, guid: 163d28218f4ac6345abeb1d05d114e99, type: 2}
   m_CullingMode: 0
   m_UpdateMode: 0
@@ -13283,7 +13283,7 @@ Animator:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 597691042}
   m_Enabled: 1
-  m_Avatar: {fileID: 9000000, guid: 288ec6a2dd1730c47a7a5f26fff99ce4, type: 3}
+  m_Avatar: {fileID: 9000000, guid: 3c9352e3d45060d478f77c108bca671d, type: 3}
   m_Controller: {fileID: 9100000, guid: 1891e5f94add3a94b987637ac99dc87e, type: 2}
   m_CullingMode: 0
   m_UpdateMode: 0
@@ -23161,6 +23161,10 @@ PrefabInstance:
       value: 
       objectReference: {fileID: 2100000, guid: 2a50abe7c3833d645a6fc6188f8fb4f7, type: 2}
     - target: {fileID: 5866666021909216657, guid: 1ef1ff349384ff84e9420843865d5bd9, type: 3}
+      propertyPath: m_Avatar
+      value: 
+      objectReference: {fileID: 9000000, guid: a1f46959c47b10540aa1956e6a12a136, type: 3}
+    - target: {fileID: 5866666021909216657, guid: 1ef1ff349384ff84e9420843865d5bd9, type: 3}
       propertyPath: m_Controller
       value: 
       objectReference: {fileID: 9100000, guid: b8ed617aaded42c4b96ee33c100492e5, type: 2}
@@ -26205,12 +26209,16 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 919132149155446097, guid: 658348f4c6435e04cb3f067012c36b12, type: 3}
       propertyPath: m_IsActive
-      value: 0
+      value: 1
       objectReference: {fileID: 0}
     - target: {fileID: 3851148295848648182, guid: 658348f4c6435e04cb3f067012c36b12, type: 3}
       propertyPath: 'm_Materials.Array.data[0]'
       value: 
       objectReference: {fileID: 6773063177845313604, guid: 0842a324783ca334f92c110573b49a24, type: 3}
+    - target: {fileID: 5866666021909216657, guid: 658348f4c6435e04cb3f067012c36b12, type: 3}
+      propertyPath: m_Avatar
+      value: 
+      objectReference: {fileID: 9000000, guid: b1622bbddbb3f4e43a92888b49ad7c29, type: 3}
     - target: {fileID: 5866666021909216657, guid: 658348f4c6435e04cb3f067012c36b12, type: 3}
       propertyPath: m_Controller
       value: 
@@ -28182,7 +28190,7 @@ Animator:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 1317268448}
   m_Enabled: 1
-  m_Avatar: {fileID: 9000000, guid: 288ec6a2dd1730c47a7a5f26fff99ce4, type: 3}
+  m_Avatar: {fileID: 9000000, guid: 3c9352e3d45060d478f77c108bca671d, type: 3}
   m_Controller: {fileID: 9100000, guid: 9d124f29bef3fd841855a6c35c49a005, type: 2}
   m_CullingMode: 0
   m_UpdateMode: 0
