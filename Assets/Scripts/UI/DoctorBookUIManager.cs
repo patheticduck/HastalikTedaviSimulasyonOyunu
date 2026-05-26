@@ -26,11 +26,20 @@ public class DoctorBookUIManager : MonoBehaviour
     private int currentPageIndex = 0;
     private DialogueManager dialogueManager;
 
+    // =====================================================
+    // BAŞLANGIÇ PANEL AYARLARI
+    // =====================================================
+
     private void Start()
     {
+        // DoctorBook paneli başlangıçta kapalı tutulur.
         if (doctorBookPanel != null)
             doctorBookPanel.SetActive(false);
     }
+
+    // =====================================================
+    // DOCTOR BOOK PANELİNİ AÇMA
+    // =====================================================
 
     public void OpenBook()
     {
@@ -39,7 +48,9 @@ public class DoctorBookUIManager : MonoBehaviour
             doctorBookPanel.SetActive(true);
             doctorBookPanel.transform.SetAsLastSibling();
 
+            // Panelin UI etkileşim ayarları yapılır.
             CanvasGroup canvasGroup = doctorBookPanel.GetComponent<CanvasGroup>();
+
             if (canvasGroup != null)
             {
                 canvasGroup.alpha = 1f;
@@ -48,22 +59,35 @@ public class DoctorBookUIManager : MonoBehaviour
             }
         }
 
+        // Aktif DialogueManager referansı alınır.
         dialogueManager = FindFirstObjectByType<DialogueManager>();
 
         currentPageIndex = 0;
         ShowCurrentPage();
     }
 
+    // =====================================================
+    // PANEL AKTİFLİK KONTROLÜ
+    // =====================================================
+
     public bool IsBookPanelOpen()
     {
         return doctorBookPanel != null && doctorBookPanel.activeInHierarchy;
     }
+
+    // =====================================================
+    // DOCTOR BOOK PANELİNİ KAPATMA
+    // =====================================================
 
     public void CloseBook()
     {
         if (doctorBookPanel != null)
             doctorBookPanel.SetActive(false);
     }
+
+    // =====================================================
+    // SAYFA GEÇİŞ KONTROLLERİ
+    // =====================================================
 
     public void NextPage()
     {
@@ -72,6 +96,7 @@ public class DoctorBookUIManager : MonoBehaviour
 
         currentPageIndex++;
 
+        // Son sayfadan sonra ilk sayfaya döner.
         if (currentPageIndex >= pages.Count)
             currentPageIndex = 0;
 
@@ -85,6 +110,7 @@ public class DoctorBookUIManager : MonoBehaviour
 
         currentPageIndex--;
 
+        // İlk sayfadan geri gidildiğinde son sayfaya geçer.
         if (currentPageIndex < 0)
             currentPageIndex = pages.Count - 1;
 
@@ -96,6 +122,10 @@ public class DoctorBookUIManager : MonoBehaviour
         PrevPage();
     }
 
+    // =====================================================
+    // MEVCUT SAYFAYI UI'A AKTARMA
+    // =====================================================
+
     private void ShowCurrentPage()
     {
         if (pages == null || pages.Count == 0)
@@ -103,9 +133,11 @@ public class DoctorBookUIManager : MonoBehaviour
 
         DiseaseBookPageData page = pages[currentPageIndex];
 
+        // Hastalık başlığı güncellenir.
         if (diseaseTitleText != null)
             diseaseTitleText.text = page.diseaseName;
 
+        // Sol sayfa içeriği oluşturulur.
         if (pageContentText != null)
         {
             string content =
@@ -116,18 +148,25 @@ public class DoctorBookUIManager : MonoBehaviour
             pageContentText.text = ApplyEvidenceHighlights(content, page);
         }
 
+        // Sağ sayfa ek bilgi alanı temizlenir.
         if (extraInfoText != null)
             extraInfoText.text = "";
 
+        // Hastalık görseli güncellenir.
         if (diseaseImage != null)
         {
             diseaseImage.sprite = page.diseaseImage;
             diseaseImage.gameObject.SetActive(page.diseaseImage != null);
         }
 
+        // Sayfa numarası güncellenir.
         if (pageNumberText != null)
             pageNumberText.text = (currentPageIndex + 1) + " / " + pages.Count;
     }
+
+    // =====================================================
+    // NOTEBOOK KANITLARINA GÖRE KELİME HIGHLIGHT
+    // =====================================================
 
     private string ApplyEvidenceHighlights(string text, DiseaseBookPageData page)
     {
@@ -136,6 +175,7 @@ public class DoctorBookUIManager : MonoBehaviour
 
         HashSet<string> evidenceTexts = new HashSet<string>();
 
+        // Notebook ve diyalog verileri toplanır.
         foreach (string item in dialogueManager.GetNotebookSymptoms())
             evidenceTexts.Add(item);
 
@@ -159,6 +199,7 @@ public class DoctorBookUIManager : MonoBehaviour
         if (page.highlightKeywords == null)
             return result;
 
+        // Keşfedilen anahtar kelimeler highlight edilir.
         foreach (string keyword in page.highlightKeywords)
         {
             if (string.IsNullOrWhiteSpace(keyword))
@@ -170,6 +211,10 @@ public class DoctorBookUIManager : MonoBehaviour
 
         return result;
     }
+
+    // =====================================================
+    // ANAHTAR KELİMENİN KEŞFEDİLİP KEŞFEDİLMEDİĞİNİ KONTROL ETME
+    // =====================================================
 
     private bool IsKeywordDiscovered(string keyword, HashSet<string> evidenceTexts)
     {
@@ -189,6 +234,10 @@ public class DoctorBookUIManager : MonoBehaviour
         return false;
     }
 
+    // =====================================================
+    // METİN İÇİNDE KELİMEYİ HIGHLIGHT ETME
+    // =====================================================
+
     private string HighlightWord(string text, string word)
     {
         return text.Replace(
@@ -197,6 +246,10 @@ public class DoctorBookUIManager : MonoBehaviour
             System.StringComparison.OrdinalIgnoreCase
         );
     }
+
+    // =====================================================
+    // TÜRKÇE KARAKTERLERİ NORMALLEŞTİRME
+    // =====================================================
 
     private string NormalizeText(string input)
     {

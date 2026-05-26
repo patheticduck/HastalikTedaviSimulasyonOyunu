@@ -6,6 +6,10 @@ using UnityEngine;
 
 public class RunHistoryManager : MonoBehaviour
 {
+    // =====================================================
+    // RUN GEÇMİŞİ YÖNETİMİ
+    // =====================================================
+
     public static RunHistoryManager Instance;
 
     [Header("History Limit")]
@@ -27,14 +31,17 @@ public class RunHistoryManager : MonoBehaviour
         public List<string> sessionsBase64 = new List<string>();
     }
 
+    // =====================================================
+    // BAŞLANGIÇ VE SINGLETON KONTROLÜ
+    // =====================================================
+
+    // Singleton yapısını kurar ve kayıtlı history verilerini yükler.
     private void Awake()
     {
         if (Instance == null)
         {
             Instance = this;
             DontDestroyOnLoad(gameObject);
-
-            Debug.Log(Application.persistentDataPath);
 
             if (usePersistentSave)
                 LoadFromFile();
@@ -45,6 +52,11 @@ public class RunHistoryManager : MonoBehaviour
         }
     }
 
+    // =====================================================
+    // SESSION HISTORY YÖNETİMİ
+    // =====================================================
+
+    // Yeni bir oyun geçmişini listeye ekler.
     public void AddSession(SessionHistoryData session)
     {
         if (session == null)
@@ -57,10 +69,9 @@ public class RunHistoryManager : MonoBehaviour
 
         TrimHistoryLimit();
         SaveToFile();
-
-        Debug.Log("History kaydı byte[] olarak RAM'e eklendi.");
     }
 
+    // Belirtilen indexteki geçmiş kaydını siler.
     public void RemoveSessionAt(int index)
     {
         if (index < 0 || index >= sessionHistoryBytes.Count)
@@ -72,36 +83,41 @@ public class RunHistoryManager : MonoBehaviour
             cachedSessionHistoryList.RemoveAt(index);
 
         SaveToFile();
-
-        Debug.Log("Seçili history kaydı RAM'den ve dosyadan silindi.");
     }
 
+    // Herhangi bir kayıt olup olmadığını kontrol eder.
     public bool HasHistory()
     {
         return cachedSessionHistoryList.Count > 0;
     }
 
+    // Tüm geçmiş listesini temizler.
     public void ClearHistory()
     {
         sessionHistoryBytes.Clear();
         cachedSessionHistoryList.Clear();
 
         DeleteHistoryFile();
-
-        Debug.Log("Tüm history RAM'den ve dosyadan temizlendi.");
     }
 
+    // Tüm geçmişi tamamen sıfırlar.
     public void ClearAllHistory()
     {
         ClearHistory();
     }
 
+    // =====================================================
+    // SERIALIZE / DESERIALIZE İŞLEMLERİ
+    // =====================================================
+
+    // Session verisini byte dizisine dönüştürür.
     private byte[] SerializeSessionToBytes(SessionHistoryData session)
     {
         string json = JsonUtility.ToJson(session, true);
         return Encoding.UTF8.GetBytes(json);
     }
 
+    // Byte dizisini tekrar Session verisine dönüştürür.
     private SessionHistoryData DeserializeBytesToSession(byte[] bytes)
     {
         if (bytes == null || bytes.Length == 0)
@@ -111,6 +127,7 @@ public class RunHistoryManager : MonoBehaviour
         return JsonUtility.FromJson<SessionHistoryData>(json);
     }
 
+    // History listesini maksimum kayıt sınırında tutar.
     private void TrimHistoryLimit()
     {
         while (sessionHistoryBytes.Count > maxHistoryCount)
@@ -120,6 +137,11 @@ public class RunHistoryManager : MonoBehaviour
             cachedSessionHistoryList.RemoveAt(cachedSessionHistoryList.Count - 1);
     }
 
+    // =====================================================
+    // DOSYA KAYDETME VE YÜKLEME
+    // =====================================================
+
+    // History verilerini persistent dosyaya kaydeder.
     private void SaveToFile()
     {
         if (!usePersistentSave)
@@ -141,8 +163,6 @@ public class RunHistoryManager : MonoBehaviour
             byte[] fileBytes = Encoding.UTF8.GetBytes(wrapperJson);
 
             File.WriteAllBytes(FilePath, fileBytes);
-
-            Debug.Log("History dosyaya kaydedildi: " + FilePath);
         }
         catch (Exception e)
         {
@@ -150,6 +170,7 @@ public class RunHistoryManager : MonoBehaviour
         }
     }
 
+    // Kayıtlı history verilerini dosyadan yükler.
     private void LoadFromFile()
     {
         if (!File.Exists(FilePath))
@@ -185,8 +206,6 @@ public class RunHistoryManager : MonoBehaviour
             }
 
             TrimHistoryLimit();
-
-            Debug.Log("History dosyadan RAM'e yüklendi. Kayıt sayısı: " + cachedSessionHistoryList.Count);
         }
         catch (Exception e)
         {
@@ -196,6 +215,7 @@ public class RunHistoryManager : MonoBehaviour
         }
     }
 
+    // Kayıtlı history dosyasını diskten siler.
     private void DeleteHistoryFile()
     {
         if (!usePersistentSave)

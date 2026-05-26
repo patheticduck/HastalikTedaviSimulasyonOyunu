@@ -3,6 +3,10 @@ using UnityEngine.InputSystem;
 
 public class PlayerInteractionModeManager : MonoBehaviour
 {
+    // =====================================================
+    // OYUNCU ETKİLEŞİM MODU YÖNETİMİ
+    // =====================================================
+
     [Header("References")]
     public MouseLookLimited mouseLook;
     public DialogueManager dialogueManager;
@@ -22,6 +26,11 @@ public class PlayerInteractionModeManager : MonoBehaviour
     private bool dialogueAvailable = false;
     private bool forceUIMode = false;
 
+    // =====================================================
+    // BAŞLANGIÇ AYARLARI
+    // =====================================================
+
+    // Gerekli manager referanslarını sahneden otomatik bulur.
     private void Start()
     {
         if (gameFlowManager == null)
@@ -31,6 +40,11 @@ public class PlayerInteractionModeManager : MonoBehaviour
             energyUIManager = FindFirstObjectByType<EnergyUIManager>();
     }
 
+    // =====================================================
+    // INPUT VE MOD KONTROLLERİ
+    // =====================================================
+
+    // Oyuncunun dialog açma/kapatma inputlarını kontrol eder.
     private void Update()
     {
         if (Keyboard.current == null)
@@ -62,6 +76,7 @@ public class PlayerInteractionModeManager : MonoBehaviour
         }
     }
 
+    // Oyuncuyu zorunlu UI moduna geçirir.
     public void EnterUIMode()
     {
         forceUIMode = true;
@@ -70,6 +85,7 @@ public class PlayerInteractionModeManager : MonoBehaviour
             mouseLook.SetLookEnabled(false);
     }
 
+    // Oyuncuyu normal gameplay moduna geri döndürür.
     public void ExitUIMode()
     {
         forceUIMode = false;
@@ -81,6 +97,7 @@ public class PlayerInteractionModeManager : MonoBehaviour
             gameFlowManager.NotifyFreeLookStateEntered();
     }
 
+    // Dialog sisteminin kullanılabilir olup olmadığını ayarlar.
     public void SetDialogueAvailable(bool available)
     {
         dialogueAvailable = available;
@@ -95,12 +112,17 @@ public class PlayerInteractionModeManager : MonoBehaviour
             if (!forceUIMode && mouseLook != null)
                 mouseLook.SetLookEnabled(true);
 
-            // Dialogue tamamen kapandıysa, güvenli free-look durumunu yeniden değerlendir
+            // Dialogue tamamen kapandıysa güvenli free-look durumunu yeniden değerlendirir.
             if (!forceUIMode && gameFlowManager != null)
                 gameFlowManager.NotifyFreeLookStateEntered();
         }
     }
 
+    // =====================================================
+    // DİYALOG MODU YÖNETİMİ
+    // =====================================================
+
+    // Dialog modunu açar ve oyuncu kontrolünü UI moduna geçirir.
     public void OpenDialogueMode()
     {
         if (!dialogueAvailable)
@@ -114,17 +136,19 @@ public class PlayerInteractionModeManager : MonoBehaviour
         if (mouseLook != null)
             mouseLook.SetLookEnabled(false);
 
+        // İstenirse kamerayı dialog focus noktasına hizalar.
         if (snapToDialogueFocusOnOpen && doctorLookRoot != null && dialogueFocusPoint != null)
         {
             doctorLookRoot.position = dialogueFocusPoint.position;
             doctorLookRoot.rotation = dialogueFocusPoint.rotation;
         }
 
-        // Dialogue açıkken notebook hiçbir şekilde açılmamalı
+        // Dialogue açıkken notebook hiçbir şekilde açılmamalı.
         if (gameFlowManager != null)
             gameFlowManager.SetNotebookBlocked(true);
     }
 
+    // Dialog modunu kapatır ve oyuncu kontrolünü geri verir.
     public void CloseDialogueMode()
     {
         dialogueModeActive = false;
@@ -135,12 +159,12 @@ public class PlayerInteractionModeManager : MonoBehaviour
         if (!forceUIMode && mouseLook != null)
             mouseLook.SetLookEnabled(true);
 
-        // Dialogue kapanınca direkt aç demiyoruz,
-        // GameFlowManager güvenli mi diye kendi karar versin
+        // Dialogue kapanınca GameFlowManager güvenli durumu tekrar değerlendirir.
         if (!forceUIMode && gameFlowManager != null)
             gameFlowManager.NotifyFreeLookStateEntered();
     }
 
+    // Dialog modunu açıp kapatan toggle sistemi.
     public void ToggleDialogueMode()
     {
         if (dialogueModeActive)
@@ -148,6 +172,10 @@ public class PlayerInteractionModeManager : MonoBehaviour
         else
             OpenDialogueMode();
     }
+
+    // =====================================================
+    // DURUM KONTROL METODLARI
+    // =====================================================
 
     public bool IsDialogueModeActive()
     {

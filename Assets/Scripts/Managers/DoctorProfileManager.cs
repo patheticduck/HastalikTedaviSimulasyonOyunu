@@ -22,8 +22,6 @@ public class DoctorProfileManager : MonoBehaviour
     public void SelectSpecialization(DoctorSpecialization specialization)
     {
         selectedSpecialization = specialization;
-
-        Debug.Log("Seçilen doktor uzmanlığı: " + selectedSpecialization);
     }
 
     public DoctorSpecialization GetSelectedSpecialization()

@@ -34,16 +34,26 @@ public class PauseMenuController : MonoBehaviour
     private bool wasDialogueModeActiveBeforePause = false;
     private bool wasForcedUIModeBeforePause = false;
 
+    // =====================================================
+    // SINGLETON REFERANSI
+    // =====================================================
+
     private void Awake()
     {
         Instance = this;
     }
 
+    // =====================================================
+    // BAŞLANGIÇ REFERANS VE UI AYARLARI
+    // =====================================================
+
     private void Start()
     {
+        // Pause paneli başlangıçta kapatılır.
         if (pauseMenuPanel != null)
             pauseMenuPanel.SetActive(false);
 
+        // Crosshair başlangıçta görünür yapılır.
         if (crosshair != null)
             crosshair.SetActive(true);
 
@@ -53,15 +63,26 @@ public class PauseMenuController : MonoBehaviour
         Time.timeScale = 1f;
         isPaused = false;
 
+        // Gerekli referanslar otomatik alınır.
         if (gameFlowManager == null)
             gameFlowManager = FindFirstObjectByType<GameFlowManager>();
 
         if (interactionModeManager == null)
-            interactionModeManager = FindFirstObjectByType<PlayerInteractionModeManager>();
+        {
+            interactionModeManager =
+                FindFirstObjectByType<PlayerInteractionModeManager>();
+        }
 
         if (aiComputerCameraController == null)
-            aiComputerCameraController = FindFirstObjectByType<AIComputerCameraController>();
+        {
+            aiComputerCameraController =
+                FindFirstObjectByType<AIComputerCameraController>();
+        }
     }
+
+    // =====================================================
+    // PAUSE INPUT KONTROLLERİ
+    // =====================================================
 
     private void Update()
     {
@@ -79,6 +100,7 @@ public class PauseMenuController : MonoBehaviour
         if (!pausePressed)
             return;
 
+        // Belirli paneller açıkken pause engellenir.
         if (doctorSelectionPanel != null && doctorSelectionPanel.activeSelf)
             return;
 
@@ -88,9 +110,13 @@ public class PauseMenuController : MonoBehaviour
         if (continueSavePanel != null && continueSavePanel.activeSelf)
             return;
 
-        if (confirmClearAllContinuePanel != null && confirmClearAllContinuePanel.activeSelf)
+        if (confirmClearAllContinuePanel != null &&
+            confirmClearAllContinuePanel.activeSelf)
+        {
             return;
+        }
 
+        // Pause açma / kapama işlemleri.
         if (isPaused)
         {
             ResumeGame();
@@ -101,6 +127,10 @@ public class PauseMenuController : MonoBehaviour
                 PauseGame();
         }
     }
+
+    // =====================================================
+    // PAUSE MENÜSÜNÜN AÇILABİLİRLİK KONTROLÜ
+    // =====================================================
 
     private bool CanOpenPause()
     {
@@ -119,68 +149,102 @@ public class PauseMenuController : MonoBehaviour
         if (continueSavePanel != null && continueSavePanel.activeSelf)
             return false;
 
-        if (confirmClearAllContinuePanel != null && confirmClearAllContinuePanel.activeSelf)
+        if (confirmClearAllContinuePanel != null &&
+            confirmClearAllContinuePanel.activeSelf)
+        {
             return false;
+        }
 
+        // Gameplay geçiş panelleri açıkken pause engellenir.
         if (gameFlowManager != null)
         {
-            if (gameFlowManager.patientResultPanel != null && gameFlowManager.patientResultPanel.activeSelf)
+            if (gameFlowManager.patientResultPanel != null &&
+                gameFlowManager.patientResultPanel.activeSelf)
+            {
                 return false;
+            }
 
-            if (gameFlowManager.endDayPanel != null && gameFlowManager.endDayPanel.activeSelf)
+            if (gameFlowManager.endDayPanel != null &&
+                gameFlowManager.endDayPanel.activeSelf)
+            {
                 return false;
+            }
 
-            if (gameFlowManager.gameOverPanel != null && gameFlowManager.gameOverPanel.activeSelf)
+            if (gameFlowManager.gameOverPanel != null &&
+                gameFlowManager.gameOverPanel.activeSelf)
+            {
                 return false;
+            }
 
-            if (gameFlowManager.dayTransitionPanel != null && gameFlowManager.dayTransitionPanel.activeSelf)
+            if (gameFlowManager.dayTransitionPanel != null &&
+                gameFlowManager.dayTransitionPanel.activeSelf)
+            {
                 return false;
+            }
         }
 
         return true;
     }
 
+    // =====================================================
+    // OYUNU DURAKLATMA
+    // =====================================================
+
     public void PauseGame()
     {
         isPaused = true;
+
         Time.timeScale = 0f;
 
         RefreshPauseInfo();
 
+        // Kamera geçişleri devam ediyorsa tamamlanır.
         if (aiComputerCameraController == null)
-            aiComputerCameraController = FindFirstObjectByType<AIComputerCameraController>();
+        {
+            aiComputerCameraController =
+                FindFirstObjectByType<AIComputerCameraController>();
+        }
 
         if (aiComputerCameraController != null)
         {
             if (aiComputerCameraController.IsMovingToComputer())
             {
-                aiComputerCameraController.ForceCompleteComputerMoveForPause();
+                aiComputerCameraController
+                    .ForceCompleteComputerMoveForPause();
             }
             else if (aiComputerCameraController.IsMovingToGameplay())
             {
-                aiComputerCameraController.ForceCompleteGameplayMoveForPause();
+                aiComputerCameraController
+                    .ForceCompleteGameplayMoveForPause();
             }
         }
 
         bool interruptedBookAnimation = false;
 
-        if (notebookInteractable != null && notebookInteractable.IsNotebookAnimating())
+        // Notebook animasyonu çalışıyorsa zorla kapatılır.
+        if (notebookInteractable != null &&
+            notebookInteractable.IsNotebookAnimating())
         {
             notebookInteractable.ForceCloseNotebookImmediate();
             interruptedBookAnimation = true;
         }
 
-        if (doctorBookInteractable != null && doctorBookInteractable.IsBookAnimating())
+        // DoctorBook animasyonu çalışıyorsa zorla kapatılır.
+        if (doctorBookInteractable != null &&
+            doctorBookInteractable.IsBookAnimating())
         {
             doctorBookInteractable.ForceCloseBookImmediate();
             interruptedBookAnimation = true;
         }
 
-        if (interruptedBookAnimation && interactionModeManager != null)
+        // UI modu gerekiyorsa sıfırlanır.
+        if (interruptedBookAnimation &&
+            interactionModeManager != null)
         {
             interactionModeManager.ExitUIMode();
         }
 
+        // Pause öncesi UI durumları kaydedilir.
         wasDialogueModeActiveBeforePause =
             interactionModeManager != null &&
             interactionModeManager.IsDialogueModeActive();
@@ -189,12 +253,14 @@ public class PauseMenuController : MonoBehaviour
             interactionModeManager != null &&
             interactionModeManager.IsInForcedUIMode();
 
+        // Pause paneli açılır.
         if (pauseMenuPanel != null)
         {
             pauseMenuPanel.SetActive(true);
             pauseMenuPanel.transform.SetAsLastSibling();
         }
 
+        // Kamera ve cursor ayarları yapılır.
         if (mouseLook != null)
             mouseLook.SetLookEnabled(false);
 
@@ -208,6 +274,10 @@ public class PauseMenuController : MonoBehaviour
             gameFlowManager.SetNotebookBlocked(true);
     }
 
+    // =====================================================
+    // OYUNU DEVAM ETTİRME
+    // =====================================================
+
     public void ResumeGame()
     {
         if (pauseMenuPanel != null)
@@ -216,7 +286,9 @@ public class PauseMenuController : MonoBehaviour
         Time.timeScale = 1f;
         isPaused = false;
 
-        if (wasDialogueModeActiveBeforePause || wasForcedUIModeBeforePause)
+        // Pause öncesinde UI modunda olunuyorsa aynı durum korunur.
+        if (wasDialogueModeActiveBeforePause ||
+            wasForcedUIModeBeforePause)
         {
             if (mouseLook != null)
                 mouseLook.SetLookEnabled(false);
@@ -230,6 +302,8 @@ public class PauseMenuController : MonoBehaviour
             if (gameFlowManager != null)
                 gameFlowManager.SetNotebookBlocked(true);
         }
+
+        // Normal gameplay moduna dönüş yapılır.
         else
         {
             if (mouseLook != null)
@@ -246,36 +320,54 @@ public class PauseMenuController : MonoBehaviour
         }
     }
 
+    // =====================================================
+    // SAVE GAME İŞLEMİ
+    // =====================================================
+
     public void SaveGame()
     {
         if (gameFlowManager == null)
         {
-            Debug.LogWarning("PauseMenuController -> GameFlowManager bağlı değil, kayıt alınamadı.");
+            Debug.LogWarning(
+                "PauseMenuController -> GameFlowManager bağlı değil, kayıt alınamadı."
+            );
+
             return;
         }
 
         if (RuntimeSaveManager.Instance == null)
         {
-            Debug.LogWarning("PauseMenuController -> RuntimeSaveManager bulunamadı, kayıt alınamadı.");
+            Debug.LogWarning(
+                "PauseMenuController -> RuntimeSaveManager bulunamadı, kayıt alınamadı."
+            );
+
             return;
         }
 
         RuntimeSaveManager.Instance.SaveGame(gameFlowManager);
-
-        Debug.Log("Pause panelinden oyun kaydedildi.");
     }
+
+    // =====================================================
+    // ANA MENÜYE DÖNÜŞ İŞLEMLERİ
+    // =====================================================
 
     public void ReturnToMainMenu()
     {
+        // Gameplay sistemleri durdurulur.
         if (gameFlowManager != null)
             gameFlowManager.ForceStopAllGameplay();
 
+        // Kamera gameplay moduna zorla döndürülür.
         if (aiComputerCameraController == null)
-            aiComputerCameraController = FindFirstObjectByType<AIComputerCameraController>();
+        {
+            aiComputerCameraController =
+                FindFirstObjectByType<AIComputerCameraController>();
+        }
 
         if (aiComputerCameraController != null)
             aiComputerCameraController.ForceResetToGameplayCamera();
 
+        // Açık UI sistemleri kapatılır.
         if (notebookInteractable != null)
             notebookInteractable.ForceCloseNotebookImmediate();
 
@@ -309,15 +401,23 @@ public class PauseMenuController : MonoBehaviour
         if (interactionModeManager != null)
             interactionModeManager.ExitUIMode();
 
-        if (gameFlowManager != null && gameFlowManager.mainMenuManager != null)
+        // Main menu ekranı açılır.
+        if (gameFlowManager != null &&
+            gameFlowManager.mainMenuManager != null)
         {
             gameFlowManager.mainMenuManager.ShowMainMenu();
         }
         else
         {
-            Debug.LogWarning("PauseMenuController -> MainMenuManager bulunamadı, menüye dönülemedi.");
+            Debug.LogWarning(
+                "PauseMenuController -> MainMenuManager bulunamadı, menüye dönülemedi."
+            );
         }
     }
+
+    // =====================================================
+    // PAUSE PANEL BİLGİLERİNİ GÜNCELLEME
+    // =====================================================
 
     private void RefreshPauseInfo()
     {
@@ -336,6 +436,7 @@ public class PauseMenuController : MonoBehaviour
                 DoctorProfileManager.Instance.GetSelectedDoctorDisplayName();
         }
 
+        // Pause ekranındaki oyun bilgileri güncellenir.
         resultText.text =
             "Doktor: " + selectedDoctorText + "\n" +
             "Gün: " + gameFlowManager.currentDay + "\n" +
@@ -346,6 +447,10 @@ public class PauseMenuController : MonoBehaviour
             "Yanlış: " + gameFlowManager.totalWrong + "\n" +
             "Kalan Hak: " + gameFlowManager.remainingHearts;
     }
+
+    // =====================================================
+    // PAUSE DURUM KONTROLÜ
+    // =====================================================
 
     public bool IsPaused()
     {

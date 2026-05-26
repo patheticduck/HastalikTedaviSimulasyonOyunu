@@ -52,11 +52,16 @@ public class HistoryItemUI : MonoBehaviour,
     private const float ClosedExtraPadding = 4f;
     private const float OpenExtraPadding = 8f;
 
+    // =====================================================
+    // REFERANS VE COMPONENT AYARLARI
+    // =====================================================
+
     private void Awake()
     {
         rootRect = GetComponent<RectTransform>();
 
         rootLayoutElement = GetComponent<LayoutElement>();
+
         if (rootLayoutElement == null)
             rootLayoutElement = gameObject.AddComponent<LayoutElement>();
 
@@ -66,11 +71,16 @@ public class HistoryItemUI : MonoBehaviour,
         AutoAssignReferences();
     }
 
+    // =====================================================
+    // UI REFERANSLARINI OTOMATİK BULMA
+    // =====================================================
+
     private void AutoAssignReferences()
     {
         if (headerButton == null)
         {
             Transform t = transform.Find("HeaderButton");
+
             if (t != null)
                 headerButton = t.GetComponent<Button>();
         }
@@ -78,6 +88,7 @@ public class HistoryItemUI : MonoBehaviour,
         if (headerText == null)
         {
             Transform t = transform.Find("HeaderButton/Text (TMP)");
+
             if (t != null)
                 headerText = t.GetComponent<TextMeshProUGUI>();
         }
@@ -85,6 +96,7 @@ public class HistoryItemUI : MonoBehaviour,
         if (detailPanel == null)
         {
             Transform t = transform.Find("DetailPanel");
+
             if (t != null)
                 detailPanel = t.gameObject;
         }
@@ -92,10 +104,12 @@ public class HistoryItemUI : MonoBehaviour,
         if (detailText == null)
         {
             Transform t = transform.Find("DetailPanel/DetailText");
+
             if (t != null)
                 detailText = t.GetComponent<TextMeshProUGUI>();
         }
 
+        // Detail panel layout bileşenleri hazırlanır.
         if (detailPanel != null)
         {
             detailPanelRect = detailPanel.GetComponent<RectTransform>();
@@ -108,10 +122,18 @@ public class HistoryItemUI : MonoBehaviour,
         }
     }
 
+    // =====================================================
+    // HISTORY CONTENT REFERANSI AYARLAMA
+    // =====================================================
+
     public void SetHistoryContentRect(RectTransform contentRect)
     {
         historyContentRect = contentRect;
     }
+
+    // =====================================================
+    // HISTORY ITEM VERİLERİNİ UI'A AKTARMA
+    // =====================================================
 
     public void Setup(SessionHistoryData sessionData, int index, Action<int> deleteCallback)
     {
@@ -123,14 +145,17 @@ public class HistoryItemUI : MonoBehaviour,
 
         AutoAssignReferences();
 
+        // Header button ayarları yapılır.
         if (headerButton != null)
         {
             headerButton.gameObject.SetActive(true);
             headerButton.interactable = true;
+
             headerButton.onClick.RemoveAllListeners();
             headerButton.onClick.AddListener(ToggleDetail);
 
             LayoutElement headerLayout = headerButton.GetComponent<LayoutElement>();
+
             if (headerLayout == null)
                 headerLayout = headerButton.gameObject.AddComponent<LayoutElement>();
 
@@ -139,12 +164,18 @@ public class HistoryItemUI : MonoBehaviour,
             headerLayout.flexibleHeight = 0f;
         }
 
+        // Header yazısı güncellenir.
         if (headerText != null)
         {
             headerText.gameObject.SetActive(true);
-            headerText.text = sessionData.completedDateText + " • " + BuildRelativeTimeText(sessionData);
+
+            headerText.text =
+                sessionData.completedDateText +
+                " • " +
+                BuildRelativeTimeText(sessionData);
         }
 
+        // Detail metni oluşturulur.
         if (detailText != null)
         {
             detailText.gameObject.SetActive(true);
@@ -161,6 +192,10 @@ public class HistoryItemUI : MonoBehaviour,
         RefreshLayout();
     }
 
+    // =====================================================
+    // DETAIL PANELİNİ AÇMA / KAPATMA
+    // =====================================================
+
     public void ToggleDetail()
     {
         if (AudioManager.Instance != null)
@@ -174,11 +209,16 @@ public class HistoryItemUI : MonoBehaviour,
         RefreshLayout();
     }
 
+    // =====================================================
+    // DELETE BUTONU OLUŞTURMA
+    // =====================================================
+
     private void CreateDeleteButtonIfNeeded()
     {
         if (headerButton == null)
             return;
 
+        // Delete butonu zaten oluşturulduysa tekrar oluşturulmaz.
         if (deleteButton != null)
             return;
 
@@ -196,7 +236,9 @@ public class HistoryItemUI : MonoBehaviour,
         image.color = new Color32(180, 45, 45, 255);
 
         deleteButton = deleteObj.AddComponent<Button>();
+
         deleteButton.onClick.RemoveAllListeners();
+
         deleteButton.onClick.AddListener(() =>
         {
             if (AudioManager.Instance != null)
@@ -205,6 +247,7 @@ public class HistoryItemUI : MonoBehaviour,
             onDeleteClicked?.Invoke(historyIndex);
         });
 
+        // Delete butonu yazısı oluşturulur.
         GameObject textObj = new GameObject("Text");
         textObj.transform.SetParent(deleteObj.transform, false);
 
@@ -225,16 +268,25 @@ public class HistoryItemUI : MonoBehaviour,
         deleteObj.SetActive(false);
     }
 
+    // =====================================================
+    // DELETE MODU GÖRÜNÜRLÜĞÜ
+    // =====================================================
+
     public void SetDeleteMode(bool active)
     {
         if (deleteButton != null)
             deleteButton.gameObject.SetActive(active);
     }
 
+    // =====================================================
+    // LAYOUT YÜKSEKLİĞİNİ GÜNCELLEME
+    // =====================================================
+
     private void RefreshLayout()
     {
         float detailHeight = 0f;
 
+        // Detail panel açıkken yükseklik hesaplanır.
         if (isOpen && detailPanel != null && detailText != null && detailLayoutElement != null)
         {
             if (useDynamicHeight)
@@ -247,8 +299,15 @@ public class HistoryItemUI : MonoBehaviour,
             detailLayoutElement.flexibleHeight = 0f;
 
             if (detailPanelRect != null)
-                detailPanelRect.SetSizeWithCurrentAnchors(RectTransform.Axis.Vertical, detailHeight);
+            {
+                detailPanelRect.SetSizeWithCurrentAnchors(
+                    RectTransform.Axis.Vertical,
+                    detailHeight
+                );
+            }
         }
+
+        // Detail panel kapalıysa yükseklik sıfırlanır.
         else if (detailLayoutElement != null)
         {
             detailLayoutElement.minHeight = 0f;
@@ -256,20 +315,33 @@ public class HistoryItemUI : MonoBehaviour,
             detailLayoutElement.flexibleHeight = 0f;
 
             if (detailPanelRect != null)
-                detailPanelRect.SetSizeWithCurrentAnchors(RectTransform.Axis.Vertical, 0f);
+            {
+                detailPanelRect.SetSizeWithCurrentAnchors(
+                    RectTransform.Axis.Vertical,
+                    0f
+                );
+            }
         }
 
+        // Root layout yüksekliği güncellenir.
         if (rootLayoutElement != null)
         {
             if (isOpen)
             {
-                float totalHeight = HeaderHeight + detailHeight + OpenExtraPadding;
+                float totalHeight =
+                    HeaderHeight +
+                    detailHeight +
+                    OpenExtraPadding;
+
                 rootLayoutElement.minHeight = totalHeight;
                 rootLayoutElement.preferredHeight = totalHeight;
             }
             else
             {
-                float closedHeight = HeaderHeight + ClosedExtraPadding;
+                float closedHeight =
+                    HeaderHeight +
+                    ClosedExtraPadding;
+
                 rootLayoutElement.minHeight = closedHeight;
                 rootLayoutElement.preferredHeight = closedHeight;
             }
@@ -277,6 +349,7 @@ public class HistoryItemUI : MonoBehaviour,
             rootLayoutElement.flexibleHeight = 0f;
         }
 
+        // Layout yeniden oluşturulur.
         Canvas.ForceUpdateCanvases();
 
         if (detailPanelRect != null)
@@ -286,6 +359,7 @@ public class HistoryItemUI : MonoBehaviour,
             LayoutRebuilder.ForceRebuildLayoutImmediate(rootRect);
 
         RectTransform parentRect = transform.parent as RectTransform;
+
         if (parentRect != null)
             LayoutRebuilder.ForceRebuildLayoutImmediate(parentRect);
 
@@ -295,14 +369,20 @@ public class HistoryItemUI : MonoBehaviour,
         Canvas.ForceUpdateCanvases();
     }
 
+    // =====================================================
+    // DETAIL PANEL GERÇEK YÜKSEKLİĞİNİ HESAPLAMA
+    // =====================================================
+
     private float CalculateRealDetailHeight()
     {
         if (detailPanel == null || detailText == null)
             return fixedDetailHeight;
 
-        RectTransform detailTextRect = detailText.GetComponent<RectTransform>();
+        RectTransform detailTextRect =
+            detailText.GetComponent<RectTransform>();
 
         bool oldActive = detailPanel.activeSelf;
+
         detailPanel.SetActive(true);
 
         Canvas.ForceUpdateCanvases();
@@ -314,6 +394,7 @@ public class HistoryItemUI : MonoBehaviour,
             LayoutRebuilder.ForceRebuildLayoutImmediate(detailTextRect);
 
         Canvas.ForceUpdateCanvases();
+
         detailText.ForceMeshUpdate();
 
         float availableWidth = 600f;
@@ -323,16 +404,26 @@ public class HistoryItemUI : MonoBehaviour,
         else if (detailPanelRect != null && detailPanelRect.rect.width > 0f)
             availableWidth = detailPanelRect.rect.width - 30f;
 
-        Vector2 preferred = detailText.GetPreferredValues(detailText.text, availableWidth, 0f);
-        float textHeight = Mathf.Max(detailText.preferredHeight, preferred.y);
+        Vector2 preferred =
+            detailText.GetPreferredValues(detailText.text, availableWidth, 0f);
 
-        float finalHeight = textHeight + topBottomPadding + 12f;
+        float textHeight =
+            Mathf.Max(detailText.preferredHeight, preferred.y);
+
+        float finalHeight =
+            textHeight +
+            topBottomPadding +
+            12f;
 
         if (!oldActive && !isOpen)
             detailPanel.SetActive(false);
 
         return Mathf.Clamp(finalHeight, minDetailHeight, maxDetailHeight);
     }
+
+    // =====================================================
+    // GÖRECELİ ZAMAN METNİ OLUŞTURMA
+    // =====================================================
 
     private string BuildRelativeTimeText(SessionHistoryData sessionData)
     {
@@ -344,20 +435,34 @@ public class HistoryItemUI : MonoBehaviour,
             return "az önce tamamlandı";
         }
 
-        System.DateTime completedAt = new System.DateTime(sessionData.completedAtTicks);
-        System.TimeSpan diff = System.DateTime.Now - completedAt;
+        System.DateTime completedAt =
+            new System.DateTime(sessionData.completedAtTicks);
+
+        System.TimeSpan diff =
+            System.DateTime.Now - completedAt;
 
         if (diff.TotalSeconds < 60)
             return "az önce tamamlandı";
 
         if (diff.TotalMinutes < 60)
-            return Mathf.FloorToInt((float)diff.TotalMinutes) + " dakika önce tamamlandı";
+        {
+            return Mathf.FloorToInt((float)diff.TotalMinutes) +
+                   " dakika önce tamamlandı";
+        }
 
         if (diff.TotalHours < 24)
-            return Mathf.FloorToInt((float)diff.TotalHours) + " saat önce tamamlandı";
+        {
+            return Mathf.FloorToInt((float)diff.TotalHours) +
+                   " saat önce tamamlandı";
+        }
 
-        return Mathf.FloorToInt((float)diff.TotalDays) + " gün önce tamamlandı";
+        return Mathf.FloorToInt((float)diff.TotalDays) +
+               " gün önce tamamlandı";
     }
+
+    // =====================================================
+    // HISTORY DETAIL METNİ OLUŞTURMA
+    // =====================================================
 
     private string BuildDetailText(SessionHistoryData sessionData)
     {
@@ -385,6 +490,7 @@ public class HistoryItemUI : MonoBehaviour,
                 {
                     sb.Append(" | Yanlış");
                     sb.AppendLine();
+
                     sb.Append("Doğru cevap: ");
                     sb.Append(patient.correctAnswer);
                     sb.AppendLine();
@@ -397,6 +503,7 @@ public class HistoryItemUI : MonoBehaviour,
         sb.AppendLine("Toplam Doğru: " + sessionData.TotalCorrect());
         sb.AppendLine("Toplam Yanlış: " + sessionData.TotalWrong());
 
+        // Seçilen doktor bilgisi eklenir.
         if (!string.IsNullOrEmpty(sessionData.selectedDoctorName))
         {
             sb.AppendLine();
@@ -405,6 +512,10 @@ public class HistoryItemUI : MonoBehaviour,
 
         return sb.ToString();
     }
+
+    // =====================================================
+    // SCROLL EVENTLERİNİ PARENT SCROLLRECT'E AKTARMA
+    // =====================================================
 
     public void OnScroll(PointerEventData eventData)
     {

@@ -9,16 +9,26 @@ public class DoorAutoController : MonoBehaviour
 
     private Quaternion targetRotation;
 
+    // =====================================================
+    // BAŞLANGIÇ KAPI DURUMU
+    // =====================================================
+
     void Start()
     {
+        // Oyun başlangıcında kapı kapalı hale getirilir.
         CloseDoorInstant();
     }
+
+    // =====================================================
+    // KAPI ROTASYON ANİMASYONU
+    // =====================================================
 
     void Update()
     {
         if (doorObject == null)
             return;
 
+        // Kapı hedef rotasyona yumuşak şekilde döndürülür.
         doorObject.localRotation = Quaternion.Lerp(
             doorObject.localRotation,
             targetRotation,
@@ -26,15 +36,27 @@ public class DoorAutoController : MonoBehaviour
         );
     }
 
+    // =====================================================
+    // KAPI AÇMA İŞLEMİ
+    // =====================================================
+
     public void OpenDoor()
     {
         targetRotation = Quaternion.Euler(openRotation);
     }
 
+    // =====================================================
+    // KAPI KAPATMA İŞLEMİ
+    // =====================================================
+
     public void CloseDoor()
     {
         targetRotation = Quaternion.Euler(closedRotation);
     }
+
+    // =====================================================
+    // KAPIYI ANINDA KAPATMA
+    // =====================================================
 
     public void CloseDoorInstant()
     {

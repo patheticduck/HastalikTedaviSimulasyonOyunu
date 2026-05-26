@@ -16,6 +16,10 @@ public class ContinueSaveItemUI : MonoBehaviour
 
     private GameObject runtimeDeleteButtonObject;
 
+    // =====================================================
+    // REFERANSLARI OTOMATİK OLARAK ALMA
+    // =====================================================
+
     private void Awake()
     {
         AutoAssignReferences();
@@ -23,20 +27,28 @@ public class ContinueSaveItemUI : MonoBehaviour
 
     private void AutoAssignReferences()
     {
+        // Header butonunu otomatik bulur.
         if (headerButton == null)
         {
             Transform t = transform.Find("HeaderButton");
+
             if (t != null)
                 headerButton = t.GetComponent<Button>();
         }
 
+        // Header yazısını otomatik bulur.
         if (headerText == null)
         {
             Transform t = transform.Find("HeaderButton/Text (TMP)");
+
             if (t != null)
                 headerText = t.GetComponent<TextMeshProUGUI>();
         }
     }
+
+    // =====================================================
+    // SAVE ITEM VERİLERİNİ UI'A AKTARMA
+    // =====================================================
 
     public void Setup(
         RuntimeSaveData data,
@@ -51,9 +63,11 @@ public class ContinueSaveItemUI : MonoBehaviour
         onClicked = clickCallback;
         onDeleteClicked = deleteCallback;
 
+        // Save bilgilerini başlık yazısına aktarır.
         if (headerText != null)
             headerText.text = BuildHeaderText(saveData);
 
+        // Header butonuna tıklama eventi eklenir.
         if (headerButton != null)
         {
             headerButton.onClick.RemoveAllListeners();
@@ -64,6 +78,10 @@ public class ContinueSaveItemUI : MonoBehaviour
         SetDeleteMode(false);
     }
 
+    // =====================================================
+    // SAVE ITEM TIKLAMA İŞLEMLERİ
+    // =====================================================
+
     private void OnHeaderClicked()
     {
         if (AudioManager.Instance != null)
@@ -72,11 +90,16 @@ public class ContinueSaveItemUI : MonoBehaviour
         onClicked?.Invoke(saveIndex, saveData);
     }
 
+    // =====================================================
+    // DELETE BUTONU OLUŞTURMA
+    // =====================================================
+
     private void CreateDeleteButtonIfNeeded()
     {
         if (headerButton == null)
             return;
 
+        // Delete butonu daha önce oluşturulduysa tekrar oluşturulmaz.
         if (runtimeDeleteButtonObject != null)
             return;
 
@@ -85,6 +108,7 @@ public class ContinueSaveItemUI : MonoBehaviour
 
         deleteObj.transform.SetParent(headerButton.transform, false);
 
+        // Delete butonunun RectTransform ayarları.
         RectTransform rect = deleteObj.AddComponent<RectTransform>();
         rect.anchorMin = new Vector2(1f, 0.5f);
         rect.anchorMax = new Vector2(1f, 0.5f);
@@ -92,11 +116,15 @@ public class ContinueSaveItemUI : MonoBehaviour
         rect.anchoredPosition = new Vector2(-28f, 0f);
         rect.sizeDelta = new Vector2(32f, 32f);
 
+        // Delete butonu görsel ayarları.
         Image image = deleteObj.AddComponent<Image>();
         image.color = new Color32(180, 45, 45, 255);
 
+        // Delete butonu tıklama işlemleri.
         Button deleteButton = deleteObj.AddComponent<Button>();
+
         deleteButton.onClick.RemoveAllListeners();
+
         deleteButton.onClick.AddListener(() =>
         {
             if (AudioManager.Instance != null)
@@ -104,6 +132,10 @@ public class ContinueSaveItemUI : MonoBehaviour
 
             onDeleteClicked?.Invoke(saveIndex);
         });
+
+        // =====================================================
+        // DELETE BUTONU YAZI OLUŞTURMA
+        // =====================================================
 
         GameObject textObj = new GameObject("Text");
         textObj.transform.SetParent(deleteObj.transform, false);
@@ -125,11 +157,19 @@ public class ContinueSaveItemUI : MonoBehaviour
         deleteObj.SetActive(false);
     }
 
+    // =====================================================
+    // DELETE MODU GÖRÜNÜRLÜK KONTROLÜ
+    // =====================================================
+
     public void SetDeleteMode(bool active)
     {
         if (runtimeDeleteButtonObject != null)
             runtimeDeleteButtonObject.SetActive(active);
     }
+
+    // =====================================================
+    // SAVE BAŞLIK METNİ OLUŞTURMA
+    // =====================================================
 
     private string BuildHeaderText(RuntimeSaveData data)
     {

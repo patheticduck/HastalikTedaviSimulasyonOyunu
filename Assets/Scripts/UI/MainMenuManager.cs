@@ -6,13 +6,25 @@ using TMPro;
 
 public class MainMenuManager : MonoBehaviour
 {
+    // =====================================================
+    // ANA MENÜ UI REFERANSLARI
+    // =====================================================
+
     [Header("Main Menu")]
     public GameObject mainMenuPanel;
     public GameObject historySection;
 
+    // =====================================================
+    // ANA MENÜ BUTONLARI
+    // =====================================================
+
     [Header("Menu Buttons")]
     public Button newGameButton;
     public Button continueButton;
+
+    // =====================================================
+    // DOKTOR SEÇİM PANELİ
+    // =====================================================
 
     [Header("Doctor Selection")]
     public GameObject doctorSelectionPanel;
@@ -20,6 +32,10 @@ public class MainMenuManager : MonoBehaviour
     public Button gastroDoctorButton;
     public Button generalistDoctorButton;
     public Button doctorSelectionBackButton;
+
+    // =====================================================
+    // CONTINUE SAVE PANELİ
+    // =====================================================
 
     [Header("Continue Save Panel")]
     public GameObject continueSavePanel;
@@ -29,6 +45,10 @@ public class MainMenuManager : MonoBehaviour
     public Button continueSelectedSaveButton;
     public Button continueSaveBackButton;
 
+    // =====================================================
+    // CONTINUE SAVE SİLME SİSTEMİ
+    // =====================================================
+
     [Header("Continue Save Delete")]
     public Button continueSaveDeleteModeButton;
     public TextMeshProUGUI continueSaveDeleteModeButtonText;
@@ -37,19 +57,35 @@ public class MainMenuManager : MonoBehaviour
     public Button confirmClearAllContinueYesButton;
     public Button confirmClearAllContinueNoButton;
 
+    // =====================================================
+    // GEÇMİŞ OYUN OTURUMLARI UI
+    // =====================================================
+
     [Header("History UI")]
     public Transform historyContent;
     public HistoryItemUI historyItemPrefab;
 
+    // =====================================================
+    // HISTORY DELETE MODE
+    // =====================================================
+
     [Header("History Delete Mode")]
     public Button deleteModeButton;
     public TextMeshProUGUI deleteModeButtonText;
+
+    // =====================================================
+    // TÜM HISTORY VERİLERİNİ SİLME
+    // =====================================================
 
     [Header("Clear All History")]
     public Button clearAllButton;
     public GameObject confirmDeleteAllPanel;
     public Button confirmDeleteYesButton;
     public Button confirmDeleteNoButton;
+
+    // =====================================================
+    // OYUN PANEL REFERANSLARI
+    // =====================================================
 
     [Header("Game Panels")]
     public GameObject dialoguePanel;
@@ -60,9 +96,17 @@ public class MainMenuManager : MonoBehaviour
     public GameObject doctorBookPanel;
     public GameObject energyConfirmPanel;
 
+    // =====================================================
+    // MANAGER REFERANSLARI
+    // =====================================================
+
     [Header("Manager")]
     public GameFlowManager gameFlowManager;
     public RunHistoryManager runHistoryManager;
+
+    // =====================================================
+    // KAMERA VE PLAYER LOOK AYARLARI
+    // =====================================================
 
     [Header("Player Look")]
     public MouseLookLimited mouseLook;
@@ -81,6 +125,10 @@ public class MainMenuManager : MonoBehaviour
 
     private string activeContinueSaveRunId = "";
 
+    // =====================================================
+    // BAŞLANGIÇ REFERANS BAĞLANTILARI
+    // =====================================================
+
     private void Awake()
     {
         if (historyContent != null)
@@ -89,6 +137,10 @@ public class MainMenuManager : MonoBehaviour
         if (continueSaveContent != null)
             continueSaveScrollRect = continueSaveContent.GetComponentInParent<ScrollRect>();
     }
+
+    // =====================================================
+    // MENÜ BAŞLANGIÇ AYARLARI VE BUTTON EVENTLERİ
+    // =====================================================
 
     private void Start()
     {
@@ -209,6 +261,10 @@ public class MainMenuManager : MonoBehaviour
         ShowMainMenu();
     }
 
+    // =====================================================
+    // ANA MENÜYE DÖNÜŞ VE MENÜ RESETLEME
+    // =====================================================
+
     public void ShowMainMenu()
     {
         Time.timeScale = 0f;
@@ -267,6 +323,10 @@ public class MainMenuManager : MonoBehaviour
         StartCoroutine(ForceHistoryLayoutRefreshNextFrame());
     }
 
+    // =====================================================
+    // DOKTOR SEÇİM PANELİ İŞLEMLERİ
+    // =====================================================
+
     public void OpenDoctorSelectionPanel()
     {
         if (AudioManager.Instance != null)
@@ -294,6 +354,10 @@ public class MainMenuManager : MonoBehaviour
             mainMenuPanel.SetActive(true);
     }
 
+    // =====================================================
+    // DOKTOR SEÇİM BUTONLARI
+    // =====================================================
+
     public void SelectRespiratoryDoctor()
     {
         SelectDoctorAndStartGame(DoctorSpecialization.Respiratory);
@@ -308,6 +372,10 @@ public class MainMenuManager : MonoBehaviour
     {
         SelectDoctorAndStartGame(DoctorSpecialization.Generalist);
     }
+
+    // =====================================================
+    // DOKTOR SEÇİMİ VE OYUN BAŞLATMA
+    // =====================================================
 
     private void SelectDoctorAndStartGame(DoctorSpecialization specialization)
     {
@@ -324,6 +392,10 @@ public class MainMenuManager : MonoBehaviour
 
         StartGameFromMenu();
     }
+
+    // =====================================================
+    // YENİ OYUN BAŞLATMA
+    // =====================================================
 
     public void StartGameFromMenu()
     {
@@ -373,12 +445,16 @@ public class MainMenuManager : MonoBehaviour
             Debug.LogWarning("GameFlowManager bağlı değil!");
         }
     }
+    // =====================================================
+    // DEVAM KAYIT PANELİ AÇMA / KAPAMA
+    // =====================================================
 
     public void OpenContinueSavePanel()
     {
         if (AudioManager.Instance != null)
             AudioManager.Instance.PlayClick();
 
+        // Kayıt bulunup bulunmadığı kontrol edilir.
         bool hasAnySave =
             RuntimeSaveManager.Instance != null &&
             RuntimeSaveManager.Instance.HasAnyContinueSave();
@@ -389,6 +465,7 @@ public class MainMenuManager : MonoBehaviour
             return;
         }
 
+        // Menü panelleri arasında geçiş yapılır.
         if (mainMenuPanel != null)
             mainMenuPanel.SetActive(false);
 
@@ -401,6 +478,7 @@ public class MainMenuManager : MonoBehaviour
         if (confirmClearAllContinuePanel != null)
             confirmClearAllContinuePanel.SetActive(false);
 
+        // Kayıt listesi yeniden oluşturulur.
         ClearContinueSaveSelection();
         RebuildContinueSaveUI();
 
@@ -412,6 +490,7 @@ public class MainMenuManager : MonoBehaviour
         if (AudioManager.Instance != null)
             AudioManager.Instance.PlayClick();
 
+        // Continue paneli kapatılır.
         if (continueSavePanel != null)
             continueSavePanel.SetActive(false);
 
@@ -421,12 +500,17 @@ public class MainMenuManager : MonoBehaviour
         if (mainMenuPanel != null)
             mainMenuPanel.SetActive(true);
 
+        // Seçim ve silme modu sıfırlanır.
         isContinueSaveDeleteMode = false;
         UpdateContinueSaveDeleteModeButtonText();
         ClearContinueSaveSelection();
 
         ShowMainMenu();
     }
+
+    // =====================================================
+    // DEVAM KAYIT LİSTESİNİ OLUŞTURMA
+    // =====================================================
 
     private void RebuildContinueSaveUI()
     {
@@ -436,6 +520,7 @@ public class MainMenuManager : MonoBehaviour
             return;
         }
 
+        // Eski kayıt itemları temizlenir.
         for (int i = continueSaveContent.childCount - 1; i >= 0; i--)
         {
             Transform child = continueSaveContent.GetChild(i);
@@ -447,6 +532,7 @@ public class MainMenuManager : MonoBehaviour
             RuntimeSaveManager.Instance.ContinueSaveList == null)
             return;
 
+        // Runtime kayıt listesindeki kayıtlar UI'a eklenir.
         for (int i = 0; i < RuntimeSaveManager.Instance.ContinueSaveList.Count; i++)
         {
             RuntimeSaveData save = RuntimeSaveManager.Instance.ContinueSaveList[i];
@@ -458,6 +544,7 @@ public class MainMenuManager : MonoBehaviour
             item.Setup(save, i, SelectContinueSave, DeleteContinueSaveItemAt);
             item.SetDeleteMode(isContinueSaveDeleteMode);
 
+            // Oluşturulan item transform değerleri sıfırlanır.
             RectTransform itemRect = item.GetComponent<RectTransform>();
             if (itemRect != null)
             {
@@ -469,18 +556,22 @@ public class MainMenuManager : MonoBehaviour
         StartCoroutine(ForceContinueSaveLayoutRefreshNextFrame());
     }
 
+    // =====================================================
+    // DEVAM KAYDI SEÇİM İŞLEMLERİ
+    // =====================================================
+
     private void SelectContinueSave(int index, RuntimeSaveData save)
     {
         selectedContinueSaveIndex = index;
         selectedContinueSave = save;
 
+        // Continue butonu aktif edilir.
         if (continueSelectedSaveButton != null)
             continueSelectedSaveButton.interactable = selectedContinueSave != null;
 
+        // Detay paneli güncellenir.
         if (continueSaveDetailText != null)
             continueSaveDetailText.text = BuildContinueSaveDetailText(save);
-
-        Debug.Log("Continue save seçildi. Index: " + index);
     }
 
     private void ClearContinueSaveSelection()
@@ -488,12 +579,18 @@ public class MainMenuManager : MonoBehaviour
         selectedContinueSaveIndex = -1;
         selectedContinueSave = null;
 
+        // Continue butonu pasif hale getirilir.
         if (continueSelectedSaveButton != null)
             continueSelectedSaveButton.interactable = false;
 
+        // Varsayılan bilgi metni gösterilir.
         if (continueSaveDetailText != null)
             continueSaveDetailText.text = "Devam etmek istediğiniz kaydı seçin.";
     }
+
+    // =====================================================
+    // DEVAM KAYDI DETAY METNİ OLUŞTURMA
+    // =====================================================
 
     private string BuildContinueSaveDetailText(RuntimeSaveData save)
     {
@@ -503,6 +600,7 @@ public class MainMenuManager : MonoBehaviour
         int patientsPerDay = 3;
         int totalPatients = 15;
 
+        // Oyun akışındaki hasta bilgileri alınır.
         if (gameFlowManager != null)
         {
             if (gameFlowManager.patientsPerDay > 0)
@@ -527,11 +625,16 @@ public class MainMenuManager : MonoBehaviour
             "Enerji: " + save.currentEnergy + " / " + save.maxEnergy;
     }
 
+    // =====================================================
+    // DEVAM KAYDINDAN OYUNA DEVAM ETME
+    // =====================================================
+
     public void ContinueSelectedSave()
     {
         if (AudioManager.Instance != null)
             AudioManager.Instance.PlayClick();
 
+        // Seçili kayıt kontrol edilir.
         if (selectedContinueSave == null)
         {
             Debug.LogWarning("Seçili devam kaydı yok.");
@@ -540,6 +643,7 @@ public class MainMenuManager : MonoBehaviour
 
         activeContinueSaveRunId = selectedContinueSave.runId;
 
+        // Aktif save runtime sisteme atanır.
         if (RuntimeSaveManager.Instance != null)
             RuntimeSaveManager.Instance.SetCurrentSave(selectedContinueSave);
 
@@ -548,6 +652,7 @@ public class MainMenuManager : MonoBehaviour
 
     private void ContinueGameFromSelectedSave(RuntimeSaveData save)
     {
+        // Save verisinin geçerliliği kontrol edilir.
         if (save == null || !save.hasSave)
         {
             Debug.LogWarning("Devam edilecek kayıt geçersiz.");
@@ -556,6 +661,7 @@ public class MainMenuManager : MonoBehaviour
 
         Time.timeScale = 1f;
 
+        // Menü ve geçiş panelleri kapatılır.
         if (continueSavePanel != null)
             continueSavePanel.SetActive(false);
 
@@ -577,17 +683,21 @@ public class MainMenuManager : MonoBehaviour
         if (dayTransitionPanel != null)
             dayTransitionPanel.SetActive(false);
 
+        // Gameplay UI aktif edilir.
         if (heartsPanel != null)
             heartsPanel.SetActive(true);
 
+        // Gameplay müziği başlatılır.
         if (AudioManager.Instance != null)
             AudioManager.Instance.PlayGameplayMusic();
 
         MoveCameraRootTo(gameplayCameraPoint);
 
+        // Kamera kontrolü tekrar açılır.
         if (mouseLook != null)
             mouseLook.SetLookEnabled(true);
 
+        // Save verileri oyun akışına uygulanır.
         if (gameFlowManager != null)
         {
             gameFlowManager.ResetGame();
@@ -610,11 +720,16 @@ public class MainMenuManager : MonoBehaviour
         OpenContinueSavePanel();
     }
 
+    // =====================================================
+    // DEVAM KAYDI SİLME MODU
+    // =====================================================
+
     private void ToggleContinueSaveDeleteMode()
     {
         if (AudioManager.Instance != null)
             AudioManager.Instance.PlayClick();
 
+        // Silme modu açılıp kapatılır.
         isContinueSaveDeleteMode = !isContinueSaveDeleteMode;
 
         UpdateContinueSaveDeleteModeButtonText();
@@ -632,6 +747,7 @@ public class MainMenuManager : MonoBehaviour
         if (continueSaveContent == null)
             return;
 
+        // Tüm kayıt itemlarına silme modu uygulanır.
         foreach (Transform child in continueSaveContent)
         {
             ContinueSaveItemUI item = child.GetComponent<ContinueSaveItemUI>();
@@ -639,6 +755,10 @@ public class MainMenuManager : MonoBehaviour
                 item.SetDeleteMode(isContinueSaveDeleteMode);
         }
     }
+
+    // =====================================================
+    // TEKİL DEVAM KAYDI SİLME
+    // =====================================================
 
     private void DeleteContinueSaveItemAt(int index)
     {
@@ -649,6 +769,7 @@ public class MainMenuManager : MonoBehaviour
 
         ClearContinueSaveSelection();
 
+        // Hiç kayıt kalmadığında panel kapatılır.
         if (!RuntimeSaveManager.Instance.HasAnyContinueSave())
         {
             isContinueSaveDeleteMode = false;
@@ -662,11 +783,16 @@ public class MainMenuManager : MonoBehaviour
         UpdateContinueButtonState(RuntimeSaveManager.Instance.HasAnyContinueSave());
     }
 
+    // =====================================================
+    // TÜM DEVAM KAYITLARINI SİLME ONAY PANELİ
+    // =====================================================
+
     public void OpenConfirmClearAllContinuePanel()
     {
         if (AudioManager.Instance != null)
             AudioManager.Instance.PlayClick();
 
+        // Toplu silme onay paneli açılır.
         if (confirmClearAllContinuePanel != null)
             confirmClearAllContinuePanel.SetActive(true);
     }
@@ -676,6 +802,7 @@ public class MainMenuManager : MonoBehaviour
         if (AudioManager.Instance != null)
             AudioManager.Instance.PlayClick();
 
+        // Toplu silme onay paneli kapatılır.
         if (confirmClearAllContinuePanel != null)
             confirmClearAllContinuePanel.SetActive(false);
     }
@@ -685,9 +812,11 @@ public class MainMenuManager : MonoBehaviour
         if (AudioManager.Instance != null)
             AudioManager.Instance.PlayClick();
 
+        // Tüm continue kayıtları temizlenir.
         if (RuntimeSaveManager.Instance != null)
             RuntimeSaveManager.Instance.ClearAllContinueSaves();
 
+        // UI seçim ve silme modu sıfırlanır.
         isContinueSaveDeleteMode = false;
         UpdateContinueSaveDeleteModeButtonText();
         ClearContinueSaveSelection();
@@ -700,8 +829,13 @@ public class MainMenuManager : MonoBehaviour
         CloseContinueSavePanel();
     }
 
+    // =====================================================
+    // MENÜYE DÖNÜŞ VE RUN TEMİZLEME
+    // =====================================================
+
     public void ReturnToMenu(int correct, int wrong)
     {
+        // Oyun geçmişi oluşturulup history sistemine eklenir.
         if (runHistoryManager != null && gameFlowManager != null)
         {
             SessionHistoryData session = gameFlowManager.BuildSessionHistoryData();
@@ -709,7 +843,6 @@ public class MainMenuManager : MonoBehaviour
             if (session != null && session.days != null && session.days.Count > 0)
             {
                 runHistoryManager.AddSession(session);
-                Debug.Log("History eklendi. Toplam session sayısı: " + runHistoryManager.SessionHistoryList.Count);
             }
             else
             {
@@ -721,33 +854,44 @@ public class MainMenuManager : MonoBehaviour
             Debug.LogWarning("ReturnToMenu -> runHistoryManager veya gameFlowManager null.");
         }
 
+        // Aktif continue kaydı temizlenir.
         if (!string.IsNullOrEmpty(activeContinueSaveRunId) && RuntimeSaveManager.Instance != null)
         {
             RuntimeSaveManager.Instance.RemoveContinueSaveByRunId(activeContinueSaveRunId);
-            Debug.Log("Tamamlanan oyuna ait continue save silindi. RunId: " + activeContinueSaveRunId);
             activeContinueSaveRunId = "";
         }
 
+        // Runtime save verisi sıfırlanır.
         if (RuntimeSaveManager.Instance != null)
             RuntimeSaveManager.Instance.ClearSave();
 
         ShowMainMenu();
     }
 
+    // =====================================================
+    // KAMERA ROOT TAŞIMA
+    // =====================================================
+
     private void MoveCameraRootTo(Transform targetPoint)
     {
         if (doctorLookRoot == null || targetPoint == null)
             return;
 
+        // Kamera root pozisyonu hedef noktaya taşınır.
         doctorLookRoot.position = targetPoint.position;
         doctorLookRoot.rotation = targetPoint.rotation;
     }
+
+    // =====================================================
+    // HISTORY BÖLÜMÜ GÜNCELLEME
+    // =====================================================
 
     private void UpdateHistorySection()
     {
         if (historySection == null)
             return;
 
+        // History verisi olup olmadığı kontrol edilir.
         bool hasAnyHistory =
             runHistoryManager != null &&
             runHistoryManager.SessionHistoryList != null &&
@@ -755,6 +899,7 @@ public class MainMenuManager : MonoBehaviour
 
         historySection.SetActive(hasAnyHistory);
 
+        // History yoksa silme modu sıfırlanır.
         if (!hasAnyHistory)
         {
             isHistoryDeleteMode = false;
@@ -764,17 +909,21 @@ public class MainMenuManager : MonoBehaviour
                 confirmDeleteAllPanel.SetActive(false);
         }
 
+        // Buton görünürlükleri güncellenir.
         if (deleteModeButton != null)
             deleteModeButton.gameObject.SetActive(hasAnyHistory);
 
         if (clearAllButton != null)
             clearAllButton.gameObject.SetActive(hasAnyHistory);
 
-        Debug.Log("History görünür mü? " + hasAnyHistory);
-
+        // History UI yeniden oluşturulur.
         if (hasAnyHistory)
             RebuildHistoryUI();
     }
+
+    // =====================================================
+    // HISTORY UI OLUŞTURMA
+    // =====================================================
 
     private void RebuildHistoryUI()
     {
@@ -784,6 +933,7 @@ public class MainMenuManager : MonoBehaviour
             return;
         }
 
+        // Eski history itemları temizlenir.
         for (int i = historyContent.childCount - 1; i >= 0; i--)
         {
             Transform child = historyContent.GetChild(i);
@@ -793,6 +943,7 @@ public class MainMenuManager : MonoBehaviour
 
         Canvas.ForceUpdateCanvases();
 
+        // Session geçmişleri UI listesine eklenir.
         for (int i = 0; i < runHistoryManager.SessionHistoryList.Count; i++)
         {
             SessionHistoryData session = runHistoryManager.SessionHistoryList[i];
@@ -806,6 +957,7 @@ public class MainMenuManager : MonoBehaviour
             item.Setup(session, i, DeleteHistoryItemAt);
             item.SetDeleteMode(isHistoryDeleteMode);
 
+            // Transform değerleri normalize edilir.
             RectTransform itemRect = item.GetComponent<RectTransform>();
             if (itemRect != null)
             {
@@ -813,15 +965,20 @@ public class MainMenuManager : MonoBehaviour
                 itemRect.localRotation = Quaternion.identity;
             }
 
-            Debug.Log("History item oluşturuldu: " + session.completedDateText);
         }
 
         StartCoroutine(ForceHistoryLayoutRefreshNextFrame());
     }
 
+    // =====================================================
+    // HISTORY SİLME MODU
+    // =====================================================
+
     private void ToggleHistoryDeleteMode()
     {
+        // Silme modu açılıp kapatılır.
         isHistoryDeleteMode = !isHistoryDeleteMode;
+
         UpdateDeleteModeButtonText();
         ApplyDeleteModeToHistoryItems();
     }
@@ -837,6 +994,7 @@ public class MainMenuManager : MonoBehaviour
         if (historyContent == null)
             return;
 
+        // Tüm history itemlarına silme modu uygulanır.
         foreach (Transform child in historyContent)
         {
             HistoryItemUI item = child.GetComponent<HistoryItemUI>();
@@ -845,6 +1003,10 @@ public class MainMenuManager : MonoBehaviour
         }
     }
 
+    // =====================================================
+    // TEKİL HISTORY KAYDI SİLME
+    // =====================================================
+
     private void DeleteHistoryItemAt(int index)
     {
         if (runHistoryManager == null)
@@ -852,6 +1014,7 @@ public class MainMenuManager : MonoBehaviour
 
         runHistoryManager.RemoveSessionAt(index);
 
+        // History tamamen bittiyse silme modu sıfırlanır.
         if (runHistoryManager.SessionHistoryList.Count == 0)
         {
             isHistoryDeleteMode = false;
@@ -861,6 +1024,10 @@ public class MainMenuManager : MonoBehaviour
         UpdateHistorySection();
         StartCoroutine(ForceHistoryLayoutRefreshNextFrame());
     }
+
+    // =====================================================
+    // TÜM HISTORY KAYITLARINI SİLME ONAY PANELİ
+    // =====================================================
 
     public void OpenConfirmDeleteAllPanel()
     {
@@ -885,6 +1052,7 @@ public class MainMenuManager : MonoBehaviour
         if (AudioManager.Instance != null)
             AudioManager.Instance.PlayClick();
 
+        // Tüm history kayıtları temizlenir.
         if (runHistoryManager != null)
             runHistoryManager.ClearAllHistory();
 
@@ -898,6 +1066,10 @@ public class MainMenuManager : MonoBehaviour
         StartCoroutine(ForceHistoryLayoutRefreshNextFrame());
     }
 
+    // =====================================================
+    // HISTORY LAYOUT YENİLEME
+    // =====================================================
+
     private IEnumerator ForceHistoryLayoutRefreshNextFrame()
     {
         yield return null;
@@ -905,6 +1077,7 @@ public class MainMenuManager : MonoBehaviour
 
         Canvas.ForceUpdateCanvases();
 
+        // Content layout yeniden hesaplanır.
         RectTransform contentRect = historyContent as RectTransform;
         if (contentRect != null)
         {
@@ -912,9 +1085,11 @@ public class MainMenuManager : MonoBehaviour
             LayoutRebuilder.ForceRebuildLayoutImmediate(contentRect);
         }
 
+        // Viewport layout güncellenir.
         if (historyContent != null && historyContent.parent is RectTransform viewportRect)
             LayoutRebuilder.ForceRebuildLayoutImmediate(viewportRect);
 
+        // History section layout güncellenir.
         if (historySection != null)
         {
             RectTransform historySectionRect = historySection.GetComponent<RectTransform>();
@@ -922,6 +1097,7 @@ public class MainMenuManager : MonoBehaviour
                 LayoutRebuilder.ForceRebuildLayoutImmediate(historySectionRect);
         }
 
+        // Main menu layout güncellenir.
         if (mainMenuPanel != null)
         {
             RectTransform mainMenuRect = mainMenuPanel.GetComponent<RectTransform>();
@@ -929,9 +1105,11 @@ public class MainMenuManager : MonoBehaviour
                 LayoutRebuilder.ForceRebuildLayoutImmediate(mainMenuRect);
         }
 
+        // ScrollRect referansı alınır.
         if (historyScrollRect == null && historyContent != null)
             historyScrollRect = historyContent.GetComponentInParent<ScrollRect>();
 
+        // Scroll pozisyonu başlangıca çekilir.
         if (historyScrollRect != null)
         {
             historyScrollRect.StopMovement();
@@ -942,6 +1120,10 @@ public class MainMenuManager : MonoBehaviour
         Canvas.ForceUpdateCanvases();
     }
 
+    // =====================================================
+    // CONTINUE SAVE LAYOUT YENİLEME
+    // =====================================================
+
     private IEnumerator ForceContinueSaveLayoutRefreshNextFrame()
     {
         yield return null;
@@ -949,6 +1131,7 @@ public class MainMenuManager : MonoBehaviour
 
         Canvas.ForceUpdateCanvases();
 
+        // Content layout yeniden hesaplanır.
         RectTransform contentRect = continueSaveContent as RectTransform;
         if (contentRect != null)
         {
@@ -956,9 +1139,11 @@ public class MainMenuManager : MonoBehaviour
             LayoutRebuilder.ForceRebuildLayoutImmediate(contentRect);
         }
 
+        // Viewport layout güncellenir.
         if (continueSaveContent != null && continueSaveContent.parent is RectTransform viewportRect)
             LayoutRebuilder.ForceRebuildLayoutImmediate(viewportRect);
 
+        // Continue panel layout güncellenir.
         if (continueSavePanel != null)
         {
             RectTransform panelRect = continueSavePanel.GetComponent<RectTransform>();
@@ -966,9 +1151,11 @@ public class MainMenuManager : MonoBehaviour
                 LayoutRebuilder.ForceRebuildLayoutImmediate(panelRect);
         }
 
+        // ScrollRect referansı alınır.
         if (continueSaveScrollRect == null && continueSaveContent != null)
             continueSaveScrollRect = continueSaveContent.GetComponentInParent<ScrollRect>();
 
+        // Scroll pozisyonu başlangıca çekilir.
         if (continueSaveScrollRect != null)
         {
             continueSaveScrollRect.StopMovement();
@@ -979,11 +1166,16 @@ public class MainMenuManager : MonoBehaviour
         Canvas.ForceUpdateCanvases();
     }
 
+    // =====================================================
+    // CONTINUE BUTON DURUMU
+    // =====================================================
+
     private void UpdateContinueButtonState(bool canContinue)
     {
         if (continueButton == null)
             return;
 
+        // Continue butonu aktif/pasif yapılır.
         continueButton.interactable = canContinue;
     }
 }

@@ -9,6 +9,10 @@ using UnityEngine.InputSystem;
 
 public class DialogueManager : MonoBehaviour
 {
+    // =========================
+    // UI VE DİYALOG REFERANSLARI
+    // =========================
+
     [Header("UI")]
     public GameObject dialoguePanel;
     public Transform contentRoot;
@@ -51,6 +55,10 @@ public class DialogueManager : MonoBehaviour
     private GameObject lastConversationLine;
     private GameObject currentTurnFocusLine;
 
+    // =========================
+    // OYUNCU VERİLERİ VE NOTEBOOK SİSTEMİ
+    // =========================
+
     private readonly HashSet<string> discoveredTags = new HashSet<string>();
     private readonly HashSet<string> usedHiddenChoices = new HashSet<string>();
     private readonly HashSet<string> notifiedQuestionTestKeys = new HashSet<string>();
@@ -64,9 +72,11 @@ public class DialogueManager : MonoBehaviour
     private readonly HashSet<string> notebookNotes = new HashSet<string>();
     private readonly HashSet<string> aiFeatures = new HashSet<string>();
 
+    // Runtime sırasında kullanılan dinamik veriler.
     private readonly Dictionary<string, string> runtimeTextValues = new Dictionary<string, string>();
     private readonly Dictionary<string, int> diseaseScores = new Dictionary<string, int>();
 
+    // Oyuncunun ilerleme sayaçları.
     private int askedQuestionCount = 0;
     private int performedTestCount = 0;
     private int totalStepCount = 0;
@@ -74,18 +84,24 @@ public class DialogueManager : MonoBehaviour
     private string currentNodeId;
     private string rootNodeId;
 
+    // =========================
+    // DİYALOG DURUM KONTROLLERİ
+    // =========================
+
     private bool isBusy = false;
     private bool isTyping = false;
     private bool skipRequested = false;
 
     private PlayerInteractionModeManager interactionModeManager;
 
+    // Oyun başlangıcında diyalog panelini gizler.
     private void Awake()
     {
         if (dialoguePanel != null)
             dialoguePanel.SetActive(false);
     }
 
+    // Gerekli manager referanslarını sahneden otomatik bulur.
     private void Start()
     {
         if (notebookUIManager == null)
@@ -95,6 +111,7 @@ public class DialogueManager : MonoBehaviour
             interactionModeManager = FindFirstObjectByType<PlayerInteractionModeManager>();
     }
 
+    // Notification UI referansını runtime sırasında çözümlemeye çalışır.
     private void ResolveNotificationUI()
     {
         if (notificationUI != null)
@@ -106,7 +123,11 @@ public class DialogueManager : MonoBehaviour
             Debug.LogWarning("DialogueManager -> DialogueNotificationUI bulunamadı!");
     }
 
+    // =========================
+    // INPUT VE SKIP SİSTEMİ
+    // =========================
 
+    // Typewriter efekti sırasında oyuncunun skip inputlarını kontrol eder.
     private void Update()
     {
         PauseMenuController pause = FindFirstObjectByType<PauseMenuController>();
@@ -130,6 +151,7 @@ public class DialogueManager : MonoBehaviour
             skipRequested = true;
     }
 
+    // Yazı animasyonunu anında tamamlamak için kullanılır.
     public void RequestSkipTyping()
     {
         if (!isTyping)
@@ -138,6 +160,11 @@ public class DialogueManager : MonoBehaviour
         skipRequested = true;
     }
 
+    // =========================
+    // DİYALOG BAŞLATMA SİSTEMİ
+    // =========================
+
+    // Diyalog başlangıç isteğini kontrol eder.
     public void StartDialogue()
     {
         if (isBusy)
@@ -146,13 +173,12 @@ public class DialogueManager : MonoBehaviour
         StartCoroutine(StartDialogueRoutine());
     }
 
+    // Yeni hasta diyaloğunu başlatır ve başlangıç verilerini hazırlar.
     private IEnumerator StartDialogueRoutine()
     {
         isBusy = true;
 
-        Debug.Log("DialogueManager -> StartDialogue çalıştı");
-        Debug.Log("Current Case -> " + (currentCase != null ? currentCase.caseId : "NULL"));
-
+        // Gerekli referans kontrolleri.
         if (currentCase == null)
         {
             Debug.LogError("DialogueManager: currentCase atanmadı.");
@@ -204,6 +230,7 @@ public class DialogueManager : MonoBehaviour
         if (notificationUI != null)
             notificationUI.ResetNotificationState();
 
+        // Önceki hastaya ait runtime verilerini temizler.
         discoveredTags.Clear();
         usedHiddenChoices.Clear();
         notifiedQuestionTestKeys.Clear();
@@ -216,7 +243,6 @@ public class DialogueManager : MonoBehaviour
         notebookTests.Clear();
         notebookNotes.Clear();
 
-        // Yeni hasta başladığında önceki hastadan kalan AI verilerini temizle.
         aiFeatures.Clear();
 
         runtimeTextValues.Clear();
@@ -228,14 +254,17 @@ public class DialogueManager : MonoBehaviour
         rootNodeId = currentCase.rootNodeId;
         currentNodeId = rootNodeId;
 
+        // Hastaya özel dinamik veri üretir.
         GenerateRuntimeVariationData();
 
+        // Notebook sistemini günceller.
         if (notebookUIManager != null)
         {
             notebookUIManager.SetDialogueManager(this);
             notebookUIManager.RefreshNotebook();
         }
 
+        // Hastanın başlangıç konuşmasını gösterir.
         currentTurnFocusLine = CreateDialogueLineObject();
         yield return StartCoroutine(TypeDialogueIntoLine(
             currentTurnFocusLine,
@@ -244,6 +273,7 @@ public class DialogueManager : MonoBehaviour
             false
         ));
 
+        // Varsa başlangıç asistan mesajını gösterir.
         if (!string.IsNullOrEmpty(currentCase.startAssistantText))
         {
             GameObject assistantLine = CreateDialogueLineObject();
@@ -255,6 +285,7 @@ public class DialogueManager : MonoBehaviour
             ));
         }
 
+        // İlk node'u yükler.
         yield return StartCoroutine(ShowNodeRoutine(rootNodeId, false));
 
         Canvas.ForceUpdateCanvases();
@@ -263,6 +294,7 @@ public class DialogueManager : MonoBehaviour
         isBusy = false;
     }
 
+    // Diyalog panelini kapatır ve aktif coroutine'leri durdurur.
     public void CloseDialoguePanel()
     {
         StopAllCoroutines();
@@ -276,6 +308,11 @@ public class DialogueManager : MonoBehaviour
             dialoguePanel.SetActive(false);
     }
 
+    // =========================
+    // CHOICE VE NODE AKIŞ SİSTEMİ
+    // =========================
+
+    // Oyuncunun seçtiği seçeneğin işlenmesini başlatır.
     public void SelectChoice(DialogueChoiceData choice)
     {
         if (isBusy)
@@ -284,13 +321,12 @@ public class DialogueManager : MonoBehaviour
         StartCoroutine(SelectChoiceRoutine(choice));
     }
 
+    // Choice seçimine göre diyalog akışını yönetir.
     private IEnumerator SelectChoiceRoutine(DialogueChoiceData choice)
     {
         isBusy = true;
 
-        Debug.Log("DialogueManager -> SelectChoice çalıştı");
-        Debug.Log("Selected Choice -> " + (choice != null ? ResolveDynamicText(choice.choiceText) : "NULL"));
-
+        // Choice verisinin geçerli olup olmadığını kontrol eder.
         if (choice == null)
         {
             Debug.LogError("SelectChoice: choice null.");
@@ -310,6 +346,7 @@ public class DialogueManager : MonoBehaviour
 
         currentTurnFocusLine = null;
 
+        // Doktor konuşmasını gösterir.
         if (!string.IsNullOrEmpty(choice.doctorLine))
         {
             currentTurnFocusLine = CreateDialogueLineObject();
@@ -321,17 +358,11 @@ public class DialogueManager : MonoBehaviour
             ));
         }
 
+        // Test seçimlerinde başarı şansı sistemi uygular.
         if (ShouldRollTestChance(choice))
         {
             int finalChance = CalculateFinalTestSuccessChance(choice);
             int roll = Random.Range(1, 101);
-
-            Debug.Log(
-                "Test Chance Roll -> " +
-                "Choice: " + ResolveDynamicText(choice.choiceText) +
-                " | Final Chance: %" + finalChance +
-                " | Roll: " + roll
-            );
 
             if (roll > finalChance)
             {
@@ -367,6 +398,7 @@ public class DialogueManager : MonoBehaviour
             }
         }
 
+        // Hastanın cevabını gösterir.
         if (!string.IsNullOrEmpty(choice.patientReply))
         {
             GameObject patientLine = CreateDialogueLineObject();
@@ -381,6 +413,7 @@ public class DialogueManager : MonoBehaviour
                 currentTurnFocusLine = patientLine;
         }
 
+        // Asistan yorumunu gösterir.
         if (!string.IsNullOrEmpty(choice.assistantReply))
         {
             GameObject assistantLine = CreateDialogueLineObject();
@@ -392,6 +425,7 @@ public class DialogueManager : MonoBehaviour
             ));
         }
 
+        // Choice üzerinden gelen verileri kaydeder.
         if (choice.gainedTags != null)
         {
             foreach (string tag in choice.gainedTags)
@@ -419,6 +453,7 @@ public class DialogueManager : MonoBehaviour
             }
         }
 
+        // Notebook kayıtlarını günceller.
         if (choice.notebookSymptoms != null)
         {
             foreach (string item in choice.notebookSymptoms)
@@ -449,18 +484,10 @@ public class DialogueManager : MonoBehaviour
             }
         }
 
+        // Hastalık skor sistemini günceller.
         ApplyDiseaseEffects(choice.diseaseEffects);
 
-        Debug.Log(
-            "Notebook Data After Choice -> " +
-            "Tags: [" + string.Join(", ", discoveredTags) + "] | " +
-            "Symptoms: [" + string.Join(", ", discoveredSymptoms) + "] | " +
-            "Tests: [" + string.Join(", ", performedTests) + "] | " +
-            "NotebookSymptoms: [" + string.Join(", ", notebookSymptoms) + "] | " +
-            "NotebookTests: [" + string.Join(", ", notebookTests) + "] | " +
-            "NotebookNotes: [" + string.Join(", ", notebookNotes) + "]"
-        );
-        // AI için choice verilerini ayrıca kaydet
+        // Yapay zeka analiz sistemi için feature verilerini toplar.
         if (choice.gainedTags != null)
             aiFeatures.UnionWith(choice.gainedTags);
 
@@ -479,22 +506,24 @@ public class DialogueManager : MonoBehaviour
         if (choice.notebookNotes != null)
             aiFeatures.UnionWith(choice.notebookNotes);
 
-        Debug.Log("AI Features Updated -> " + string.Join(", ", aiFeatures));
-
+        // Notebook ekranını günceller.
         if (notebookUIManager != null)
         {
             notebookUIManager.SetDialogueManager(this);
             notebookUIManager.RefreshNotebook();
         }
 
+        // Tek kullanımlık seçimleri gizler.
         if (choice.hideAfterUse)
         {
             string key = BuildChoiceKey(currentNodeId, choice.choiceText);
             usedHiddenChoices.Add(key);
         }
 
+        // Gerekirse asistan ipucu gösterir.
         yield return StartCoroutine(TryShowAssistantHintsRoutine());
 
+        // Tanı panelini açar.
         if (choice.opensDiagnosisPanel)
         {
             yield return StartCoroutine(OpenDiagnosisPanelRoutine());
@@ -502,6 +531,7 @@ public class DialogueManager : MonoBehaviour
             yield break;
         }
 
+        // Ana hub node'una dönüş yapar.
         if (choice.returnToHub)
         {
             yield return StartCoroutine(ShowNodeRoutine(rootNodeId, false));
@@ -509,6 +539,7 @@ public class DialogueManager : MonoBehaviour
             yield break;
         }
 
+        // Sonraki node'a geçiş yapar.
         if (!string.IsNullOrEmpty(choice.nextNodeId))
         {
             yield return StartCoroutine(ShowNodeRoutine(choice.nextNodeId, true));
@@ -520,7 +551,11 @@ public class DialogueManager : MonoBehaviour
 
         isBusy = false;
     }
+    // =========================
+    // TANI SİSTEMİ VE TANI PANELİ
+    // =========================
 
+    // Oyuncunun seçtiği tanıyı işleme alır.
     public void SelectDiagnosis(DiagnosisChoiceData diagnosis)
     {
         if (isBusy)
@@ -529,10 +564,12 @@ public class DialogueManager : MonoBehaviour
         StartCoroutine(SelectDiagnosisRoutine(diagnosis));
     }
 
+    // Tanı seçimi sonrası gerekli UI ve oyun akışını yönetir.
     private IEnumerator SelectDiagnosisRoutine(DiagnosisChoiceData diagnosis)
     {
         isBusy = true;
 
+        // Tanı verisinin geçerli olup olmadığını kontrol eder.
         if (diagnosis == null)
         {
             Debug.LogError("SelectDiagnosis: diagnosis null.");
@@ -540,16 +577,16 @@ public class DialogueManager : MonoBehaviour
             yield break;
         }
 
-        Debug.Log("DialogueManager -> SelectDiagnosis çalıştı: " + diagnosis.diagnosisName);
-
         RemoveCurrentOptions();
 
+        // Tanı aşamasında notebook kullanımını engeller.
         if (gameFlowManager != null)
             gameFlowManager.SetNotebookBlocked(true);
 
         if (interactionModeManager != null)
             interactionModeManager.EnterUIMode();
 
+        // Doktorun koyduğu tanıyı ekrana yazdırır.
         currentTurnFocusLine = CreateDialogueLineObject();
         yield return StartCoroutine(
             TypeDialogueIntoLine(
@@ -565,6 +602,7 @@ public class DialogueManager : MonoBehaviour
         Canvas.ForceUpdateCanvases();
         yield return StartCoroutine(ScrollToConversationFocus(true));
 
+        // Diyalog modundan çıkış yapar.
         if (interactionModeManager != null)
         {
             interactionModeManager.SetDialogueAvailable(false);
@@ -575,6 +613,7 @@ public class DialogueManager : MonoBehaviour
             dialoguePanel.SetActive(false);
         }
 
+        // Tanı sonucunu oyun akış sistemine gönderir.
         if (gameFlowManager != null)
         {
             gameFlowManager.SubmitDiagnosis(diagnosis.diseaseId);
@@ -589,36 +628,22 @@ public class DialogueManager : MonoBehaviour
         isBusy = false;
     }
 
+    // Tanı seçeneklerini oluşturur ve tanı panelini açar.
     private IEnumerator OpenDiagnosisPanelRoutine()
     {
-        Debug.Log("DialogueManager -> OpenDiagnosisPanel çalıştı");
-
         if (currentCase == null)
         {
             Debug.LogError("OpenDiagnosisPanel: currentCase null.");
             yield break;
         }
 
+        // Hastaya ait tanı seçeneklerini kontrol eder.
         if (currentCase.diagnosisChoices == null || currentCase.diagnosisChoices.Count == 0)
         {
             GameObject systemLine = CreateDialogueLineObject();
             yield return StartCoroutine(TypeDialogueIntoLine(systemLine, "SİSTEM", "Teşhis seçenekleri tanımlanmamış.", true));
             yield break;
         }
-
-        /*
-        if (askedQuestionCount < 3)
-        {
-            GameObject systemLine = CreateDialogueLineObject();
-            yield return StartCoroutine(TypeDialogueIntoLine(systemLine, "SİSTEM", "Henüz yeterli anamnez toplanmamış olabilir.", false));
-        }
-
-        if (performedTestCount == 0)
-        {
-            GameObject systemLine = CreateDialogueLineObject();
-            yield return StartCoroutine(TypeDialogueIntoLine(systemLine, "SİSTEM", "En az bir muayene veya test tanıyı netleştirebilir.", false));
-        }
-        */
 
         DebugTopDiseaseScores();
 
@@ -627,6 +652,7 @@ public class DialogueManager : MonoBehaviour
 
         CreateSectionHeaderAndContainer("Tanı", out diagnosisContainer);
 
+        // Tüm tanı seçeneklerini oluşturur.
         foreach (DiagnosisChoiceData diagnosis in currentCase.diagnosisChoices)
         {
             if (diagnosis == null)
@@ -649,10 +675,9 @@ public class DialogueManager : MonoBehaviour
         CreateReturnFromDiagnosisButton();
 
         yield return StartCoroutine(ScrollToConversationFocus(false));
-
-        Debug.Log("DialogueManager -> Tanı seçenekleri oluşturuldu. Notification tetiklenmedi.");
     }
 
+    // Tanı paneline geri dönüş butonu ekler.
     private void CreateReturnFromDiagnosisButton()
     {
         if (optionButtonPrefab == null || diagnosisContainer == null)
@@ -678,6 +703,11 @@ public class DialogueManager : MonoBehaviour
         button.onClick.AddListener(ReturnFromDiagnosisPanel);
     }
 
+    // =========================
+    // NODE VE CHOICE AKIŞ SİSTEMİ
+    // =========================
+
+    // Tanı panelinden mevcut node'a geri dönüş işlemini başlatır.
     public void ReturnFromDiagnosisPanel()
     {
         if (isBusy)
@@ -686,6 +716,7 @@ public class DialogueManager : MonoBehaviour
         StartCoroutine(ReturnFromDiagnosisPanelRoutine());
     }
 
+    // Tanı panelinden çıkıp mevcut node'a geri döner.
     private IEnumerator ReturnFromDiagnosisPanelRoutine()
     {
         isBusy = true;
@@ -700,10 +731,9 @@ public class DialogueManager : MonoBehaviour
         isBusy = false;
     }
 
+    // Verilen node'u yükler ve intro mesajlarını gösterir.
     private IEnumerator ShowNodeRoutine(string nodeId, bool showNodeIntro)
     {
-        Debug.Log("DialogueManager -> ShowNode çalıştı: " + nodeId);
-
         DialogueNodeData node = GetNodeById(nodeId);
 
         if (node == null)
@@ -714,6 +744,7 @@ public class DialogueManager : MonoBehaviour
 
         currentNodeId = nodeId;
 
+        // Node intro ve asistan mesajlarını gösterir.
         if (showNodeIntro)
         {
             if (!string.IsNullOrEmpty(node.nodeIntroText))
@@ -742,14 +773,14 @@ public class DialogueManager : MonoBehaviour
         yield return StartCoroutine(ShowChoicesRoutine(node));
     }
 
+    // Aktif node için uygun seçenekleri oluşturur.
     private IEnumerator ShowChoicesRoutine(DialogueNodeData node)
     {
-        Debug.Log("DialogueManager -> ShowChoices çalıştı");
-
         List<DialogueChoiceData> availableChoices = GetAvailableChoices(node);
 
         RemoveCurrentOptions();
 
+        // Kullanılabilir seçenek yoksa sistem mesajı gösterir.
         if (availableChoices.Count == 0)
         {
             GameObject systemLine = CreateDialogueLineObject();
@@ -757,6 +788,7 @@ public class DialogueManager : MonoBehaviour
             yield break;
         }
 
+        // Choice türlerine göre listeleme yapar.
         List<DialogueChoiceData> questionChoices = availableChoices
             .Where(c => c.choiceType == ChoiceType.Question || c.choiceType == ChoiceType.General)
             .ToList();
@@ -771,6 +803,7 @@ public class DialogueManager : MonoBehaviour
 
         CreateOptionsGroup();
 
+        // Soru seçeneklerini oluşturur.
         if (questionChoices.Count > 0)
         {
             CreateSectionHeaderAndContainer("Sorular", out questionsContainer);
@@ -779,6 +812,7 @@ public class DialogueManager : MonoBehaviour
                 yield return StartCoroutine(CreateChoiceButtonRoutine(choice, questionsContainer));
         }
 
+        // Test seçeneklerini oluşturur.
         if (testChoices.Count > 0)
         {
             CreateSectionHeaderAndContainer("Testler", out testsContainer);
@@ -787,6 +821,7 @@ public class DialogueManager : MonoBehaviour
                 yield return StartCoroutine(CreateChoiceButtonRoutine(choice, testsContainer));
         }
 
+        // Tanı seçeneklerini oluşturur.
         if (diagnosisChoices.Count > 0)
         {
             CreateSectionHeaderAndContainer("Tanı", out diagnosisContainer);
@@ -797,10 +832,9 @@ public class DialogueManager : MonoBehaviour
 
         yield return StartCoroutine(ScrollToConversationFocus(false));
 
-        Debug.Log("DialogueManager -> Yeni soru/test/tanı seçenekleri oluşturuldu. Notification kontrol ediliyor.");
-
         ResolveNotificationUI();
 
+        // Yeni seçenek oluştuğunda bildirim sistemini çalıştırır.
         if (notificationUI != null && HasNewQuestionOrTestOptions(availableChoices, node.nodeId))
         {
             notificationUI.NotifyNewOptions();
@@ -809,11 +843,9 @@ public class DialogueManager : MonoBehaviour
         {
             Debug.LogWarning("DialogueManager -> notificationUI NULL!");
         }
-        else
-        {
-            Debug.Log("DialogueManager -> Yeni soru/test yok, notification tetiklenmedi.");
-        }
     }
+
+    // Tek bir choice butonu oluşturur.
     private IEnumerator CreateChoiceButtonRoutine(DialogueChoiceData choice, Transform parent)
     {
         GameObject optionObj = Instantiate(optionButtonPrefab, parent);
@@ -832,6 +864,11 @@ public class DialogueManager : MonoBehaviour
         yield return null;
     }
 
+    // =========================
+    // CHOICE FİLTRELEME VE TAG SİSTEMİ
+    // =========================
+
+    // Yeni soru veya test seçenekleri oluşup oluşmadığını kontrol eder.
     private bool HasNewQuestionOrTestOptions(List<DialogueChoiceData> choices, string nodeId)
     {
         if (choices == null || choices.Count == 0)
@@ -860,6 +897,7 @@ public class DialogueManager : MonoBehaviour
         return hasNew;
     }
 
+    // Choice butonunun yazısını anında günceller.
     private void SetOptionButtonTextInstant(DialogueOptionButton optionScript, string fullText)
     {
         if (optionScript == null)
@@ -879,6 +917,7 @@ public class DialogueManager : MonoBehaviour
         targetText.text = fullText;
     }
 
+    // Mevcut node için kullanılabilir seçimleri filtreler.
     private List<DialogueChoiceData> GetAvailableChoices(DialogueNodeData node)
     {
         List<DialogueChoiceData> result = new List<DialogueChoiceData>();
@@ -891,6 +930,7 @@ public class DialogueManager : MonoBehaviour
             if (choice == null)
                 continue;
 
+            // Tek kullanımlık seçimleri tekrar göstermez.
             if (choice.hideAfterUse)
             {
                 string key = BuildChoiceKey(node.nodeId, choice.choiceText);
@@ -910,6 +950,7 @@ public class DialogueManager : MonoBehaviour
         return result;
     }
 
+    // Test seçiminin başarı şansı sistemini kullanıp kullanmayacağını kontrol eder.
     private bool ShouldRollTestChance(DialogueChoiceData choice)
     {
         if (choice == null)
@@ -918,6 +959,7 @@ public class DialogueManager : MonoBehaviour
         return choice.choiceType == ChoiceType.Test && choice.useTestChance;
     }
 
+    // Doktor uzmanlığına göre testin başarı şansını hesaplar.
     private int CalculateFinalTestSuccessChance(DialogueChoiceData choice)
     {
         if (choice == null)
@@ -942,6 +984,7 @@ public class DialogueManager : MonoBehaviour
         return Mathf.Clamp(finalChance, 0, 100);
     }
 
+    // Choice üzerinden gelen hastalık skor etkilerini uygular.
     private void ApplyDiseaseEffects(List<DiseaseScoreEffect> effects)
     {
         if (effects == null || effects.Count == 0)
@@ -956,11 +999,10 @@ public class DialogueManager : MonoBehaviour
                 diseaseScores[effect.diseaseId] = 0;
 
             diseaseScores[effect.diseaseId] += effect.score;
-
-            Debug.Log("Disease Score Updated -> " + effect.diseaseId + ": " + diseaseScores[effect.diseaseId]);
         }
     }
 
+    // Gerekli koşullar sağlandığında asistan ipuçlarını gösterir.
     private IEnumerator TryShowAssistantHintsRoutine()
     {
         if (currentCase == null || currentCase.assistantHints == null || currentCase.assistantHints.Count == 0)
@@ -990,6 +1032,7 @@ public class DialogueManager : MonoBehaviour
                 ResolveDynamicText(hint.hintText),
                 false
             ));
+
             shownAssistantHints.Add(hint.hintId);
 
             if (hint.showOnlyOnce)
@@ -997,6 +1040,7 @@ public class DialogueManager : MonoBehaviour
         }
     }
 
+    // Gerekli tag koşullarının sağlanıp sağlanmadığını kontrol eder.
     private bool AreRequiredTagsMet(List<string> requiredTags)
     {
         if (requiredTags == null || requiredTags.Count == 0)
@@ -1011,6 +1055,7 @@ public class DialogueManager : MonoBehaviour
         return true;
     }
 
+    // Yasaklı taglerden herhangi birinin aktif olup olmadığını kontrol eder.
     private bool HasAnyBlockedTag(List<string> blockedTags)
     {
         if (blockedTags == null || blockedTags.Count == 0)
@@ -1025,6 +1070,7 @@ public class DialogueManager : MonoBehaviour
         return false;
     }
 
+    // Verilen node ID'sine ait node verisini bulur.
     private DialogueNodeData GetNodeById(string nodeId)
     {
         if (currentCase == null || currentCase.allNodes == null)
@@ -1033,16 +1079,17 @@ public class DialogueManager : MonoBehaviour
         return currentCase.allNodes.FirstOrDefault(n => n != null && n.nodeId == nodeId);
     }
 
+    // Node ve choice kombinasyonu için benzersiz anahtar oluşturur.
     private string BuildChoiceKey(string nodeId, string choiceText)
     {
         return nodeId + "::" + choiceText;
     }
 
+    // Hastalık skor listesini sıralı şekilde hazırlar.
     private void DebugTopDiseaseScores()
     {
         if (diseaseScores == null || diseaseScores.Count == 0)
         {
-            Debug.Log("Henüz disease score oluşmadı.");
             return;
         }
 
@@ -1050,18 +1097,12 @@ public class DialogueManager : MonoBehaviour
             .OrderByDescending(x => x.Value)
             .Take(5)
             .ToList();
-
-        string debugText = "Top Disease Scores -> ";
-        for (int i = 0; i < sortedScores.Count; i++)
-        {
-            debugText += sortedScores[i].Key + ": " + sortedScores[i].Value;
-            if (i < sortedScores.Count - 1)
-                debugText += " | ";
-        }
-
-        Debug.Log(debugText);
     }
+    // =========================
+    // RUNTIME VARYASYON VE DİNAMİK METİN SİSTEMİ
+    // =========================
 
+    // Hastaya özel runtime varyasyon verilerini oluşturur.
     private void GenerateRuntimeVariationData()
     {
         runtimeTextValues.Clear();
@@ -1071,6 +1112,7 @@ public class DialogueManager : MonoBehaviour
 
         CaseVariationProfile profile = currentCase.variationProfile;
 
+        // Sayısal değişkenler için rastgele değer üretir.
         if (profile.floatVariables != null)
         {
             foreach (FloatVariableRange variable in profile.floatVariables)
@@ -1091,6 +1133,7 @@ public class DialogueManager : MonoBehaviour
             }
         }
 
+        // String değişkenler için rastgele seçenek belirler.
         if (profile.stringVariables != null)
         {
             foreach (StringVariableOptions variable in profile.stringVariables)
@@ -1112,11 +1155,9 @@ public class DialogueManager : MonoBehaviour
                 runtimeTextValues[variable.key] = validOptions[index];
             }
         }
-
-        Debug.Log("Runtime Variation Data -> " +
-                  string.Join(" | ", runtimeTextValues.Select(x => x.Key + "=" + x.Value)));
     }
 
+    // Dinamik placeholder içeren metinleri runtime verileriyle değiştirir.
     private string ResolveDynamicText(string rawText)
     {
         if (string.IsNullOrEmpty(rawText))
@@ -1133,11 +1174,17 @@ public class DialogueManager : MonoBehaviour
         });
     }
 
+    // =========================
+    // DIŞ SİSTEM VERİ ERİŞİMLERİ
+    // =========================
+
+    // Runtime sırasında oluşturulan tüm varyasyon verilerini döndürür.
     public Dictionary<string, string> GetRuntimeVariationValues()
     {
         return new Dictionary<string, string>(runtimeTextValues);
     }
 
+    // Belirli bir runtime değişken değerini döndürür.
     public string GetRuntimeValue(string key)
     {
         if (string.IsNullOrWhiteSpace(key))
@@ -1149,6 +1196,7 @@ public class DialogueManager : MonoBehaviour
         return "";
     }
 
+    // Belirli bir hastalığın mevcut skorunu döndürür.
     public int GetDiseaseScore(string diseaseId)
     {
         if (string.IsNullOrEmpty(diseaseId))
@@ -1160,25 +1208,31 @@ public class DialogueManager : MonoBehaviour
         return 0;
     }
 
+    // Tüm hastalık skorlarını dış sistemlere kopya olarak verir.
     public Dictionary<string, int> GetAllDiseaseScores()
     {
         return new Dictionary<string, int>(diseaseScores);
     }
 
+    // Oyuncunun keşfettiği tag verilerini döndürür.
     public HashSet<string> GetDiscoveredTags()
     {
         return new HashSet<string>(discoveredTags);
     }
 
+    // Oyuncunun keşfettiği semptom verilerini döndürür.
     public HashSet<string> GetDiscoveredSymptoms()
     {
         return new HashSet<string>(discoveredSymptoms);
     }
 
+    // Oyuncunun yaptığı testleri döndürür.
     public HashSet<string> GetPerformedTests()
     {
         return new HashSet<string>(performedTests);
     }
+
+    // Yapay zeka analiz sistemi için gerekli tüm feature verilerini birleştirir.
     public List<string> GetAIFeatures()
     {
         HashSet<string> mergedFeatures = new HashSet<string>();
@@ -1194,27 +1248,28 @@ public class DialogueManager : MonoBehaviour
             .Distinct()
             .ToList();
 
-        Debug.Log("AI Features Count: " + cleanFeatures.Count);
-        Debug.Log("AI Features: " + string.Join(", ", cleanFeatures));
-
         return cleanFeatures;
     }
 
+    // Notebook ekranındaki semptom kayıtlarını döndürür.
     public HashSet<string> GetNotebookSymptoms()
     {
         return new HashSet<string>(notebookSymptoms);
     }
 
+    // Notebook ekranındaki test kayıtlarını döndürür.
     public HashSet<string> GetNotebookTests()
     {
         return new HashSet<string>(notebookTests);
     }
 
+    // Notebook ekranındaki not kayıtlarını döndürür.
     public HashSet<string> GetNotebookNotes()
     {
         return new HashSet<string>(notebookNotes);
     }
 
+    // Oyuncunun istatistik verilerini döndürür.
     public int GetAskedQuestionCount()
     {
         return askedQuestionCount;
@@ -1230,6 +1285,11 @@ public class DialogueManager : MonoBehaviour
         return totalStepCount;
     }
 
+    // =========================
+    // DİYALOG SATIRI VE TYPEWRITER SİSTEMİ
+    // =========================
+
+    // Konuşmacıya göre diyalog satırının görsel ön ekini oluşturur.
     private string GetSpeakerPrefix(string speaker)
     {
         switch (speaker)
@@ -1251,11 +1311,13 @@ public class DialogueManager : MonoBehaviour
         }
     }
 
+    // Konuşmacı yazısının kapanış formatını döndürür.
     private string GetSpeakerSuffix(string speaker)
     {
         return "</color></size>";
     }
 
+    // Yeni bir diyalog satırı UI objesi oluşturur.
     private GameObject CreateDialogueLineObject()
     {
         if (dialogueLinePrefab == null)
@@ -1269,6 +1331,7 @@ public class DialogueManager : MonoBehaviour
         return lineObj;
     }
 
+    // Oyuncunun scroll pozisyonunun alt bölgede olup olmadığını kontrol eder.
     private bool IsUserNearBottom()
     {
         if (scrollRect == null)
@@ -1277,6 +1340,7 @@ public class DialogueManager : MonoBehaviour
         return scrollRect.verticalNormalizedPosition <= bottomScrollThreshold;
     }
 
+    // Belirtilen süre boyunca bekler veya skip isteği gelirse işlemi atlar.
     private IEnumerator WaitOrSkip(float seconds)
     {
         if (seconds <= 0f)
@@ -1294,6 +1358,7 @@ public class DialogueManager : MonoBehaviour
         }
     }
 
+    // Diyalog satırını harf harf yazdırır ve scroll yönetimini sağlar.
     private IEnumerator TypeDialogueIntoLine(GameObject lineObj, string speaker, string bodyText, bool autoScroll)
     {
         if (lineObj == null)
@@ -1362,6 +1427,7 @@ public class DialogueManager : MonoBehaviour
             yield return StartCoroutine(ScrollToConversationFocus(false));
     }
 
+    // Düz metinleri typewriter efektiyle yazdırır.
     private IEnumerator TypePlainText(TextMeshProUGUI targetText, string fullText, float speed)
     {
         if (targetText == null)
@@ -1403,6 +1469,7 @@ public class DialogueManager : MonoBehaviour
         skipRequested = false;
     }
 
+    // Choice buton yazısını typewriter efektiyle oluşturur.
     private IEnumerator TypeOptionButtonText(DialogueOptionButton optionScript, string fullText)
     {
         if (optionScript == null)
@@ -1423,6 +1490,11 @@ public class DialogueManager : MonoBehaviour
         yield return StartCoroutine(ScrollToConversationFocus(false));
     }
 
+    // =========================
+    // OPTION UI VE SCROLL SİSTEMİ
+    // =========================
+
+    // Choice kategorilerini tutacak ana seçenek grubunu oluşturur.
     private void CreateOptionsGroup()
     {
         RemoveCurrentOptions();
@@ -1453,6 +1525,7 @@ public class DialogueManager : MonoBehaviour
         diagnosisContainer = null;
     }
 
+    // Belirtilen kategori için başlık ve container oluşturur.
     private void CreateSectionHeaderAndContainer(string title, out Transform sectionContainer)
     {
         CreateSectionHeader(title);
@@ -1479,6 +1552,7 @@ public class DialogueManager : MonoBehaviour
         sectionContainer = containerObj.transform;
     }
 
+    // Seçim kategorisi için görsel başlık oluşturur.
     private void CreateSectionHeader(string title)
     {
         GameObject headerObj = new GameObject(title + "Header");
@@ -1500,6 +1574,7 @@ public class DialogueManager : MonoBehaviour
         text.textWrappingMode = TextWrappingModes.NoWrap;
     }
 
+    // Bölümler arasında görsel ayırıcı oluşturur.
     private void CreateDivider()
     {
         GameObject dividerObj = new GameObject("Divider");
@@ -1516,6 +1591,7 @@ public class DialogueManager : MonoBehaviour
         image.color = new Color32(90, 90, 90, 255);
     }
 
+    // Aktif seçenek grubunu temizler.
     private void RemoveCurrentOptions()
     {
         if (currentOptionsGroup != null)
@@ -1529,6 +1605,7 @@ public class DialogueManager : MonoBehaviour
         diagnosisContainer = null;
     }
 
+    // Tüm diyalog içeriğini temizler.
     private void ClearDialogueContent()
     {
         RemoveCurrentOptions();
@@ -1542,6 +1619,7 @@ public class DialogueManager : MonoBehaviour
         }
     }
 
+    // Aktif konuşma satırına doğru akıllı scroll uygular.
     private IEnumerator ScrollToConversationFocus(bool forceScroll = false)
     {
         yield return null;

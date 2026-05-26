@@ -13,24 +13,42 @@ public class NotebookUIManager : MonoBehaviour
 
     private DialogueManager currentDialogueManager;
 
+    // =====================================================
+    // BAŞLANGIÇ PANEL AYARLARI
+    // =====================================================
+
     private void Start()
     {
+        // Notebook paneli başlangıçta kapalı tutulur.
         if (notebookPanel != null)
             notebookPanel.SetActive(false);
     }
+
+    // =====================================================
+    // DIALOGUE MANAGER REFERANSI ATAMA
+    // =====================================================
 
     public void SetDialogueManager(DialogueManager manager)
     {
         currentDialogueManager = manager;
     }
 
+    // =====================================================
+    // NOTEBOOK PANELİNİ AÇMA
+    // =====================================================
+
     public void OpenNotebookUI()
     {
+        // Açılmadan önce notebook verileri güncellenir.
         RefreshNotebook();
 
         if (notebookPanel != null)
             notebookPanel.SetActive(true);
     }
+
+    // =====================================================
+    // NOTEBOOK PANELİNİ KAPATMA
+    // =====================================================
 
     public void CloseNotebookUI()
     {
@@ -38,31 +56,54 @@ public class NotebookUIManager : MonoBehaviour
             notebookPanel.SetActive(false);
     }
 
+    // =====================================================
+    // NOTEBOOK VERİLERİNİ UI'A AKTARMA
+    // =====================================================
+
     public void RefreshNotebook()
     {
+        // DialogueManager atanmadıysa işlem yapılmaz.
         if (currentDialogueManager == null)
         {
             Debug.LogWarning("NotebookUIManager -> currentDialogueManager atanmadı.");
             return;
         }
 
-        HashSet<string> symptoms = currentDialogueManager.GetNotebookSymptoms();
-        HashSet<string> notes = currentDialogueManager.GetNotebookNotes();
-        HashSet<string> tests = currentDialogueManager.GetNotebookTests();
+        // Notebook kayıtları DialogueManager üzerinden alınır.
+        HashSet<string> symptoms =
+            currentDialogueManager.GetNotebookSymptoms();
 
-        Debug.Log(
-            $"Notebook Refresh -> Symptoms: {symptoms.Count}, Notes: {notes.Count}, Tests: {tests.Count}"
-        );
+        HashSet<string> notes =
+            currentDialogueManager.GetNotebookNotes();
 
+        HashSet<string> tests =
+            currentDialogueManager.GetNotebookTests();
+
+        // Belirti listesi güncellenir.
         if (symptomsText != null)
-            symptomsText.text = BuildSectionText(symptoms, "Henüz belirti kaydı yok.");
+        {
+            symptomsText.text =
+                BuildSectionText(symptoms, "Henüz belirti kaydı yok.");
+        }
 
+        // İpucu/not listesi güncellenir.
         if (tagsText != null)
-            tagsText.text = BuildSectionText(notes, "Henüz ipucu kaydı yok.");
+        {
+            tagsText.text =
+                BuildSectionText(notes, "Henüz ipucu kaydı yok.");
+        }
 
+        // Yapılan test listesi güncellenir.
         if (testsText != null)
-            testsText.text = BuildSectionText(tests, "Henüz test yapılmadı.");
+        {
+            testsText.text =
+                BuildSectionText(tests, "Henüz test yapılmadı.");
+        }
     }
+
+    // =====================================================
+    // NOTEBOOK BÖLÜM METNİ OLUŞTURMA
+    // =====================================================
 
     private string BuildSectionText(HashSet<string> items, string emptyMessage)
     {
@@ -79,6 +120,10 @@ public class NotebookUIManager : MonoBehaviour
         return sb.ToString().TrimEnd();
     }
 
+    // =====================================================
+    // NOTEBOOK YAZI FORMATINI DÜZENLEME
+    // =====================================================
+
     private string FormatLabel(string raw)
     {
         if (string.IsNullOrWhiteSpace(raw))
@@ -86,9 +131,11 @@ public class NotebookUIManager : MonoBehaviour
 
         string formatted = raw.Trim();
 
+        // Tek karakterli ifadeler direkt büyük harfe çevrilir.
         if (formatted.Length == 1)
             return formatted.ToUpper();
 
+        // İlk harf büyük olacak şekilde düzenlenir.
         return char.ToUpper(formatted[0]) + formatted.Substring(1);
     }
 }

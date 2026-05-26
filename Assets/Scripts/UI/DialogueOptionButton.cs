@@ -18,6 +18,10 @@ public class DialogueOptionButton : MonoBehaviour, IPointerEnterHandler, IPointe
     private DialogueManager dialogueManager;
     private Button button;
 
+    // =====================================================
+    // REFERANS VE BAŞLANGIÇ AYARLARI
+    // =====================================================
+
     private void Awake()
     {
         EnsureReferences();
@@ -34,6 +38,7 @@ public class DialogueOptionButton : MonoBehaviour, IPointerEnterHandler, IPointe
     {
         ApplyNormalColor();
 
+        // Tooltip açık kaldıysa gizlenir.
         if (TestChanceTooltipUI.Instance != null)
             TestChanceTooltipUI.Instance.Hide();
     }
@@ -44,16 +49,19 @@ public class DialogueOptionButton : MonoBehaviour, IPointerEnterHandler, IPointe
         ApplyNormalColor();
     }
 
+    // =====================================================
+    // NORMAL DİYALOG SEÇENEĞİ AYARLARI
+    // =====================================================
+
     public void SetupChoice(DialogueChoiceData choice, DialogueManager manager)
     {
-        Debug.Log("SetupChoice çalıştı: " + (choice != null ? choice.choiceText : "NULL"));
-
         choiceData = choice;
         diagnosisData = null;
         dialogueManager = manager;
 
         EnsureReferences();
 
+        // Seçenek yazısını UI'a aktarır.
         if (buttonText != null && choice != null)
         {
             buttonText.text = choice.choiceText;
@@ -65,10 +73,12 @@ public class DialogueOptionButton : MonoBehaviour, IPointerEnterHandler, IPointe
             Debug.LogError("SetupChoice: buttonText veya choice null.");
         }
 
+        // Buton click ayarları yapılır.
         if (button != null)
         {
             button.onClick.RemoveAllListeners();
             button.onClick.AddListener(OnClickChoice);
+
             button.transition = Selectable.Transition.None;
             button.interactable = true;
         }
@@ -78,16 +88,19 @@ public class DialogueOptionButton : MonoBehaviour, IPointerEnterHandler, IPointe
         }
     }
 
+    // =====================================================
+    // TANI SEÇENEĞİ AYARLARI
+    // =====================================================
+
     public void SetupDiagnosisChoice(DiagnosisChoiceData diagnosis, DialogueManager manager)
     {
-        Debug.Log("SetupDiagnosisChoice çalıştı: " + (diagnosis != null ? diagnosis.diagnosisName : "NULL"));
-
         diagnosisData = diagnosis;
         choiceData = null;
         dialogueManager = manager;
 
         EnsureReferences();
 
+        // Tanı yazısını UI'a aktarır.
         if (buttonText != null && diagnosis != null)
         {
             buttonText.text = diagnosis.diagnosisName;
@@ -99,10 +112,12 @@ public class DialogueOptionButton : MonoBehaviour, IPointerEnterHandler, IPointe
             Debug.LogError("SetupDiagnosisChoice: buttonText veya diagnosis null.");
         }
 
+        // Buton click ayarları yapılır.
         if (button != null)
         {
             button.onClick.RemoveAllListeners();
             button.onClick.AddListener(OnClickDiagnosisChoice);
+
             button.transition = Selectable.Transition.None;
             button.interactable = true;
         }
@@ -112,16 +127,21 @@ public class DialogueOptionButton : MonoBehaviour, IPointerEnterHandler, IPointe
         }
     }
 
+    // =====================================================
+    // NORMAL SEÇENEK TIKLAMA İŞLEMLERİ
+    // =====================================================
+
     private void OnClickChoice()
     {
-        Debug.Log("Choice butonuna tıklandı: " + (choiceData != null ? choiceData.choiceText : "NULL"));
-
+        // Tooltip gizlenir.
         if (TestChanceTooltipUI.Instance != null)
             TestChanceTooltipUI.Instance.Hide();
 
+        // Çift tıklamayı engellemek için buton devre dışı bırakılır.
         if (button != null)
             button.interactable = false;
 
+        // DialogueManager üzerinden seçim çalıştırılır.
         if (dialogueManager != null && choiceData != null)
         {
             dialogueManager.SelectChoice(choiceData);
@@ -132,16 +152,21 @@ public class DialogueOptionButton : MonoBehaviour, IPointerEnterHandler, IPointe
         }
     }
 
+    // =====================================================
+    // TANI SEÇENEĞİ TIKLAMA İŞLEMLERİ
+    // =====================================================
+
     private void OnClickDiagnosisChoice()
     {
-        Debug.Log("Diagnosis butonuna tıklandı: " + (diagnosisData != null ? diagnosisData.diagnosisName : "NULL"));
-
+        // Tooltip gizlenir.
         if (TestChanceTooltipUI.Instance != null)
             TestChanceTooltipUI.Instance.Hide();
 
+        // Çift tıklamayı engellemek için buton devre dışı bırakılır.
         if (button != null)
             button.interactable = false;
 
+        // Tanı seçimi DialogueManager'a gönderilir.
         if (dialogueManager != null && diagnosisData != null)
         {
             dialogueManager.SelectDiagnosis(diagnosisData);
@@ -152,15 +177,20 @@ public class DialogueOptionButton : MonoBehaviour, IPointerEnterHandler, IPointe
         }
     }
 
+    // =====================================================
+    // POINTER EVENTLERİ
+    // =====================================================
+
     public void OnPointerClick(PointerEventData eventData)
     {
-        Debug.Log("IPointerClick alındı: " + gameObject.name);
+
     }
 
     public void OnPointerEnter(PointerEventData eventData)
     {
         ApplyHoverColor();
 
+        // Test seçeneklerinde başarı şansı tooltipi gösterilir.
         if (choiceData != null &&
             choiceData.choiceType == ChoiceType.Test &&
             choiceData.useTestChance &&
@@ -178,6 +208,10 @@ public class DialogueOptionButton : MonoBehaviour, IPointerEnterHandler, IPointe
             TestChanceTooltipUI.Instance.Hide();
     }
 
+    // =====================================================
+    // COMPONENT REFERANSLARINI ALMA
+    // =====================================================
+
     private void EnsureReferences()
     {
         if (buttonText == null)
@@ -186,6 +220,10 @@ public class DialogueOptionButton : MonoBehaviour, IPointerEnterHandler, IPointe
         if (button == null)
             button = GetComponent<Button>();
     }
+
+    // =====================================================
+    // YAZI RENK KONTROLLERİ
+    // =====================================================
 
     private void ApplyNormalColor()
     {

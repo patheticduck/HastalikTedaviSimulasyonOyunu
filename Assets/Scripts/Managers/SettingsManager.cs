@@ -3,6 +3,10 @@ using UnityEngine.UI;
 
 public class SettingsManager : MonoBehaviour
 {
+    // =====================================================
+    // SETTINGS PANEL YÖNETİMİ
+    // =====================================================
+
     private GameObject previousPanel;
 
     [Header("References")]
@@ -25,6 +29,11 @@ public class SettingsManager : MonoBehaviour
     private readonly Color pauseBackgroundColor = new Color(0f, 0f, 0f, 150f / 255f);
     private readonly Color mainMenuBackgroundColor = new Color(0f, 0f, 0f, 0f);
 
+    // =====================================================
+    // BAŞLANGIÇ AYARLARI
+    // =====================================================
+
+    // Settings panelinin başlangıç transform bilgilerini kaydeder.
     private void Awake()
     {
         if (settingsPanel != null)
@@ -48,6 +57,11 @@ public class SettingsManager : MonoBehaviour
         }
     }
 
+    // =====================================================
+    // SETTINGS PANEL AÇMA İŞLEMLERİ
+    // =====================================================
+
+    // Pause menüsü üzerinden settings panelini açar.
     public void OpenFromPause()
     {
         previousPanel = pausePanel;
@@ -67,6 +81,7 @@ public class SettingsManager : MonoBehaviour
         Time.timeScale = 0f;
     }
 
+    // Ana menü üzerinden settings panelini açar.
     public void OpenFromMainMenu()
     {
         previousPanel = mainMenuPanel;
@@ -83,6 +98,11 @@ public class SettingsManager : MonoBehaviour
         Time.timeScale = 0f;
     }
 
+    // =====================================================
+    // SETTINGS PANEL KAPATMA İŞLEMLERİ
+    // =====================================================
+
+    // Settings panelini kapatır ve önceki ekrana geri döner.
     public void CloseSettings()
     {
         if (settingsPanel != null)
@@ -109,6 +129,11 @@ public class SettingsManager : MonoBehaviour
         Time.timeScale = 0f;
     }
 
+    // =====================================================
+    // PANEL GÖRSEL AYARLARI
+    // =====================================================
+
+    // Settings panelinin arka plan rengini değiştirir.
     private void SetPanelBackground(Color color)
     {
         if (settingsPanelImage == null && settingsPanel != null)
@@ -121,6 +146,7 @@ public class SettingsManager : MonoBehaviour
         settingsPanelImage.color = color;
     }
 
+    // Settings panelini ana menü content box yapısına hizalar.
     private void ApplyMainMenuContentBoxTransform()
     {
         if (settingsRect == null && settingsPanel != null)
@@ -144,6 +170,7 @@ public class SettingsManager : MonoBehaviour
         settingsPanel.transform.SetSiblingIndex(originalSiblingIndex);
     }
 
+    // Settings panelini kayıtlı orijinal transform değerlerine döndürür.
     private void RestoreOriginalTransform()
     {
         if (settingsRect == null && settingsPanel != null)

@@ -3,6 +3,10 @@ using UnityEngine;
 
 public class AudioManager : MonoBehaviour
 {
+    // =====================================================
+    // AUDIO MANAGER - ANA SES YÖNETİM SİSTEMİ
+    // =====================================================
+
     public static AudioManager Instance;
 
     [Header("Audio Sources")]
@@ -33,6 +37,11 @@ public class AudioManager : MonoBehaviour
     private bool isMainMenuMusicPlaying = false;
     private bool isGameplayMusicPlaying = false;
 
+    // =====================================================
+    // INITIALIZATION
+    // =====================================================
+
+    // Singleton yapısını kurar ve AudioManager'ın sahneler arasında korunmasını sağlar.
     private void Awake()
     {
         if (Instance == null)
@@ -47,6 +56,11 @@ public class AudioManager : MonoBehaviour
         }
     }
 
+    // =====================================================
+    // MUSIC MANAGEMENT
+    // =====================================================
+
+    // Ana menü müziğini loop halinde oynatır.
     public void PlayMainMenuMusic()
     {
         StopGameplayMusic();
@@ -64,6 +78,7 @@ public class AudioManager : MonoBehaviour
         musicSource.Play();
     }
 
+    // Gameplay müzik döngüsünü başlatır.
     public void PlayGameplayMusic()
     {
         if (musicSource == null || gameplayMusics == null || gameplayMusics.Length == 0)
@@ -76,6 +91,7 @@ public class AudioManager : MonoBehaviour
         gameplayRoutine = StartCoroutine(GameplayMusicLoop());
     }
 
+    // Gameplay müziklerini sırayla oynatır.
     private IEnumerator GameplayMusicLoop()
     {
         int index = 0;
@@ -106,6 +122,7 @@ public class AudioManager : MonoBehaviour
         }
     }
 
+    // Gameplay müzik coroutine'ini durdurur.
     public void StopGameplayMusic()
     {
         if (gameplayRoutine != null)
@@ -115,6 +132,7 @@ public class AudioManager : MonoBehaviour
         }
     }
 
+    // Çalan tüm müzikleri durdurur.
     public void StopAllMusic()
     {
         StopGameplayMusic();
@@ -126,6 +144,11 @@ public class AudioManager : MonoBehaviour
             musicSource.Stop();
     }
 
+    // =====================================================
+    // SOUND EFFECTS
+    // =====================================================
+
+    // Hazır ses efektlerini oynatmak için kullanılan helper metodlar.
     public void PlayClick()
     {
         PlaySFX(clickSound);
@@ -156,6 +179,7 @@ public class AudioManager : MonoBehaviour
         PlaySFX(notificationSound);
     }
 
+    // Verilen ses efektini belirtilen ses çarpanı ile oynatır.
     private void PlaySFX(AudioClip clip, float volumeMultiplier = 1f)
     {
         if (clip == null || sfxSource == null)
@@ -165,6 +189,11 @@ public class AudioManager : MonoBehaviour
         sfxSource.PlayOneShot(clip, volumeMultiplier);
     }
 
+    // =====================================================
+    // VOLUME SETTINGS
+    // =====================================================
+
+    // Ana menü müzik ses seviyesini günceller.
     public void SetMainMenuVolume(float value)
     {
         mainMenuVolume = Mathf.Clamp01(value);
@@ -173,6 +202,7 @@ public class AudioManager : MonoBehaviour
             musicSource.volume = mainMenuVolume;
     }
 
+    // Gameplay müzik ses seviyesini günceller.
     public void SetGameplayVolume(float value)
     {
         gameplayVolume = Mathf.Clamp01(value);
@@ -181,12 +211,14 @@ public class AudioManager : MonoBehaviour
             musicSource.volume = gameplayVolume;
     }
 
+    // Genel ses efekti seviyesini günceller.
     public void SetSFXVolume(float value)
     {
         sfxVolume = Mathf.Clamp01(value);
         ApplySFXVolume();
     }
 
+    // Güncel SFX ses seviyesini AudioSource üzerine uygular.
     private void ApplySFXVolume()
     {
         if (sfxSource != null)

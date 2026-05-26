@@ -6,6 +6,10 @@ using UnityEngine;
 
 public class RuntimeSaveManager : MonoBehaviour
 {
+    // =====================================================
+    // RUNTIME SAVE YÖNETİMİ
+    // =====================================================
+
     public static RuntimeSaveManager Instance;
 
     [Header("Current Runtime Save")]
@@ -28,6 +32,11 @@ public class RuntimeSaveManager : MonoBehaviour
         public List<string> savesBase64 = new List<string>();
     }
 
+    // =====================================================
+    // BAŞLANGIÇ VE SINGLETON KONTROLÜ
+    // =====================================================
+
+    // Singleton yapısını oluşturur ve kayıtlı continue save verilerini yükler.
     private void Awake()
     {
         if (Instance == null)
@@ -46,6 +55,11 @@ public class RuntimeSaveManager : MonoBehaviour
         }
     }
 
+    // =====================================================
+    // SAVE OLUŞTURMA VE YÖNETİMİ
+    // =====================================================
+
+    // Aktif oyun akışından runtime save verisi oluşturur.
     public void SaveGame(GameFlowManager gameFlow)
     {
         if (gameFlow == null)
@@ -58,10 +72,9 @@ public class RuntimeSaveManager : MonoBehaviour
         currentSave.hasSave = true;
 
         AddContinueSave(currentSave);
-
-        Debug.Log("Oyun kaydedildi ve continue save listesine eklendi/güncellendi.");
     }
 
+    // Mevcut aktif save verisini manuel olarak ayarlar.
     public void SetCurrentSave(RuntimeSaveData save)
     {
         if (save == null)
@@ -74,16 +87,19 @@ public class RuntimeSaveManager : MonoBehaviour
         currentSave.hasSave = true;
     }
 
+    // Aktif runtime save verisini temizler.
     public void ClearSave()
     {
         currentSave = new RuntimeSaveData();
     }
 
+    // Herhangi bir continue save kaydı olup olmadığını kontrol eder.
     public bool HasAnyContinueSave()
     {
         return cachedContinueSaveList.Count > 0;
     }
 
+    // Yeni bir continue save kaydı ekler veya mevcut run kaydını günceller.
     public void AddContinueSave(RuntimeSaveData save)
     {
         if (save == null)
@@ -110,23 +126,18 @@ public class RuntimeSaveManager : MonoBehaviour
 
             continueSaveBytesList.Insert(0, saveBytes);
             cachedContinueSaveList.Insert(0, clonedSave);
-
-            Debug.Log("Aynı oyun döngüsüne ait continue save güncellendi.");
         }
         else
         {
             continueSaveBytesList.Insert(0, saveBytes);
             cachedContinueSaveList.Insert(0, clonedSave);
-
-            Debug.Log("Yeni continue save eklendi.");
         }
 
         TrimContinueSaveLimit();
         SaveContinueSavesToFile();
-
-        Debug.Log("Continue save toplam: " + cachedContinueSaveList.Count);
     }
 
+    // Belirtilen indexteki continue save kaydını döndürür.
     public RuntimeSaveData GetContinueSaveAt(int index)
     {
         if (index < 0 || index >= cachedContinueSaveList.Count)
@@ -135,6 +146,7 @@ public class RuntimeSaveManager : MonoBehaviour
         return CloneRuntimeSave(cachedContinueSaveList[index]);
     }
 
+    // Belirtilen indexteki continue save kaydını siler.
     public void RemoveContinueSaveAt(int index)
     {
         if (index < 0 || index >= cachedContinueSaveList.Count)
@@ -146,10 +158,9 @@ public class RuntimeSaveManager : MonoBehaviour
         cachedContinueSaveList.RemoveAt(index);
 
         SaveContinueSavesToFile();
-
-        Debug.Log("Continue save silindi. Kalan: " + cachedContinueSaveList.Count);
     }
 
+    // Run ID üzerinden ilgili continue save kaydını siler.
     public void RemoveContinueSaveByRunId(string runId)
     {
         int index = FindContinueSaveIndexByRunId(runId);
@@ -158,6 +169,7 @@ public class RuntimeSaveManager : MonoBehaviour
             RemoveContinueSaveAt(index);
     }
 
+    // Tüm continue save kayıtlarını temizler.
     public void ClearAllContinueSaves()
     {
         continueSaveBytesList.Clear();
@@ -166,10 +178,13 @@ public class RuntimeSaveManager : MonoBehaviour
         DeleteContinueSaveFile();
 
         ClearSave();
-
-        Debug.Log("Tüm continue save kayıtları temizlendi.");
     }
 
+    // =====================================================
+    // SAVE ARAMA VE SERIALIZE İŞLEMLERİ
+    // =====================================================
+
+    // Verilen run ID için kayıtlı save indexini bulur.
     private int FindContinueSaveIndexByRunId(string runId)
     {
         if (string.IsNullOrEmpty(runId))
@@ -189,12 +204,14 @@ public class RuntimeSaveManager : MonoBehaviour
         return -1;
     }
 
+    // Runtime save verisini byte dizisine dönüştürür.
     private byte[] SerializeSaveToBytes(RuntimeSaveData save)
     {
         string json = JsonUtility.ToJson(save, true);
         return Encoding.UTF8.GetBytes(json);
     }
 
+    // Byte dizisini tekrar runtime save verisine dönüştürür.
     private RuntimeSaveData DeserializeBytesToSave(byte[] bytes)
     {
         if (bytes == null || bytes.Length == 0)
@@ -204,6 +221,7 @@ public class RuntimeSaveManager : MonoBehaviour
         return JsonUtility.FromJson<RuntimeSaveData>(json);
     }
 
+    // Continue save listesini maksimum limitte tutar.
     private void TrimContinueSaveLimit()
     {
         while (continueSaveBytesList.Count > maxContinueSaveCount)
@@ -213,6 +231,11 @@ public class RuntimeSaveManager : MonoBehaviour
             cachedContinueSaveList.RemoveAt(cachedContinueSaveList.Count - 1);
     }
 
+    // =====================================================
+    // DOSYA KAYDETME VE YÜKLEME
+    // =====================================================
+
+    // Continue save listesini persistent dosyaya kaydeder.
     private void SaveContinueSavesToFile()
     {
         if (!usePersistentContinueSaves)
@@ -234,8 +257,6 @@ public class RuntimeSaveManager : MonoBehaviour
             byte[] fileBytes = Encoding.UTF8.GetBytes(wrapperJson);
 
             File.WriteAllBytes(FilePath, fileBytes);
-
-            Debug.Log("Continue saves dosyaya kaydedildi: " + FilePath);
         }
         catch (Exception e)
         {
@@ -243,6 +264,7 @@ public class RuntimeSaveManager : MonoBehaviour
         }
     }
 
+    // Persistent dosyadan continue save kayıtlarını yükler.
     private void LoadContinueSavesFromFile()
     {
         if (!File.Exists(FilePath))
@@ -280,8 +302,6 @@ public class RuntimeSaveManager : MonoBehaviour
             }
 
             TrimContinueSaveLimit();
-
-            Debug.Log("Continue saves dosyadan RAM'e yüklendi. Kayıt sayısı: " + cachedContinueSaveList.Count);
         }
         catch (Exception e)
         {
@@ -291,6 +311,7 @@ public class RuntimeSaveManager : MonoBehaviour
         }
     }
 
+    // Persistent continue save dosyasını diskten siler.
     private void DeleteContinueSaveFile()
     {
         if (!usePersistentContinueSaves)
@@ -307,6 +328,11 @@ public class RuntimeSaveManager : MonoBehaviour
         }
     }
 
+    // =====================================================
+    // SAVE CLONE İŞLEMLERİ
+    // =====================================================
+
+    // Runtime save verisinin güvenli bir kopyasını oluşturur.
     private RuntimeSaveData CloneRuntimeSave(RuntimeSaveData source)
     {
         if (source == null)
@@ -344,6 +370,7 @@ public class RuntimeSaveManager : MonoBehaviour
         clone.savedDateText = source.savedDateText;
         clone.savedAtTicks = source.savedAtTicks;
 
+        // Planlanan hasta sırasını kopyalar.
         clone.plannedPatientCaseIds = new List<string>();
         if (source.plannedPatientCaseIds != null)
         {
@@ -351,6 +378,7 @@ public class RuntimeSaveManager : MonoBehaviour
                 clone.plannedPatientCaseIds.Add(id);
         }
 
+        // Hasta analiz geçmişini kopyalar.
         clone.patientAnalysisHistory = new List<PatientAnalysisEntry>();
         if (source.patientAnalysisHistory != null)
         {

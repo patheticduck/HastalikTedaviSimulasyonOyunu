@@ -31,10 +31,18 @@ public class PatientMovement : MonoBehaviour
     private int pathIndex = 0;
     private Vector3[] walkPath;
 
+    // =====================================================
+    // COMPONENT REFERANSLARINI ALMA
+    // =====================================================
+
     void OnEnable()
     {
         animator = GetComponentInChildren<Animator>();
     }
+
+    // =====================================================
+    // HASTA HAREKET VE YÖN KONTROLLERİ
+    // =====================================================
 
     void Update()
     {
@@ -51,18 +59,21 @@ public class PatientMovement : MonoBehaviour
             currentTarget.z
         );
 
+        // Hastayı mevcut hedef noktaya doğru hareket ettirir.
         transform.position = Vector3.MoveTowards(
             transform.position,
             targetPosition,
             moveSpeed * Time.deltaTime
         );
 
+        // Hastanın hareket yönüne dönmesini sağlar.
         Vector3 direction = targetPosition - transform.position;
         direction.y = 0f;
 
         if (direction.sqrMagnitude > 0.001f)
             transform.forward = direction.normalized;
 
+        // Hedef noktaya ulaşıldığında sıradaki noktaya geçilir.
         if (Vector3.Distance(transform.position, targetPosition) <= stopDistance)
         {
             pathIndex++;
@@ -72,11 +83,16 @@ public class PatientMovement : MonoBehaviour
         }
     }
 
+    // =====================================================
+    // KAPI AÇMA VE KAPATMA KONTROLLERİ
+    // =====================================================
+
     private void HandleDoorByDistance()
     {
         if (doorController == null)
             return;
 
+        // Odaya giriş sırasında çalışan kapı kontrolleri.
         if (walkingIn)
         {
             if (!doorOpened && doorPoint != null &&
@@ -93,6 +109,8 @@ public class PatientMovement : MonoBehaviour
                 doorClosedAfterEntry = true;
             }
         }
+
+        // Odadan çıkış sırasında çalışan kapı kontrolleri.
         else
         {
             if (!doorOpened && insideDoorPoint != null &&
@@ -111,11 +129,16 @@ public class PatientMovement : MonoBehaviour
         }
     }
 
+    // =====================================================
+    // HEDEF NOKTAYA ULAŞMA İŞLEMLERİ
+    // =====================================================
+
     private void ArriveAtTarget()
     {
         canMove = false;
         PlayIdle();
 
+        // Hasta koltuğa ulaştığında çalışır.
         if (walkingIn)
         {
             if (targetPoint != null)
@@ -124,6 +147,8 @@ public class PatientMovement : MonoBehaviour
             if (gameFlowManager != null)
                 gameFlowManager.OnPatientArrived();
         }
+
+        // Hasta odadan çıktığında çalışır.
         else
         {
             if (doorController != null)
@@ -136,6 +161,10 @@ public class PatientMovement : MonoBehaviour
         }
     }
 
+    // =====================================================
+    // HASTANIN ODAYA GİRİŞ HAREKETİNİ BAŞLATMA
+    // =====================================================
+
     public void BeginWalk()
     {
         if (doorController != null)
@@ -147,6 +176,7 @@ public class PatientMovement : MonoBehaviour
 
         animator = GetComponentInChildren<Animator>();
 
+        // Giriş yürüyüş yolu oluşturulur.
         if (startPoint != null && targetPoint != null)
         {
             transform.position = startPoint.position;
@@ -173,10 +203,15 @@ public class PatientMovement : MonoBehaviour
         PlayWalk();
     }
 
+    // =====================================================
+    // HASTANIN ODADAN ÇIKIŞ HAREKETİNİ BAŞLATMA
+    // =====================================================
+
     public void BeginExit()
     {
         animator = GetComponentInChildren<Animator>();
 
+        // Başlangıç noktası yoksa hasta direkt gizlenir.
         if (startPoint == null)
         {
             HidePatient();
@@ -187,6 +222,7 @@ public class PatientMovement : MonoBehaviour
             return;
         }
 
+        // Çıkış yürüyüş yolu oluşturulur.
         walkPath = new Vector3[]
         {
             insideDoorPoint != null ? insideDoorPoint.position : targetPoint.position,
@@ -208,6 +244,10 @@ public class PatientMovement : MonoBehaviour
         PlayWalk();
     }
 
+    // =====================================================
+    // HASTA DAVRANIŞLARINI SIFIRLAMA
+    // =====================================================
+
     private void ResetPatientBehaviours()
     {
         PatientCough[] coughScripts = GetComponentsInChildren<PatientCough>(true);
@@ -218,6 +258,10 @@ public class PatientMovement : MonoBehaviour
                 cough.ResetCough();
         }
     }
+
+    // =====================================================
+    // HASTAYI MEVCUT HEDEF NOKTASINA ÇEVİRME
+    // =====================================================
 
     private void LookAtCurrentTarget()
     {
@@ -231,6 +275,10 @@ public class PatientMovement : MonoBehaviour
             transform.forward = direction.normalized;
     }
 
+    // =====================================================
+    // HASTA GÖRÜNÜRLÜK VE HAREKET KONTROLLERİ
+    // =====================================================
+
     public void HidePatient()
     {
         canMove = false;
@@ -243,6 +291,10 @@ public class PatientMovement : MonoBehaviour
         canMove = false;
         PlayIdle();
     }
+
+    // =====================================================
+    // HASTA MODELİNİ AKTİF ETME
+    // =====================================================
 
     public void SetPatientVisual(int index)
     {
@@ -262,6 +314,10 @@ public class PatientMovement : MonoBehaviour
 
         animator = GetComponentInChildren<Animator>();
     }
+
+    // =====================================================
+    // HASTA ANİMASYON KONTROLLERİ
+    // =====================================================
 
     private void PlayWalk()
     {

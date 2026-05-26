@@ -4,12 +4,24 @@ using UnityEngine;
 [CreateAssetMenu(fileName = "NewPatientCase", menuName = "Game/Patient Case")]
 public class PatientCaseData : ScriptableObject
 {
+    // =====================================================
+    // VAKA KİMLİĞİ
+    // =====================================================
+
     [Header("Case Identity")]
     public string caseId;
     public string trueDiseaseId;
 
+    // =====================================================
+    // HASTA GÖRSELİ
+    // =====================================================
+
     [Header("Patient Visual")]
     public int patientVisualIndex;
+
+    // =====================================================
+    // BAŞLANGIÇ AYARLARI
+    // =====================================================
 
     [Header("Start")]
     public string rootNodeId;
@@ -20,14 +32,30 @@ public class PatientCaseData : ScriptableObject
     [TextArea]
     public string startAssistantText;
 
+    // =====================================================
+    // DİYALOG NODE VERİLERİ
+    // =====================================================
+
     [Header("Dialogue")]
     public List<DialogueNodeData> allNodes = new List<DialogueNodeData>();
+
+    // =====================================================
+    // TANI SEÇENEKLERİ
+    // =====================================================
 
     [Header("Diagnosis")]
     public List<DiagnosisChoiceData> diagnosisChoices = new List<DiagnosisChoiceData>();
 
+    // =====================================================
+    // ASİSTAN İPUÇLARI
+    // =====================================================
+
     [Header("Assistant Hints")]
     public List<AssistantHintRuleData> assistantHints = new List<AssistantHintRuleData>();
+
+    // =====================================================
+    // RASTGELE VAKA VARYASYONLARI
+    // =====================================================
 
     [Header("Random Variation")]
     public CaseVariationProfile variationProfile;

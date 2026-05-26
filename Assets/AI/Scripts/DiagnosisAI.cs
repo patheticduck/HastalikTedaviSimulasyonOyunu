@@ -13,6 +13,10 @@ public class DiagnosisAI : MonoBehaviour
 
     private AIModelData modelData;
 
+    // =====================================================
+    // MODEL YÜKLEME
+    // =====================================================
+
     private void Awake()
     {
         LoadModel();
@@ -20,14 +24,17 @@ public class DiagnosisAI : MonoBehaviour
 
     private void LoadModel()
     {
+        // Model JSON atanmadıysa hata verilir.
         if (modelJson == null)
         {
             Debug.LogError("DiagnosisAI: modelJson atanmadı!");
             return;
         }
 
+        // JSON verisi deserialize edilir.
         modelData = JsonUtility.FromJson<AIModelData>(modelJson.text);
 
+        // Model verisi eksik veya bozuksa hata verilir.
         if (modelData == null ||
             modelData.classes == null ||
             modelData.features == null ||
@@ -37,29 +44,38 @@ public class DiagnosisAI : MonoBehaviour
             Debug.LogError("DiagnosisAI: model JSON okunamadı veya eksik!");
             return;
         }
-
-        Debug.Log(
-            "AI Model Loaded! Class Count: " + modelData.classes.Length +
-            " | Feature Count: " + modelData.features.Length
-        );
     }
+
+    // =====================================================
+    // HASTALIK TAHMİNİ ÜRETME
+    // =====================================================
 
     public List<DiagnosisPrediction> Predict(List<string> rawFeatures)
     {
-        List<DiagnosisPrediction> emptyResults = new List<DiagnosisPrediction>();
+        List<DiagnosisPrediction> emptyResults =
+            new List<DiagnosisPrediction>();
 
+        // Model yüklenmediyse boş sonuç döndürülür.
         if (modelData == null)
         {
-            Debug.LogError("DiagnosisAI: modelData null. Model yüklenmemiş.");
+            Debug.LogError(
+                "DiagnosisAI: modelData null. Model yüklenmemiş."
+            );
+
             return emptyResults;
         }
 
+        // Feature yoksa tahmin yapılmaz.
         if (rawFeatures == null || rawFeatures.Count == 0)
         {
-            Debug.LogWarning("DiagnosisAI: Predict için feature gelmedi.");
+            Debug.LogWarning(
+                "DiagnosisAI: Predict için feature gelmedi."
+            );
+
             return emptyResults;
         }
 
+        // Gelen feature'lar normalize edilir.
         List<string> normalizedFeatures =
             rawFeatures
             .Where(f => !string.IsNullOrWhiteSpace(f))
@@ -68,21 +84,30 @@ public class DiagnosisAI : MonoBehaviour
             .Distinct()
             .ToList();
 
-        Debug.Log("AI Raw Features: " + string.Join(", ", rawFeatures));
-        Debug.Log("AI Normalized Features: " + string.Join(", ", normalizedFeatures));
+        List<DiagnosisPrediction> results =
+            new List<DiagnosisPrediction>();
 
-        List<DiagnosisPrediction> results = new List<DiagnosisPrediction>();
-
-        for (int classIndex = 0; classIndex < modelData.classes.Length; classIndex++)
+        // Her hastalık sınıfı için skor hesaplanır.
+        for (int classIndex = 0;
+             classIndex < modelData.classes.Length;
+             classIndex++)
         {
-            double score = modelData.class_log_prior[classIndex];
+            double score =
+                modelData.class_log_prior[classIndex];
 
-            for (int featureIndex = 0; featureIndex < modelData.features.Length; featureIndex++)
+            // Eşleşen feature log probability değerleri eklenir.
+            for (int featureIndex = 0;
+                 featureIndex < modelData.features.Length;
+                 featureIndex++)
             {
-                string feature = modelData.features[featureIndex];
+                string feature =
+                    modelData.features[featureIndex];
 
                 if (normalizedFeatures.Contains(feature))
-                    score += modelData.feature_log_prob[classIndex][featureIndex];
+                {
+                    score +=
+                        modelData.feature_log_prob[classIndex][featureIndex];
+                }
             }
 
             results.Add(new DiagnosisPrediction
@@ -95,33 +120,52 @@ public class DiagnosisAI : MonoBehaviour
         if (results.Count == 0)
             return results;
 
+        // =====================================================
+        // SOFTMAX OLASILIK HESAPLAMA
+        // =====================================================
+
         double maxScore = results.Max(r => r.score);
         double sumExp = 0;
 
-        double temperature = Math.Max(softmaxTemperature, 0.1);
+        // Temperature değeri minimum sınırda tutulur.
+        double temperature =
+            Math.Max(softmaxTemperature, 0.1);
 
+        // Exp skorları hesaplanır.
         foreach (var r in results)
         {
-            r.probability = Math.Exp((r.score - maxScore) / temperature);
+            r.probability =
+                Math.Exp((r.score - maxScore) / temperature);
+
             sumExp += r.probability;
         }
 
+        // Geçersiz sonuç kontrolü yapılır.
         if (sumExp <= 0)
         {
-            Debug.LogWarning("DiagnosisAI: Softmax sumExp 0 veya negatif.");
+            Debug.LogWarning(
+                "DiagnosisAI: Softmax sumExp 0 veya negatif."
+            );
+
             return results;
         }
 
+        // Normalize edilmiş probability değerleri hesaplanır.
         foreach (var r in results)
         {
             r.probability /= sumExp;
         }
 
+        // Sonuçlar probability değerine göre sıralanır.
         return results
             .OrderByDescending(r => r.probability)
             .ToList();
     }
 }
+
+// =====================================================
+// AI TAHMİN SONUÇ VERİSİ
+// =====================================================
 
 [Serializable]
 public class DiagnosisPrediction
@@ -131,6 +175,10 @@ public class DiagnosisPrediction
     public double probability;
 }
 
+// =====================================================
+// MODEL JSON VERİ YAPISI
+// =====================================================
+
 [Serializable]
 public class AIModelData
 {
@@ -139,6 +187,10 @@ public class AIModelData
     public double[] class_log_prior;
     public DoubleArrayWrapper[] feature_log_prob;
 }
+
+// =====================================================
+// DOUBLE ARRAY WRAPPER
+// =====================================================
 
 [Serializable]
 public class DoubleArrayWrapper

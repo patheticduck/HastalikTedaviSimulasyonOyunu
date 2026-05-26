@@ -28,40 +28,68 @@ public class AIComputerCameraController : MonoBehaviour
 
     private Coroutine moveRoutine;
 
+    // =====================================================
+    // REFERANS VE BAŞLANGIÇ AYARLARI
+    // =====================================================
+
     private void Start()
     {
+        // Kamera atanmadıysa ana kamera alınır.
         if (mainCamera == null)
             mainCamera = Camera.main;
 
+        // Gerekli sistem referansları otomatik alınır.
         if (aiAnalysisUIManager == null)
-            aiAnalysisUIManager = FindFirstObjectByType<AIAnalysisUIManager>();
+        {
+            aiAnalysisUIManager =
+                FindFirstObjectByType<AIAnalysisUIManager>();
+        }
 
         if (interactionModeManager == null)
-            interactionModeManager = FindFirstObjectByType<PlayerInteractionModeManager>();
+        {
+            interactionModeManager =
+                FindFirstObjectByType<PlayerInteractionModeManager>();
+        }
 
         if (gameFlowManager == null)
             gameFlowManager = FindFirstObjectByType<GameFlowManager>();
 
         if (pauseMenuController == null)
-            pauseMenuController = FindFirstObjectByType<PauseMenuController>();
+        {
+            pauseMenuController =
+                FindFirstObjectByType<PauseMenuController>();
+        }
 
+        // AI panelinin dışarıdan kapanma aksiyonu atanır.
         if (aiAnalysisUIManager != null)
-            aiAnalysisUIManager.SetExternalCloseAction(CloseComputerMode);
+        {
+            aiAnalysisUIManager
+                .SetExternalCloseAction(CloseComputerMode);
+        }
     }
+
+    // =====================================================
+    // INPUT VE MOD KONTROLLERİ
+    // =====================================================
 
     private void Update()
     {
         if (Keyboard.current == null)
             return;
 
-        if (pauseMenuController != null && pauseMenuController.IsPaused())
+        // Pause sırasında kamera geçişleri çalışmaz.
+        if (pauseMenuController != null &&
+            pauseMenuController.IsPaused())
+        {
             return;
+        }
 
-        // Toggle Key None ise hiçbir tuş kontrolü yapma.
-        // Artık bilgisayar Monitor üzerindeki AIComputerInteractable ile E tuşundan açılıyor.
+        // ToggleKey None ise manuel input kontrolü yapılmaz.
+        // Bilgisayar artık interactable sistemi üzerinden açılıyor.
         if (toggleKey == Key.None)
             return;
 
+        // Toggle tuşu ile bilgisayar modu açılır / kapanır.
         if (Keyboard.current[toggleKey].wasPressedThisFrame)
         {
             if (isMoving)
@@ -74,20 +102,36 @@ public class AIComputerCameraController : MonoBehaviour
         }
     }
 
+    // =====================================================
+    // BİLGİSAYAR MODUNU AÇMA
+    // =====================================================
+
     public void OpenComputerMode()
     {
-        if (mainCamera == null || aiComputerCameraPoint == null || aiAnalysisUIManager == null)
+        if (mainCamera == null ||
+            aiComputerCameraPoint == null ||
+            aiAnalysisUIManager == null)
+        {
             return;
+        }
 
         if (isMoving || isComputerModeActive)
             return;
 
-        if (pauseMenuController != null && pauseMenuController.IsPaused())
+        if (pauseMenuController != null &&
+            pauseMenuController.IsPaused())
+        {
             return;
+        }
 
-        if (interactionModeManager != null && interactionModeManager.IsDialogueModeActive())
+        // Diyalog modunda AI paneli açılamaz.
+        if (interactionModeManager != null &&
+            interactionModeManager.IsDialogueModeActive())
+        {
             return;
+        }
 
+        // AI sistemi kilitliyse açılmaz.
         if (gameFlowManager != null)
         {
             if (!gameFlowManager.IsAIAnalysisUnlockedForCurrentPatient())
@@ -97,31 +141,43 @@ public class AIComputerCameraController : MonoBehaviour
                 return;
         }
 
+        // Kamera başlangıç pozisyonu kaydedilir.
         startPosition = mainCamera.transform.position;
         startRotation = mainCamera.transform.rotation;
 
         isComputerModeActive = true;
+
         movingToComputer = true;
         movingToGameplay = false;
 
+        // UI modu aktif edilir.
         if (interactionModeManager != null)
             interactionModeManager.EnterUIMode();
 
+        // Eski coroutine durdurulur.
         if (moveRoutine != null)
             StopCoroutine(moveRoutine);
 
-        moveRoutine = StartCoroutine(MoveCameraRoutine(
-            aiComputerCameraPoint.position,
-            aiComputerCameraPoint.rotation,
-            true
-        ));
+        // Kamera AI bilgisayar noktasına hareket ettirilir.
+        moveRoutine = StartCoroutine(
+            MoveCameraRoutine(
+                aiComputerCameraPoint.position,
+                aiComputerCameraPoint.rotation,
+                true
+            )
+        );
     }
+
+    // =====================================================
+    // BİLGİSAYAR MODUNU KAPATMA
+    // =====================================================
 
     public void CloseComputerMode()
     {
         if (!isComputerModeActive && !isMoving)
             return;
 
+        // AI paneli kapatılır.
         if (aiAnalysisUIManager != null)
             aiAnalysisUIManager.ClosePanelOnly();
 
@@ -131,12 +187,19 @@ public class AIComputerCameraController : MonoBehaviour
         if (moveRoutine != null)
             StopCoroutine(moveRoutine);
 
-        moveRoutine = StartCoroutine(MoveCameraRoutine(
-            startPosition,
-            startRotation,
-            false
-        ));
+        // Kamera gameplay pozisyonuna geri döndürülür.
+        moveRoutine = StartCoroutine(
+            MoveCameraRoutine(
+                startPosition,
+                startRotation,
+                false
+            )
+        );
     }
+
+    // =====================================================
+    // DURUM KONTROLLERİ
+    // =====================================================
 
     public bool IsComputerModeActive()
     {
@@ -158,23 +221,34 @@ public class AIComputerCameraController : MonoBehaviour
         return movingToGameplay;
     }
 
+    // =====================================================
+    // PAUSE İÇİN BİLGİSAYAR MODUNU TAMAMLAMA
+    // =====================================================
+
     public void ForceCompleteComputerMoveForPause()
     {
         if (moveRoutine != null)
             StopCoroutine(moveRoutine);
 
         isMoving = false;
+
         movingToComputer = false;
         movingToGameplay = false;
+
         isComputerModeActive = true;
 
         if (mainCamera == null)
             mainCamera = Camera.main;
 
-        if (mainCamera != null && aiComputerCameraPoint != null)
+        // Kamera doğrudan bilgisayar pozisyonuna yerleştirilir.
+        if (mainCamera != null &&
+            aiComputerCameraPoint != null)
         {
-            mainCamera.transform.position = aiComputerCameraPoint.position;
-            mainCamera.transform.rotation = aiComputerCameraPoint.rotation;
+            mainCamera.transform.position =
+                aiComputerCameraPoint.position;
+
+            mainCamera.transform.rotation =
+                aiComputerCameraPoint.rotation;
         }
 
         if (interactionModeManager != null)
@@ -184,14 +258,20 @@ public class AIComputerCameraController : MonoBehaviour
             aiAnalysisUIManager.OpenPanel();
     }
 
+    // =====================================================
+    // PAUSE İÇİN GAMEPLAY MODUNA DÖNÜŞ
+    // =====================================================
+
     public void ForceCompleteGameplayMoveForPause()
     {
         if (moveRoutine != null)
             StopCoroutine(moveRoutine);
 
         isMoving = false;
+
         movingToComputer = false;
         movingToGameplay = false;
+
         isComputerModeActive = false;
 
         if (aiAnalysisUIManager != null)
@@ -200,15 +280,24 @@ public class AIComputerCameraController : MonoBehaviour
         if (mainCamera == null)
             mainCamera = Camera.main;
 
-        if (mainCamera != null && gameplayCameraPoint != null)
+        // Kamera gameplay pozisyonuna yerleştirilir.
+        if (mainCamera != null &&
+            gameplayCameraPoint != null)
         {
-            mainCamera.transform.position = gameplayCameraPoint.position;
-            mainCamera.transform.rotation = gameplayCameraPoint.rotation;
+            mainCamera.transform.position =
+                gameplayCameraPoint.position;
+
+            mainCamera.transform.rotation =
+                gameplayCameraPoint.rotation;
         }
 
         if (interactionModeManager != null)
             interactionModeManager.ExitUIMode();
     }
+
+    // =====================================================
+    // GAMEPLAY KAMERASINA ZORLA RESETLEME
+    // =====================================================
 
     public void ForceResetToGameplayCamera(bool exitUIMode = true)
     {
@@ -216,8 +305,10 @@ public class AIComputerCameraController : MonoBehaviour
             StopCoroutine(moveRoutine);
 
         isMoving = false;
+
         movingToComputer = false;
         movingToGameplay = false;
+
         isComputerModeActive = false;
 
         if (aiAnalysisUIManager != null)
@@ -226,17 +317,32 @@ public class AIComputerCameraController : MonoBehaviour
         if (mainCamera == null)
             mainCamera = Camera.main;
 
-        if (mainCamera != null && gameplayCameraPoint != null)
+        // Kamera gameplay noktasına sıfırlanır.
+        if (mainCamera != null &&
+            gameplayCameraPoint != null)
         {
-            mainCamera.transform.position = gameplayCameraPoint.position;
-            mainCamera.transform.rotation = gameplayCameraPoint.rotation;
+            mainCamera.transform.position =
+                gameplayCameraPoint.position;
+
+            mainCamera.transform.rotation =
+                gameplayCameraPoint.rotation;
         }
 
-        if (exitUIMode && interactionModeManager != null)
+        if (exitUIMode &&
+            interactionModeManager != null)
+        {
             interactionModeManager.ExitUIMode();
+        }
     }
 
-    private IEnumerator MoveCameraRoutine(Vector3 targetPosition, Quaternion targetRotation, bool openPanelAfterMove)
+    // =====================================================
+    // KAMERA GEÇİŞ ANİMASYONU
+    // =====================================================
+
+    private IEnumerator MoveCameraRoutine(
+        Vector3 targetPosition,
+        Quaternion targetRotation,
+        bool openPanelAfterMove)
     {
         isMoving = true;
 
@@ -245,15 +351,21 @@ public class AIComputerCameraController : MonoBehaviour
 
         float elapsed = 0f;
 
+        // Kamera geçiş animasyonu oynatılır.
         while (elapsed < moveDuration)
         {
             elapsed += Time.unscaledDeltaTime;
 
             float t = Mathf.Clamp01(elapsed / moveDuration);
+
+            // Smoothstep benzeri geçiş efekti uygulanır.
             t = t * t * (3f - 2f * t);
 
-            mainCamera.transform.position = Vector3.Lerp(fromPosition, targetPosition, t);
-            mainCamera.transform.rotation = Quaternion.Slerp(fromRotation, targetRotation, t);
+            mainCamera.transform.position =
+                Vector3.Lerp(fromPosition, targetPosition, t);
+
+            mainCamera.transform.rotation =
+                Quaternion.Slerp(fromRotation, targetRotation, t);
 
             yield return null;
         }
@@ -262,14 +374,18 @@ public class AIComputerCameraController : MonoBehaviour
         mainCamera.transform.rotation = targetRotation;
 
         isMoving = false;
+
         movingToComputer = false;
         movingToGameplay = false;
 
+        // AI paneli gerekiyorsa açılır.
         if (openPanelAfterMove)
         {
             if (aiAnalysisUIManager != null)
                 aiAnalysisUIManager.OpenPanel();
         }
+
+        // Gameplay moduna geri dönülür.
         else
         {
             isComputerModeActive = false;

@@ -34,29 +34,47 @@ public class DoctorBookInteractable : MonoBehaviour
     private bool isAnimating = false;
     private bool isLookingAt = false;
 
+    // =====================================================
+    // REFERANS VE BAŞLANGIÇ AYARLARI
+    // =====================================================
+
     private void Start()
     {
+        // Kamera atanmadıysa ana kamera alınır.
         if (playerCamera == null)
             playerCamera = Camera.main;
 
+        // Sistem referansları otomatik alınır.
         if (interactionManager == null)
-            interactionManager = FindFirstObjectByType<PlayerInteractionModeManager>();
+        {
+            interactionManager =
+                FindFirstObjectByType<PlayerInteractionModeManager>();
+        }
 
         if (doctorBookUIManager == null)
-            doctorBookUIManager = FindFirstObjectByType<DoctorBookUIManager>();
+        {
+            doctorBookUIManager =
+                FindFirstObjectByType<DoctorBookUIManager>();
+        }
 
         if (gameFlowManager == null)
             gameFlowManager = FindFirstObjectByType<GameFlowManager>();
 
+        // Kitabın başlangıç pozisyonu kaydedilir.
         originalPosition = transform.position;
         originalRotation = transform.rotation;
 
+        // Interaction görselleri başlangıçta gizlenir.
         if (highlightObject != null)
             highlightObject.SetActive(false);
 
         if (interactText != null)
             interactText.SetActive(false);
     }
+
+    // =====================================================
+    // INPUT VE INTERACTION KONTROLLERİ
+    // =====================================================
 
     private void Update()
     {
@@ -68,12 +86,24 @@ public class DoctorBookInteractable : MonoBehaviour
 
         CheckLookAt();
 
-        if (isLookingAt && Keyboard.current.eKey.wasPressedThisFrame)
+        // E tuşu ile kitabı açma / kapama.
+        if (isLookingAt &&
+            Keyboard.current.eKey.wasPressedThisFrame)
+        {
             TryToggleBook();
+        }
 
-        if (isOpen && Keyboard.current.escapeKey.wasPressedThisFrame)
+        // ESC ile kitabı kapatma.
+        if (isOpen &&
+            Keyboard.current.escapeKey.wasPressedThisFrame)
+        {
             CloseBook();
+        }
     }
+
+    // =====================================================
+    // PAUSE DURUM KONTROLÜ
+    // =====================================================
 
     private bool IsPauseActive()
     {
@@ -85,19 +115,30 @@ public class DoctorBookInteractable : MonoBehaviour
 
         if (PauseMenuController.Instance.pauseMenuPanel != null &&
             PauseMenuController.Instance.pauseMenuPanel.activeInHierarchy)
+        {
             return true;
+        }
 
         return false;
     }
+
+    // =====================================================
+    // KİTABA BAKIŞ KONTROLÜ
+    // =====================================================
 
     private void CheckLookAt()
     {
         if (playerCamera == null || isAnimating || isOpen)
             return;
 
-        Ray ray = new Ray(playerCamera.transform.position, playerCamera.transform.forward);
+        Ray ray = new Ray(
+            playerCamera.transform.position,
+            playerCamera.transform.forward
+        );
+
         bool hitBook = false;
 
+        // Oyuncunun kitaba bakıp bakmadığı raycast ile kontrol edilir.
         if (Physics.Raycast(ray, out RaycastHit hit, interactDistance))
         {
             if (hit.collider != null &&
@@ -107,6 +148,7 @@ public class DoctorBookInteractable : MonoBehaviour
             }
         }
 
+        // Bakış durumu değiştiğinde interaction UI güncellenir.
         if (hitBook != isLookingAt)
         {
             isLookingAt = hitBook;
@@ -114,20 +156,32 @@ public class DoctorBookInteractable : MonoBehaviour
         }
     }
 
+    // =====================================================
+    // INTERACTION GÖRSELLERİNİ GÜNCELLEME
+    // =====================================================
+
     private void RefreshInteractionVisuals()
     {
-        bool canShow = isLookingAt && !isOpen && !isAnimating && CanOpenBookNow();
+        bool canShow =
+            isLookingAt &&
+            !isOpen &&
+            !isAnimating &&
+            CanOpenBookNow();
 
+        // Highlight objesi güncellenir.
         if (highlightObject != null)
             highlightObject.SetActive(canShow);
 
+        // Interaction yazısı güncellenir.
         if (interactText != null)
         {
             interactText.SetActive(canShow);
 
             if (canShow)
             {
-                TextMeshProUGUI tmp = interactText.GetComponent<TextMeshProUGUI>();
+                TextMeshProUGUI tmp =
+                    interactText.GetComponent<TextMeshProUGUI>();
+
                 if (tmp != null)
                 {
                     if (IsDoctorBookUnlocked())
@@ -139,6 +193,10 @@ public class DoctorBookInteractable : MonoBehaviour
         }
     }
 
+    // =====================================================
+    // KİTABIN AÇILABİLİRLİK KONTROLÜ
+    // =====================================================
+
     private bool CanOpenBookNow()
     {
         if (IsPauseActive())
@@ -147,22 +205,36 @@ public class DoctorBookInteractable : MonoBehaviour
         if (interactionManager == null)
             return false;
 
+        // Diyalog modunda kitap açılamaz.
         if (interactionManager.IsDialogueModeActive())
             return false;
 
-        if (gameFlowManager != null && !gameFlowManager.CanOpenNotebook())
+        // Hasta masaya ulaşmadan kitap açılamaz.
+        if (gameFlowManager != null &&
+            !gameFlowManager.CanOpenNotebook())
+        {
             return false;
+        }
 
         return true;
     }
+
+    // =====================================================
+    // KİTABIN KİLİT DURUMU
+    // =====================================================
 
     private bool IsDoctorBookUnlocked()
     {
         if (gameFlowManager == null)
             return false;
 
-        return gameFlowManager.IsDoctorBookUnlockedForCurrentPatient();
+        return gameFlowManager
+            .IsDoctorBookUnlockedForCurrentPatient();
     }
+
+    // =====================================================
+    // KİTABI AÇMA / KAPAMA İŞLEMİ
+    // =====================================================
 
     private void TryToggleBook()
     {
@@ -172,18 +244,20 @@ public class DoctorBookInteractable : MonoBehaviour
         if (isAnimating)
             return;
 
+        // Kitap açıksa kapatılır.
         if (isOpen)
         {
             CloseBook();
             return;
         }
 
+        // Açılabilir durumda değilse işlem yapılmaz.
         if (!CanOpenBookNow())
             return;
 
+        // Kilitliyse sadece interaction UI güncellenir.
         if (!IsDoctorBookUnlocked())
         {
-            Debug.Log("DoctorBook kilitli. Açmak için enerji kullanmalısın.");
             RefreshInteractionVisuals();
             return;
         }
@@ -191,36 +265,50 @@ public class DoctorBookInteractable : MonoBehaviour
         StartCoroutine(OpenBookRoutine());
     }
 
+    // =====================================================
+    // KİTABI KAMERAYA DOĞRU AÇMA ANİMASYONU
+    // =====================================================
+
     private IEnumerator OpenBookRoutine()
     {
         isAnimating = true;
         isOpen = true;
 
+        // Açılış sesi oynatılır.
         if (AudioManager.Instance != null)
             AudioManager.Instance.PlayBookOpenClose();
 
         RefreshInteractionVisuals();
 
+        // UI modu aktif edilir.
         if (interactionManager != null)
             interactionManager.EnterUIMode();
 
         yield return null;
         yield return new WaitForEndOfFrame();
 
+        // Kameraya göre hedef pozisyon hesaplanır.
         Vector3 targetPos =
             playerCamera.transform.position +
             playerCamera.transform.forward * cameraOffset.z +
             playerCamera.transform.up * cameraOffset.y +
             playerCamera.transform.right * cameraOffset.x;
 
-        Quaternion baseLookRot = Quaternion.LookRotation(playerCamera.transform.forward, playerCamera.transform.up);
-        Quaternion targetRot = baseLookRot * Quaternion.Euler(openRotationOffset);
+        Quaternion baseLookRot =
+            Quaternion.LookRotation(
+                playerCamera.transform.forward,
+                playerCamera.transform.up
+            );
+
+        Quaternion targetRot =
+            baseLookRot * Quaternion.Euler(openRotationOffset);
 
         Vector3 startPos = transform.position;
         Quaternion startRot = transform.rotation;
 
         float t = 0f;
 
+        // Kitap açılış animasyonu oynatılır.
         while (t < 1f)
         {
             if (IsPauseActive())
@@ -230,22 +318,33 @@ public class DoctorBookInteractable : MonoBehaviour
             }
 
             t += Time.deltaTime * moveSpeed;
-            transform.position = Vector3.Lerp(startPos, targetPos, t);
-            transform.rotation = Quaternion.Slerp(startRot, targetRot, t);
+
+            transform.position =
+                Vector3.Lerp(startPos, targetPos, t);
+
+            transform.rotation =
+                Quaternion.Slerp(startRot, targetRot, t);
+
             yield return null;
         }
 
         transform.position = targetPos;
         transform.rotation = targetRot;
 
+        // Book panel güvenli şekilde açılır.
         yield return StartCoroutine(SafeOpenBookPanelRoutine());
 
         Cursor.lockState = CursorLockMode.None;
         Cursor.visible = true;
 
         isAnimating = false;
+
         RefreshInteractionVisuals();
     }
+
+    // =====================================================
+    // BOOK PANELİNİ GÜVENLİ ŞEKİLDE AÇMA
+    // =====================================================
 
     private IEnumerator SafeOpenBookPanelRoutine()
     {
@@ -257,6 +356,7 @@ public class DoctorBookInteractable : MonoBehaviour
         yield return null;
         yield return new WaitForEndOfFrame();
 
+        // Panel açılmadıysa tekrar denenir.
         if (!doctorBookUIManager.IsBookPanelOpen())
             doctorBookUIManager.OpenBook();
 
@@ -265,6 +365,10 @@ public class DoctorBookInteractable : MonoBehaviour
         if (!doctorBookUIManager.IsBookPanelOpen())
             doctorBookUIManager.OpenBook();
     }
+
+    // =====================================================
+    // KİTABI KAPATMA İŞLEMİ
+    // =====================================================
 
     private void CloseBook()
     {
@@ -285,6 +389,10 @@ public class DoctorBookInteractable : MonoBehaviour
         CloseBook();
     }
 
+    // =====================================================
+    // KİTABI ANINDA KAPATMA
+    // =====================================================
+
     public void ForceCloseBookImmediate()
     {
         StopAllCoroutines();
@@ -301,15 +409,24 @@ public class DoctorBookInteractable : MonoBehaviour
         RefreshInteractionVisuals();
     }
 
+    // =====================================================
+    // ANİMASYON DURUM KONTROLÜ
+    // =====================================================
+
     public bool IsBookAnimating()
     {
         return isAnimating;
     }
 
+    // =====================================================
+    // KİTABI ESKİ KONUMUNA GERİ GÖNDERME
+    // =====================================================
+
     private IEnumerator CloseBookRoutine()
     {
         isAnimating = true;
 
+        // Kapanış sesi oynatılır.
         if (AudioManager.Instance != null)
             AudioManager.Instance.PlayBookOpenClose();
 
@@ -321,6 +438,7 @@ public class DoctorBookInteractable : MonoBehaviour
 
         float t = 0f;
 
+        // Kitap kapanış animasyonu oynatılır.
         while (t < 1f)
         {
             if (IsPauseActive())
@@ -330,8 +448,13 @@ public class DoctorBookInteractable : MonoBehaviour
             }
 
             t += Time.deltaTime * moveSpeed;
-            transform.position = Vector3.Lerp(startPos, originalPosition, t);
-            transform.rotation = Quaternion.Slerp(startRot, originalRotation, t);
+
+            transform.position =
+                Vector3.Lerp(startPos, originalPosition, t);
+
+            transform.rotation =
+                Quaternion.Slerp(startRot, originalRotation, t);
+
             yield return null;
         }
 
@@ -341,9 +464,11 @@ public class DoctorBookInteractable : MonoBehaviour
         isOpen = false;
         isAnimating = false;
 
+        // UI modu kapatılır.
         if (interactionManager != null)
             interactionManager.ExitUIMode();
 
+        // Gameplay free look modu geri açılır.
         if (gameFlowManager != null)
             gameFlowManager.NotifyFreeLookStateEntered();
 

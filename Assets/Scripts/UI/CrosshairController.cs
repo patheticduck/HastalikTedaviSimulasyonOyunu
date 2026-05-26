@@ -15,8 +15,13 @@ public class CrosshairController : MonoBehaviour
     public GameObject GameOverPanel;
     public GameObject AIAnalysisPanel;
 
+    // =====================================================
+    // CROSSHAIR GÖRÜNÜRLÜK KONTROLLERİ
+    // =====================================================
+
     void Update()
     {
+        // Belirli UI panelleri açıkken crosshair gizlenir.
         bool shouldHide =
             IsOpen(MainMenuPanel) ||
             IsOpen(DialoguePanel) ||
@@ -30,6 +35,10 @@ public class CrosshairController : MonoBehaviour
         if (crosshair != null)
             crosshair.SetActive(!shouldHide);
     }
+
+    // =====================================================
+    // PANEL AKTİFLİK KONTROLÜ
+    // =====================================================
 
     bool IsOpen(GameObject panel)
     {

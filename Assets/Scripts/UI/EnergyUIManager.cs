@@ -24,38 +24,52 @@ public class EnergyUIManager : MonoBehaviour
     [Header("Optional Text")]
     public TextMeshProUGUI energyInfoText;
 
+    // =====================================================
+    // REFERANS VE BUTTON EVENT AYARLARI
+    // =====================================================
+
     private void Awake()
     {
+        // GameFlowManager referansı otomatik alınır.
         if (gameFlowManager == null)
             gameFlowManager = FindFirstObjectByType<GameFlowManager>();
 
+        // Confirm paneli başlangıçta kapatılır.
         if (confirmPanel != null)
             confirmPanel.SetActive(false);
 
+        // Enerji kullanım butonu eventleri atanır.
         if (useEnergyButton != null)
         {
             useEnergyButton.onClick.RemoveListener(OnClickUseEnergy);
             useEnergyButton.onClick.AddListener(OnClickUseEnergy);
         }
 
+        // DoctorBook enerji butonu eventleri atanır.
         if (doctorBookButton != null)
         {
             doctorBookButton.onClick.RemoveListener(OnDoctorBookButton);
             doctorBookButton.onClick.AddListener(OnDoctorBookButton);
         }
 
+        // AI analiz enerji butonu eventleri atanır.
         if (aiAnalysisButton != null)
         {
             aiAnalysisButton.onClick.RemoveListener(OnAIAnalysisButton);
             aiAnalysisButton.onClick.AddListener(OnAIAnalysisButton);
         }
 
+        // Vazgeç butonu eventleri atanır.
         if (noButton != null)
         {
             noButton.onClick.RemoveListener(OnConfirmNo);
             noButton.onClick.AddListener(OnConfirmNo);
         }
     }
+
+    // =====================================================
+    // BAŞLANGIÇ UI GÜNCELLEME
+    // =====================================================
 
     private void Start()
     {
@@ -67,6 +81,10 @@ public class EnergyUIManager : MonoBehaviour
         UpdateEnergyUI();
     }
 
+    // =====================================================
+    // ENERJİ KULLANIM PANELİNİ AÇMA
+    // =====================================================
+
     public void OnClickUseEnergy()
     {
         if (gameFlowManager == null)
@@ -74,9 +92,11 @@ public class EnergyUIManager : MonoBehaviour
 
         UpdateEnergyUI();
 
+        // İpucu paneli açılamıyorsa işlem iptal edilir.
         if (!gameFlowManager.CanOpenHintPanel())
             return;
 
+        // Confirm paneli açılır.
         if (confirmPanel != null)
         {
             confirmPanel.SetActive(true);
@@ -85,6 +105,7 @@ public class EnergyUIManager : MonoBehaviour
 
         UpdateHintButtons();
 
+        // Confirm mesajı güncellenir.
         if (confirmText != null)
         {
             confirmText.text =
@@ -95,6 +116,10 @@ public class EnergyUIManager : MonoBehaviour
         Cursor.visible = true;
     }
 
+    // =====================================================
+    // DOCTOR BOOK ENERJİ KULLANIMI
+    // =====================================================
+
     public void OnDoctorBookButton()
     {
         if (gameFlowManager != null)
@@ -104,6 +129,10 @@ public class EnergyUIManager : MonoBehaviour
         UpdateEnergyUI();
     }
 
+    // =====================================================
+    // AI ANALİZ ENERJİ KULLANIMI
+    // =====================================================
+
     public void OnAIAnalysisButton()
     {
         if (gameFlowManager != null)
@@ -112,6 +141,10 @@ public class EnergyUIManager : MonoBehaviour
         CloseConfirmPanel();
         UpdateEnergyUI();
     }
+
+    // =====================================================
+    // CONFIRM PANELİNİ KAPATMA
+    // =====================================================
 
     public void OnConfirmNo()
     {
@@ -128,13 +161,22 @@ public class EnergyUIManager : MonoBehaviour
         Cursor.visible = true;
     }
 
+    // =====================================================
+    // CONFIRM PANELİ DURUM KONTROLÜ
+    // =====================================================
+
     public bool IsConfirmPanelOpen()
     {
         return confirmPanel != null && confirmPanel.activeInHierarchy;
     }
 
+    // =====================================================
+    // ENERJİ UI GÜNCELLEME
+    // =====================================================
+
     public void UpdateEnergyUI()
     {
+        // Referans kaybolduysa tekrar alınır.
         if (gameFlowManager == null)
             gameFlowManager = FindFirstObjectByType<GameFlowManager>();
 
@@ -142,6 +184,7 @@ public class EnergyUIManager : MonoBehaviour
             ? gameFlowManager.currentEnergy
             : 0;
 
+        // Enerji ikonları güncellenir.
         if (energyIcons != null)
         {
             for (int i = 0; i < energyIcons.Length; i++)
@@ -151,16 +194,26 @@ public class EnergyUIManager : MonoBehaviour
             }
         }
 
+        // Enerji kullanım butonu güncellenir.
         if (useEnergyButton != null && gameFlowManager != null)
+        {
             useEnergyButton.interactable =
                 gameFlowManager.CanOpenHintPanel();
+        }
 
+        // Enerji bilgi yazısı güncellenir.
         if (energyInfoText != null && gameFlowManager != null)
+        {
             energyInfoText.text =
                 currentEnergy + " / " + gameFlowManager.maxEnergy;
+        }
 
         UpdateHintButtons();
     }
+
+    // =====================================================
+    // İPUCU BUTON DURUMLARINI GÜNCELLEME
+    // =====================================================
 
     private void UpdateHintButtons()
     {
@@ -169,6 +222,7 @@ public class EnergyUIManager : MonoBehaviour
 
         bool hasEnergy = gameFlowManager.currentEnergy > 0;
 
+        // DoctorBook butonu kontrol edilir.
         if (doctorBookButton != null)
         {
             doctorBookButton.interactable =
@@ -176,6 +230,7 @@ public class EnergyUIManager : MonoBehaviour
                 !gameFlowManager.IsDoctorBookUnlockedForCurrentPatient();
         }
 
+        // AI analiz butonu kontrol edilir.
         if (aiAnalysisButton != null)
         {
             aiAnalysisButton.interactable =

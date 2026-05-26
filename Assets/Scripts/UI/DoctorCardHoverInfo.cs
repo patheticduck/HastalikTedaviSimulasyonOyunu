@@ -17,12 +17,18 @@ public class DoctorCardHoverInfo : MonoBehaviour, IPointerEnterHandler, IPointer
     private Vector3 originalScale;
     private Coroutine animationCoroutine;
 
+    // =====================================================
+    // BAŞLANGIÇ REFERANS VE DURUM AYARLARI
+    // =====================================================
+
     private void Awake()
     {
+        // Scale hedefi atanmadıysa mevcut RectTransform alınır.
         if (scaleTarget == null)
             scaleTarget = GetComponent<RectTransform>();
 
         originalScale = scaleTarget.localScale;
+
         ResetHoverState();
     }
 
@@ -36,11 +42,17 @@ public class DoctorCardHoverInfo : MonoBehaviour, IPointerEnterHandler, IPointer
         ResetHoverState();
     }
 
+    // =====================================================
+    // HOVER GİRİŞ / ÇIKIŞ EVENTLERİ
+    // =====================================================
+
     public void OnPointerEnter(PointerEventData eventData)
     {
+        // Hover bilgi paneli açılır.
         if (hoverInfoPanel != null)
             hoverInfoPanel.SetActive(true);
 
+        // Hover scale animasyonu başlatılır.
         StartScaleAnimation(originalScale * hoverScale);
     }
 
@@ -49,31 +61,47 @@ public class DoctorCardHoverInfo : MonoBehaviour, IPointerEnterHandler, IPointer
         ResetHoverState();
     }
 
+    // =====================================================
+    // HOVER DURUMUNU SIFIRLAMA
+    // =====================================================
+
     private void ResetHoverState()
     {
+        // Aktif animasyon durdurulur.
         if (animationCoroutine != null)
         {
             StopCoroutine(animationCoroutine);
             animationCoroutine = null;
         }
 
+        // Hover bilgi paneli kapatılır.
         if (hoverInfoPanel != null)
             hoverInfoPanel.SetActive(false);
 
+        // Kart eski scale değerine döndürülür.
         if (scaleTarget != null)
             scaleTarget.localScale = originalScale;
     }
+
+    // =====================================================
+    // SCALE ANİMASYONUNU BAŞLATMA
+    // =====================================================
 
     private void StartScaleAnimation(Vector3 targetScale)
     {
         if (scaleTarget == null)
             return;
 
+        // Önceki animasyon varsa durdurulur.
         if (animationCoroutine != null)
             StopCoroutine(animationCoroutine);
 
         animationCoroutine = StartCoroutine(ScaleRoutine(targetScale));
     }
+
+    // =====================================================
+    // SCALE GEÇİŞ ANİMASYONU
+    // =====================================================
 
     private IEnumerator ScaleRoutine(Vector3 targetScale)
     {
@@ -83,6 +111,7 @@ public class DoctorCardHoverInfo : MonoBehaviour, IPointerEnterHandler, IPointer
         while (timer < animationDuration)
         {
             timer += Time.unscaledDeltaTime;
+
             float t = Mathf.Clamp01(timer / animationDuration);
 
             scaleTarget.localScale = Vector3.Lerp(startScale, targetScale, t);

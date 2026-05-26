@@ -21,38 +21,59 @@ public class AIComputerInteractable : MonoBehaviour
 
     private bool isLookingAt = false;
 
+    // =====================================================
+    // REFERANS VE BAŞLANGIÇ AYARLARI
+    // =====================================================
+
     private void Start()
     {
+        // Kamera referansı atanmadıysa ana kamera alınır.
         if (playerCamera == null)
             playerCamera = Camera.main;
 
+        // Gerekli sistem referansları otomatik alınır.
         if (interactionManager == null)
-            interactionManager = FindFirstObjectByType<PlayerInteractionModeManager>();
+        {
+            interactionManager =
+                FindFirstObjectByType<PlayerInteractionModeManager>();
+        }
 
         if (gameFlowManager == null)
             gameFlowManager = FindFirstObjectByType<GameFlowManager>();
 
         if (aiComputerController == null)
-            aiComputerController = FindFirstObjectByType<AIComputerCameraController>();
+        {
+            aiComputerController =
+                FindFirstObjectByType<AIComputerCameraController>();
+        }
 
         HideVisuals();
     }
+
+    // =====================================================
+    // INTERACTION VE INPUT KONTROLLERİ
+    // =====================================================
 
     private void Update()
     {
         if (Keyboard.current == null)
             return;
 
+        // Pause durumunda interaction çalışmaz.
         if (PauseMenuController.Instance != null &&
             PauseMenuController.Instance.IsPaused())
+        {
             return;
+        }
 
-        // Kamera hareket ederken hiçbir interaction çalışmasın
+        // Kamera geçiş animasyonu sırasında interaction çalışmaz.
         if (aiComputerController != null &&
             aiComputerController.IsMoving())
+        {
             return;
+        }
 
-        // Bilgisayar açıksa E ile kapat
+        // Bilgisayar modu açıksa E ile kapatılır.
         if (aiComputerController != null &&
             aiComputerController.IsComputerModeActive() &&
             Keyboard.current.eKey.wasPressedThisFrame)
@@ -63,15 +84,21 @@ public class AIComputerInteractable : MonoBehaviour
 
         CheckLookAt();
 
+        // Interaction UI sürekli güncellenir.
         if (isLookingAt)
             RefreshInteractionVisuals();
 
+        // E tuşuna basıldığında bilgisayar açılır.
         if (isLookingAt &&
             Keyboard.current.eKey.wasPressedThisFrame)
         {
             TryOpenComputer();
         }
     }
+
+    // =====================================================
+    // BİLGİSAYARA BAKIŞ KONTROLÜ
+    // =====================================================
 
     private void CheckLookAt()
     {
@@ -85,6 +112,7 @@ public class AIComputerInteractable : MonoBehaviour
 
         bool hitComputer = false;
 
+        // Raycast ile oyuncunun bilgisayara bakıp bakmadığı kontrol edilir.
         if (Physics.Raycast(ray, out RaycastHit hit, interactDistance))
         {
             AIComputerInteractable computer =
@@ -94,6 +122,7 @@ public class AIComputerInteractable : MonoBehaviour
                 hitComputer = true;
         }
 
+        // Bakış durumu değiştiğinde interaction görselleri güncellenir.
         if (hitComputer != isLookingAt)
         {
             isLookingAt = hitComputer;
@@ -101,13 +130,21 @@ public class AIComputerInteractable : MonoBehaviour
         }
     }
 
+    // =====================================================
+    // INTERACTION GÖRSELLERİNİ GÜNCELLEME
+    // =====================================================
+
     private void RefreshInteractionVisuals()
     {
-        bool canShow = isLookingAt && CanShowInteractionPrompt();
+        bool canShow =
+            isLookingAt &&
+            CanShowInteractionPrompt();
 
+        // Highlight objesi güncellenir.
         if (highlightObject != null)
             highlightObject.SetActive(canShow);
 
+        // Interaction yazısı güncellenir.
         if (interactText != null)
         {
             interactText.SetActive(canShow);
@@ -127,48 +164,70 @@ public class AIComputerInteractable : MonoBehaviour
         }
     }
 
+    // =====================================================
+    // INTERACTION PROMPT GÖSTERİM KONTROLÜ
+    // =====================================================
+
     private bool CanShowInteractionPrompt()
     {
         if (interactionManager == null)
             return false;
 
+        // Diyalog modunda interaction engellenir.
         if (interactionManager.IsDialogueModeActive())
             return false;
 
+        // Zorunlu UI modunda interaction engellenir.
         if (interactionManager.IsInForcedUIMode())
             return false;
 
-        // Hasta masaya gelmeden görünmesin
+        // Hasta masaya gelmeden interaction gösterilmez.
         if (gameFlowManager != null &&
             !gameFlowManager.CanOpenNotebook())
+        {
             return false;
+        }
 
         return true;
     }
+
+    // =====================================================
+    // BİLGİSAYAR MODUNU AÇMA
+    // =====================================================
 
     private void TryOpenComputer()
     {
         if (!CanShowInteractionPrompt())
             return;
 
-        // Kilitliyse açma
+        // AI sistemi kilitliyse açılmaz.
         if (!IsAIUnlocked())
             return;
 
         HideVisuals();
         isLookingAt = false;
 
+        // Bilgisayar kamera modu açılır.
         if (aiComputerController != null)
             aiComputerController.OpenComputerMode();
     }
+
+    // =====================================================
+    // AI ANALİZ SİSTEMİNİN KİLİT DURUMU
+    // =====================================================
 
     private bool IsAIUnlocked()
     {
         if (gameFlowManager == null)
             return false;
 
-        return gameFlowManager.IsAIAnalysisUnlockedForCurrentPatient();
+        return gameFlowManager
+            .IsAIAnalysisUnlockedForCurrentPatient();
     }
+
+    // =====================================================
+    // INTERACTION GÖRSELLERİNİ GİZLEME
+    // =====================================================
 
     private void HideVisuals()
     {

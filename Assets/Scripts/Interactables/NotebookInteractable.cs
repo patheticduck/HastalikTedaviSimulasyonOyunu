@@ -33,26 +33,44 @@ public class NotebookInteractable : MonoBehaviour
     private bool isAnimating = false;
     private bool isLookingAt = false;
 
+    // =====================================================
+    // REFERANS VE BAŞLANGIÇ AYARLARI
+    // =====================================================
+
     private void Start()
     {
+        // Kamera atanmadıysa ana kamera alınır.
         if (playerCamera == null)
             playerCamera = Camera.main;
 
+        // Gerekli sistem referansları otomatik alınır.
         if (interactionManager == null)
-            interactionManager = FindFirstObjectByType<PlayerInteractionModeManager>();
+        {
+            interactionManager =
+                FindFirstObjectByType<PlayerInteractionModeManager>();
+        }
 
         if (notebookUIManager == null)
-            notebookUIManager = FindFirstObjectByType<NotebookUIManager>();
+        {
+            notebookUIManager =
+                FindFirstObjectByType<NotebookUIManager>();
+        }
 
         if (gameFlowManager == null)
             gameFlowManager = FindFirstObjectByType<GameFlowManager>();
 
+        // Başlangıç pozisyonu kaydedilir.
         originalPosition = transform.position;
         originalRotation = transform.rotation;
 
-        if (notebookUIManager != null && notebookUIManager.notebookPanel != null)
+        // Notebook paneli başlangıçta kapatılır.
+        if (notebookUIManager != null &&
+            notebookUIManager.notebookPanel != null)
+        {
             notebookUIManager.notebookPanel.SetActive(false);
+        }
 
+        // Interaction görselleri başlangıçta gizlenir.
         if (highlightObject != null)
             highlightObject.SetActive(false);
 
@@ -60,45 +78,68 @@ public class NotebookInteractable : MonoBehaviour
             interactText.SetActive(false);
     }
 
+    // =====================================================
+    // INPUT VE INTERACTION KONTROLLERİ
+    // =====================================================
+
     private void Update()
     {
-        if (PauseMenuController.Instance != null && PauseMenuController.Instance.IsPaused())
+        // Pause sırasında interaction çalışmaz.
+        if (PauseMenuController.Instance != null &&
+            PauseMenuController.Instance.IsPaused())
+        {
             return;
+        }
 
         if (Keyboard.current == null)
             return;
 
         CheckLookAt();
 
-        if (isLookingAt && Keyboard.current.eKey.wasPressedThisFrame)
+        // E tuşu ile notebook açılır / kapanır.
+        if (isLookingAt &&
+            Keyboard.current.eKey.wasPressedThisFrame)
         {
             TryToggleNotebook();
         }
 
-        if (isOpen && Keyboard.current.escapeKey.wasPressedThisFrame)
+        // ESC ile notebook kapatılır.
+        if (isOpen &&
+            Keyboard.current.escapeKey.wasPressedThisFrame)
         {
             StartCoroutine(CloseNotebook());
         }
     }
+
+    // =====================================================
+    // NOTEBOOK'A BAKIŞ KONTROLÜ
+    // =====================================================
 
     private void CheckLookAt()
     {
         if (playerCamera == null || isAnimating)
             return;
 
-        Ray ray = new Ray(playerCamera.transform.position, playerCamera.transform.forward);
+        Ray ray = new Ray(
+            playerCamera.transform.position,
+            playerCamera.transform.forward
+        );
+
         RaycastHit hit;
 
         bool hitNotebook = false;
 
+        // Raycast ile notebook hedef kontrolü yapılır.
         if (Physics.Raycast(ray, out hit, interactDistance))
         {
-            if (hit.collider != null && hit.collider.GetComponentInParent<NotebookInteractable>() == this)
+            if (hit.collider != null &&
+                hit.collider.GetComponentInParent<NotebookInteractable>() == this)
             {
                 hitNotebook = true;
             }
         }
 
+        // Bakış durumu değişirse interaction UI güncellenir.
         if (hitNotebook != isLookingAt)
         {
             isLookingAt = hitNotebook;
@@ -106,63 +147,104 @@ public class NotebookInteractable : MonoBehaviour
         }
     }
 
+    // =====================================================
+    // INTERACTION GÖRSELLERİNİ GÜNCELLEME
+    // =====================================================
+
     private void RefreshInteractionVisuals()
     {
-        bool canShowPrompt = isLookingAt && !isOpen && !isAnimating && CanShowInteractionPrompt();
+        bool canShowPrompt =
+            isLookingAt &&
+            !isOpen &&
+            !isAnimating &&
+            CanShowInteractionPrompt();
 
+        // Highlight objesi güncellenir.
         if (highlightObject != null)
             highlightObject.SetActive(canShowPrompt);
 
+        // Interaction yazısı güncellenir.
         if (interactText != null)
         {
             interactText.SetActive(canShowPrompt);
 
             if (canShowPrompt)
             {
-                TextMeshProUGUI tmp = interactText.GetComponent<TextMeshProUGUI>();
+                TextMeshProUGUI tmp =
+                    interactText.GetComponent<TextMeshProUGUI>();
+
                 if (tmp != null)
                     tmp.text = notebookInteractText;
             }
         }
     }
 
+    // =====================================================
+    // INTERACTION PROMPT GÖSTERİM KONTROLÜ
+    // =====================================================
+
     private bool CanShowInteractionPrompt()
     {
-        if (PauseMenuController.Instance != null && PauseMenuController.Instance.IsPaused())
+        if (PauseMenuController.Instance != null &&
+            PauseMenuController.Instance.IsPaused())
+        {
             return false;
+        }
 
         if (interactionManager == null)
             return false;
 
+        // Diyalog modunda notebook açılamaz.
         if (interactionManager.IsDialogueModeActive())
             return false;
 
-        if (gameFlowManager != null && !gameFlowManager.CanOpenNotebook())
+        // Hasta masaya ulaşmadan notebook açılamaz.
+        if (gameFlowManager != null &&
+            !gameFlowManager.CanOpenNotebook())
+        {
             return false;
+        }
 
         return true;
     }
 
+    // =====================================================
+    // NOTEBOOK AÇMA / KAPAMA KONTROLÜ
+    // =====================================================
+
     private void TryToggleNotebook()
     {
-        if (PauseMenuController.Instance != null && PauseMenuController.Instance.IsPaused())
+        if (PauseMenuController.Instance != null &&
+            PauseMenuController.Instance.IsPaused())
+        {
             return;
+        }
 
         if (isAnimating)
             return;
 
+        // Gerekli referanslar eksikse hata verilir.
         if (playerCamera == null)
         {
-            Debug.LogError($"NotebookInteractable -> playerCamera atanmadı: {gameObject.name}", this);
+            Debug.LogError(
+                $"NotebookInteractable -> playerCamera atanmadı: {gameObject.name}",
+                this
+            );
+
             return;
         }
 
         if (interactionManager == null)
         {
-            Debug.LogError($"NotebookInteractable -> interactionManager atanmadı: {gameObject.name}", this);
+            Debug.LogError(
+                $"NotebookInteractable -> interactionManager atanmadı: {gameObject.name}",
+                this
+            );
+
             return;
         }
 
+        // Notebook açıksa kapatılır.
         if (isOpen)
         {
             StartCoroutine(CloseNotebook());
@@ -175,10 +257,17 @@ public class NotebookInteractable : MonoBehaviour
         StartCoroutine(OpenNotebook());
     }
 
+    // =====================================================
+    // NOTEBOOK AÇILABİLİRLİK KONTROLÜ
+    // =====================================================
+
     private bool CanOpenNotebookNow()
     {
-        if (PauseMenuController.Instance != null && PauseMenuController.Instance.IsPaused())
+        if (PauseMenuController.Instance != null &&
+            PauseMenuController.Instance.IsPaused())
+        {
             return false;
+        }
 
         if (interactionManager == null)
             return false;
@@ -186,16 +275,26 @@ public class NotebookInteractable : MonoBehaviour
         if (interactionManager.IsDialogueModeActive())
             return false;
 
-        if (gameFlowManager != null && !gameFlowManager.CanOpenNotebook())
+        if (gameFlowManager != null &&
+            !gameFlowManager.CanOpenNotebook())
+        {
             return false;
+        }
 
         return true;
     }
 
+    // =====================================================
+    // NOTEBOOK AÇILIŞ ANİMASYONU
+    // =====================================================
+
     private IEnumerator OpenNotebook()
     {
-        if (PauseMenuController.Instance != null && PauseMenuController.Instance.IsPaused())
+        if (PauseMenuController.Instance != null &&
+            PauseMenuController.Instance.IsPaused())
+        {
             yield break;
+        }
 
         if (!CanOpenNotebookNow())
             yield break;
@@ -203,88 +302,133 @@ public class NotebookInteractable : MonoBehaviour
         isAnimating = true;
         isOpen = true;
 
+        // Açılış sesi oynatılır.
         if (AudioManager.Instance != null)
             AudioManager.Instance.PlayBookOpenClose();
 
         RefreshInteractionVisuals();
 
+        // UI modu aktif edilir.
         interactionManager.EnterUIMode();
 
+        // Kameraya göre hedef pozisyon hesaplanır.
         Vector3 targetPos =
             playerCamera.transform.position +
             playerCamera.transform.forward * cameraOffset.z +
             playerCamera.transform.up * cameraOffset.y +
             playerCamera.transform.right * cameraOffset.x;
 
-        Quaternion baseLookRot = Quaternion.LookRotation(playerCamera.transform.forward, playerCamera.transform.up);
-        Quaternion targetRot = baseLookRot * Quaternion.Euler(openRotationOffset);
+        Quaternion baseLookRot =
+            Quaternion.LookRotation(
+                playerCamera.transform.forward,
+                playerCamera.transform.up
+            );
+
+        Quaternion targetRot =
+            baseLookRot * Quaternion.Euler(openRotationOffset);
 
         float t = 0f;
 
+        // Notebook açılış animasyonu oynatılır.
         while (t < 1f)
         {
-            if (PauseMenuController.Instance != null && PauseMenuController.Instance.IsPaused())
+            if (PauseMenuController.Instance != null &&
+                PauseMenuController.Instance.IsPaused())
+            {
                 yield break;
+            }
 
             if (playerCamera == null)
                 break;
 
             t += Time.deltaTime * moveSpeed;
-            transform.position = Vector3.Lerp(originalPosition, targetPos, t);
-            transform.rotation = Quaternion.Slerp(originalRotation, targetRot, t);
+
+            transform.position =
+                Vector3.Lerp(originalPosition, targetPos, t);
+
+            transform.rotation =
+                Quaternion.Slerp(originalRotation, targetRot, t);
+
             yield return null;
         }
 
         transform.position = targetPos;
         transform.rotation = targetRot;
 
+        // Notebook UI açılır.
         if (notebookUIManager != null)
             notebookUIManager.OpenNotebookUI();
 
         isAnimating = false;
+
         RefreshInteractionVisuals();
     }
 
+    // =====================================================
+    // NOTEBOOK KAPANIŞ ANİMASYONU
+    // =====================================================
+
     private IEnumerator CloseNotebook()
     {
-        if (PauseMenuController.Instance != null && PauseMenuController.Instance.IsPaused())
+        if (PauseMenuController.Instance != null &&
+            PauseMenuController.Instance.IsPaused())
+        {
             yield break;
+        }
 
         isAnimating = true;
         isOpen = false;
 
+        // Kapanış sesi oynatılır.
         if (AudioManager.Instance != null)
             AudioManager.Instance.PlayBookOpenClose();
 
+        // Notebook UI kapatılır.
         if (notebookUIManager != null)
             notebookUIManager.CloseNotebookUI();
 
         float t = 0f;
+
         Vector3 currentPos = transform.position;
         Quaternion currentRot = transform.rotation;
 
+        // Notebook eski konumuna döndürülür.
         while (t < 1f)
         {
-            if (PauseMenuController.Instance != null && PauseMenuController.Instance.IsPaused())
+            if (PauseMenuController.Instance != null &&
+                PauseMenuController.Instance.IsPaused())
+            {
                 yield break;
+            }
 
             t += Time.deltaTime * moveSpeed;
-            transform.position = Vector3.Lerp(currentPos, originalPosition, t);
-            transform.rotation = Quaternion.Slerp(currentRot, originalRotation, t);
+
+            transform.position =
+                Vector3.Lerp(currentPos, originalPosition, t);
+
+            transform.rotation =
+                Quaternion.Slerp(currentRot, originalRotation, t);
+
             yield return null;
         }
 
         transform.position = originalPosition;
         transform.rotation = originalRotation;
 
+        // UI modu kapatılır.
         interactionManager.ExitUIMode();
 
         if (gameFlowManager != null)
             gameFlowManager.NotifyFreeLookStateEntered();
 
         isAnimating = false;
+
         RefreshInteractionVisuals();
     }
+
+    // =====================================================
+    // NOTEBOOK DURUM KONTROLLERİ
+    // =====================================================
 
     public bool IsNotebookOpen()
     {
@@ -296,16 +440,27 @@ public class NotebookInteractable : MonoBehaviour
         return isAnimating;
     }
 
+    // =====================================================
+    // UI BUTONU ÜZERİNDEN NOTEBOOK KAPATMA
+    // =====================================================
+
     public void CloseNotebookFromButton()
     {
         if (!isOpen || isAnimating)
             return;
 
-        if (PauseMenuController.Instance != null && PauseMenuController.Instance.IsPaused())
+        if (PauseMenuController.Instance != null &&
+            PauseMenuController.Instance.IsPaused())
+        {
             return;
+        }
 
         StartCoroutine(CloseNotebook());
     }
+
+    // =====================================================
+    // NOTEBOOK'U ANINDA KAPATMA
+    // =====================================================
 
     public void ForceCloseNotebookImmediate()
     {

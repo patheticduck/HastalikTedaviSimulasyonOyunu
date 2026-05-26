@@ -31,14 +31,21 @@ public class DialogueNotificationUI : MonoBehaviour
     private Coroutine blinkRoutine;
     private bool isBlinking = false;
 
+    // =====================================================
+    // UI BAŞLANGIÇ AYARLARI
+    // =====================================================
+
     private void Awake()
     {
+        // Bilgilendirme paneli başlangıçta kapatılır.
         if (notificationInfoPanel != null)
             notificationInfoPanel.SetActive(false);
 
+        // Bildirim mesajı UI'a aktarılır.
         if (notificationText != null)
             notificationText.text = message;
 
+        // Bildirim butonu click eventi atanır.
         if (notificationButton != null)
         {
             notificationButton.onClick.RemoveAllListeners();
@@ -51,8 +58,13 @@ public class DialogueNotificationUI : MonoBehaviour
             notificationButton.transform.localScale = Vector3.one;
     }
 
+    // =====================================================
+    // DİYALOG DURUMU KONTROLLERİ
+    // =====================================================
+
     private void Update()
     {
+        // Diyalog paneli kapalıysa bildirim sistemi durdurulur.
         if (!IsDialogueContextActive())
         {
             if (notificationInfoPanel != null &&
@@ -66,29 +78,32 @@ public class DialogueNotificationUI : MonoBehaviour
         }
     }
 
+    // =====================================================
+    // YENİ SEÇENEK BİLDİRİMİNİ BAŞLATMA
+    // =====================================================
+
     public void NotifyNewOptions()
     {
-        Debug.Log("DialogueNotificationUI -> NotifyNewOptions çağrıldı.");
-
+        // Obje aktif değilse bildirim başlatılmaz.
         if (!gameObject.activeInHierarchy)
         {
             Debug.LogWarning("DialogueNotificationUI -> Obje aktif değil, bildirim başlatılmadı.");
             return;
         }
 
+        // Diyalog paneli aktif değilse çalışmaz.
         if (!IsDialogueContextActive())
             return;
 
+        // Bildirim zaten çalışıyorsa tekrar başlatılmaz.
         if (isBlinking)
         {
-            Debug.Log("DialogueNotificationUI -> Zaten blink çalışıyor.");
             return;
         }
 
         isBlinking = true;
 
-        Debug.Log("DialogueNotificationUI -> Blink başladı, bildirim sesi çalacak.");
-
+        // Bildirim sesi oynatılır.
         if (AudioManager.Instance != null)
             AudioManager.Instance.PlayNotification();
         else
@@ -96,6 +111,10 @@ public class DialogueNotificationUI : MonoBehaviour
 
         blinkRoutine = StartCoroutine(BlinkRoutine());
     }
+
+    // =====================================================
+    // BİLDİRİM EFEKTİNİ DURDURMA
+    // =====================================================
 
     public void StopNotification()
     {
@@ -113,6 +132,10 @@ public class DialogueNotificationUI : MonoBehaviour
             notificationButton.transform.localScale = Vector3.one;
     }
 
+    // =====================================================
+    // BİLDİRİM DURUMUNU SIFIRLAMA
+    // =====================================================
+
     public void ResetNotificationState()
     {
         StopNotification();
@@ -121,11 +144,16 @@ public class DialogueNotificationUI : MonoBehaviour
             notificationInfoPanel.SetActive(false);
     }
 
+    // =====================================================
+    // BİLGİ PANELİNİ AÇMA / KAPATMA
+    // =====================================================
+
     private void ToggleNotificationPanel()
     {
         if (notificationInfoPanel == null)
             return;
 
+        // Diyalog paneli aktif değilse bilgi paneli kapatılır.
         if (!IsDialogueContextActive())
         {
             notificationInfoPanel.SetActive(false);
@@ -138,11 +166,19 @@ public class DialogueNotificationUI : MonoBehaviour
         StopNotification();
     }
 
+    // =====================================================
+    // DİYALOG PANELİ AKTİFLİK KONTROLÜ
+    // =====================================================
+
     private bool IsDialogueContextActive()
     {
         return dialoguePanel != null &&
                dialoguePanel.activeInHierarchy;
     }
+
+    // =====================================================
+    // YANIP SÖNME VE PULSE ANİMASYONU
+    // =====================================================
 
     private IEnumerator BlinkRoutine()
     {
@@ -166,6 +202,10 @@ public class DialogueNotificationUI : MonoBehaviour
         if (notificationButton != null)
             notificationButton.transform.localScale = Vector3.one;
     }
+
+    // =====================================================
+    // BUTON ALPHA DEĞERİNİ GÜNCELLEME
+    // =====================================================
 
     private void SetButtonAlpha(float alpha)
     {

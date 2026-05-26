@@ -2,7 +2,12 @@ using System.Collections.Generic;
 
 public static class AIFeatureNormalizer
 {
-    private static readonly Dictionary<string, string> map = new Dictionary<string, string>
+    // =====================================================
+    // FEATURE NORMALIZATION EŞLEŞME TABLOSU
+    // =====================================================
+
+    private static readonly Dictionary<string, string> map =
+        new Dictionary<string, string>
     {
         // Fever
         { "fever", "HAS_FEVER" },
@@ -126,16 +131,23 @@ public static class AIFeatureNormalizer
         { "hand_wrist", "JOINT_PAIN" }
     };
 
+    // =====================================================
+    // FEATURE NORMALIZATION İŞLEMİ
+    // =====================================================
+
     public static string Normalize(string feature)
     {
+        // Boş veya geçersiz feature kontrolü.
         if (string.IsNullOrWhiteSpace(feature))
             return "";
 
         feature = feature.Trim();
 
+        // Feature eşleşme tablosunda varsa normalize edilir.
         if (map.ContainsKey(feature))
             return map[feature];
 
+        // Eşleşme yoksa orijinal değer döndürülür.
         return feature;
     }
 }

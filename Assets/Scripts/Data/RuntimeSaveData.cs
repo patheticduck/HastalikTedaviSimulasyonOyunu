@@ -3,18 +3,34 @@ using System.Collections.Generic;
 [System.Serializable]
 public class RuntimeSaveData
 {
+    // =====================================================
+    // OYUN İLERLEME VERİLERİ
+    // =====================================================
+
     public int currentDay;
     public int currentPatientNumber;
     public int totalCorrect;
     public int totalWrong;
     public int remainingHearts;
 
+    // =====================================================
+    // ENERJİ VE DOCTOR BOOK DURUMU
+    // =====================================================
+
     public int maxEnergy;
     public int currentEnergy;
     public bool doctorBookUnlockedForCurrentPatient;
 
+    // =====================================================
+    // GÜNLÜK SONUÇ VERİLERİ
+    // =====================================================
+
     public int dayCorrect;
     public int dayWrong;
+
+    // =====================================================
+    // HASTA VE TANI DURUMU
+    // =====================================================
 
     public bool diagnosisSubmittedForCurrentPatient;
     public bool patientResultPanelPendingAfterLoad;
@@ -25,6 +41,10 @@ public class RuntimeSaveData
 
     public bool pendingLoseGameOver;
 
+    // =====================================================
+    // SAVE VE DOKTOR BİLGİLERİ
+    // =====================================================
+
     public bool hasSave;
 
     public DoctorSpecialization selectedDoctorSpecialization = DoctorSpecialization.None;
@@ -32,12 +52,22 @@ public class RuntimeSaveData
     // Aynı oyun döngüsünü ayırt etmek için kullanılır.
     public string runId;
 
-    // Continue save oluşturulma zamanı
+    // =====================================================
+    // SAVE TARİH BİLGİLERİ
+    // =====================================================
+
     public string savedDateText;
     public long savedAtTicks;
 
-    // Oyun başında oluşturulan hasta sırası
+    // =====================================================
+    // PLANLANAN HASTA SIRASI
+    // =====================================================
+
     public List<string> plannedPatientCaseIds = new List<string>();
+
+    // =====================================================
+    // HASTA ANALİZ GEÇMİŞİ
+    // =====================================================
 
     public List<PatientAnalysisEntry> patientAnalysisHistory = new List<PatientAnalysisEntry>();
 }

@@ -3,6 +3,10 @@ using System.Collections.Generic;
 [System.Serializable]
 public class PatientHistoryData
 {
+    // =====================================================
+    // HASTA SONUÇ BİLGİLERİ
+    // =====================================================
+
     public string patientLabel;
     public string playerAnswer;
     public bool isCorrect;
@@ -12,8 +16,16 @@ public class PatientHistoryData
 [System.Serializable]
 public class DayHistoryData
 {
+    // =====================================================
+    // GÜN GEÇMİŞİ VERİLERİ
+    // =====================================================
+
     public int dayNumber;
     public List<PatientHistoryData> patients = new List<PatientHistoryData>();
+
+    // =====================================================
+    // GÜNLÜK DOĞRU / YANLIŞ HESAPLAMA
+    // =====================================================
 
     public int TotalCorrect()
     {
@@ -45,13 +57,25 @@ public class DayHistoryData
 [System.Serializable]
 public class SessionHistoryData
 {
+    // =====================================================
+    // OTURUM GENEL BİLGİLERİ
+    // =====================================================
+
     public string completedDateText;
     public string relativeTimeText;
     public long completedAtTicks;
 
     public string selectedDoctorName;
 
+    // =====================================================
+    // GÜN GEÇMİŞİ LİSTESİ
+    // =====================================================
+
     public List<DayHistoryData> days = new List<DayHistoryData>();
+
+    // =====================================================
+    // TOPLAM DOĞRU / YANLIŞ HESAPLAMA
+    // =====================================================
 
     public int TotalCorrect()
     {

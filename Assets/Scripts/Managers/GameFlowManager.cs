@@ -19,6 +19,10 @@ public class PatientAnalysisEntry
 
 public class GameFlowManager : MonoBehaviour
 {
+    // =========================
+    // ANA MANAGER VE HASTA SİSTEMLERİ
+    // =========================
+
     [Header("Main Managers")]
     public MainMenuManager mainMenuManager;
 
@@ -27,6 +31,10 @@ public class GameFlowManager : MonoBehaviour
 
     [Header("Patient")]
     public PatientMovement patientMovement;
+
+    // =========================
+    // HASTA HAVUZLARI VE VAKA PLANLAMA
+    // =========================
 
     [Header("Patient Pools")]
     public List<PatientCaseData> respiratoryCases = new List<PatientCaseData>();
@@ -42,6 +50,10 @@ public class GameFlowManager : MonoBehaviour
 
     private readonly List<PatientCaseData> plannedPatientCases = new List<PatientCaseData>();
     private readonly List<string> plannedPatientCaseIds = new List<string>();
+
+    // =========================
+    // UI PANEL VE SONUÇ EKRANLARI
+    // =========================
 
     [Header("Panels")]
     public GameObject dialoguePanel;
@@ -81,6 +93,10 @@ public class GameFlowManager : MonoBehaviour
     [Header("Heart UI")]
     public GameObject[] hearts;
 
+    // =========================
+    // ENERJİ VE NOTEBOOK ERİŞİMİ
+    // =========================
+
     [Header("Energy UI")]
     public GameObject energyPanel;
     public EnergyUIManager energyUIManager;
@@ -93,6 +109,10 @@ public class GameFlowManager : MonoBehaviour
 
     [Header("Notebook Access")]
     [SerializeField] private bool blockNotebookInteraction = true;
+
+    // =========================
+    // OYUN VE İLERLEME VERİLERİ
+    // =========================
 
     [Header("Game Data")]
     public int currentDay = 1;
@@ -128,6 +148,7 @@ public class GameFlowManager : MonoBehaviour
 
     private string currentRunId = "";
 
+    // Oyunun başlangıç UI ve sistem durumlarını hazırlar.
     private void Start()
     {
         if (dialoguePanel != null) dialoguePanel.SetActive(false);
@@ -155,6 +176,11 @@ public class GameFlowManager : MonoBehaviour
         UpdateEnergyUI();
     }
 
+    // =========================
+    // YENİ OYUN VE RESET SİSTEMİ
+    // =========================
+
+    // Oyunu tamamen başlangıç durumuna sıfırlar.
     public void ResetGame()
     {
         currentRunId = System.Guid.NewGuid().ToString();
@@ -214,10 +240,13 @@ public class GameFlowManager : MonoBehaviour
             interactionModeManager.SetDialogueAvailable(false);
             interactionModeManager.ExitUIMode();
         }
-
-        Debug.Log("Yeni oyun başlatıldı. Rastgele hasta sırası oluşturuldu.");
     }
 
+    // =========================
+    // HASTA HAVUZU OLUŞTURMA
+    // =========================
+
+    // Oyun başlangıcında kullanılacak hasta sıralamasını oluşturur.
     private void GeneratePlannedPatientCases()
     {
         plannedPatientCases.Clear();
@@ -238,9 +267,9 @@ public class GameFlowManager : MonoBehaviour
         foreach (PatientCaseData patientCase in plannedPatientCases)
             plannedPatientCaseIds.Add(GetCaseSaveId(patientCase));
 
-        Debug.Log("Planlanan hasta sayısı: " + plannedPatientCases.Count);
     }
 
+    // Null veya tekrar eden vakaları temizleyerek güvenli havuz oluşturur.
     private List<PatientCaseData> BuildCleanPool(List<PatientCaseData> source)
     {
         List<PatientCaseData> cleanPool = new List<PatientCaseData>();
@@ -260,6 +289,7 @@ public class GameFlowManager : MonoBehaviour
         return cleanPool;
     }
 
+    // Eski sistemden kalan vakaları yeni havuza ekler.
     private void AddDeprecatedCasesIfNeeded(List<PatientCaseData> respiratoryPool)
     {
         if (gripCase != null && !respiratoryPool.Contains(gripCase))
@@ -269,6 +299,7 @@ public class GameFlowManager : MonoBehaviour
             respiratoryPool.Add(coldCase);
     }
 
+    // Belirtilen havuzdan rastgele vaka seçerek planlanan listeye ekler.
     private void AddRandomCasesFromPool(List<PatientCaseData> pool, int targetCount, string poolName)
     {
         if (pool == null || pool.Count == 0)
@@ -295,6 +326,7 @@ public class GameFlowManager : MonoBehaviour
         }
     }
 
+    // Save/load sistemi için vaka ID'si oluşturur.
     private string GetCaseSaveId(PatientCaseData patientCase)
     {
         if (patientCase == null)
@@ -306,6 +338,7 @@ public class GameFlowManager : MonoBehaviour
         return patientCase.name;
     }
 
+    // Kayıtlı ID üzerinden ilgili hasta vakasını bulur.
     private PatientCaseData FindCaseBySaveId(string caseId)
     {
         if (string.IsNullOrEmpty(caseId))
@@ -330,6 +363,7 @@ public class GameFlowManager : MonoBehaviour
         return null;
     }
 
+    // Aktif hasta numarasına göre mevcut vakayı döndürür.
     private PatientCaseData GetCurrentPlannedPatientCase()
     {
         if (plannedPatientCases.Count == 0)
@@ -346,6 +380,11 @@ public class GameFlowManager : MonoBehaviour
         return plannedPatientCases[index];
     }
 
+    // =========================
+    // GAMEPLAY VE HASTA AKIŞI
+    // =========================
+
+    // Yeni hasta akışını başlatır ve gerekli sistemleri hazırlar.
     public void StartGameplayFlow()
     {
         if (gameEnded) return;
@@ -358,8 +397,6 @@ public class GameFlowManager : MonoBehaviour
         aiAnalysisUsedForCurrentPatient = false;
         patientTransitionInProgress = true;
         diagnosisFlowInProgress = false;
-
-        Debug.Log("Oyun akışı başlatıldı. Hasta No: " + currentPatientNumber);
 
         if (dialoguePanel != null) dialoguePanel.SetActive(false);
         if (endDayPanel != null) endDayPanel.SetActive(false);
@@ -383,6 +420,7 @@ public class GameFlowManager : MonoBehaviour
             Debug.LogWarning("PatientMovement bağlı değil!");
     }
 
+    // Mevcut hasta vakasını DialogueManager sistemine atar.
     private void AssignCurrentPatientCase()
     {
         DialogueManager dialogueManager = FindFirstObjectByType<DialogueManager>();
@@ -399,18 +437,22 @@ public class GameFlowManager : MonoBehaviour
         {
             dialogueManager.currentCase = selectedCase;
 
-        if (patientMovement != null)
-        {
-        patientMovement.SetPatientVisual(selectedCase.patientVisualIndex);
-        }
+            if (patientMovement != null)
+            {
+                patientMovement.SetPatientVisual(selectedCase.patientVisualIndex);
+            }
 
-        Debug.Log("Atanan vaka: " + selectedCase.name);
-        return;
-    }
+            return;
+        }
 
         Debug.LogWarning("Planlanan hasta bulunamadı. Vaka atanamadı.");
     }
 
+    // =========================
+    // SAVE / LOAD SİSTEMİ
+    // =========================
+
+    // Oyun akışındaki runtime verilerini save datasına dönüştürür.
     public RuntimeSaveData BuildRuntimeSaveData()
     {
         RuntimeSaveData save = new RuntimeSaveData();
@@ -455,6 +497,7 @@ public class GameFlowManager : MonoBehaviour
         return save;
     }
 
+    // Save datasındaki bilgileri oyun akışına geri yükler.
     public void ApplyRuntimeSaveData(RuntimeSaveData save)
     {
         if (save == null)
@@ -550,7 +593,11 @@ public class GameFlowManager : MonoBehaviour
         UpdateHeartsUI();
         UpdateEnergyUI();
     }
+    // =========================
+    // SAVE / LOAD DEVAM AKIŞI
+    // =========================
 
+    // Save dosyasındaki hasta sırasını geri yükler.
     private void RestorePlannedPatientCasesFromSave(List<string> savedCaseIds)
     {
         plannedPatientCases.Clear();
@@ -583,6 +630,7 @@ public class GameFlowManager : MonoBehaviour
             GeneratePlannedPatientCases();
     }
 
+    // Save yüklendikten sonra gameplay akışını doğru noktadan devam ettirir.
     public void ContinueAfterLoadedSave()
     {
         SetEnergyPanelVisible(true);
@@ -608,6 +656,7 @@ public class GameFlowManager : MonoBehaviour
         StartGameplayFlow();
     }
 
+    // Patient analysis geçmişinin güvenli bir kopyasını oluşturur.
     private List<PatientAnalysisEntry> ClonePatientAnalysisHistory()
     {
         List<PatientAnalysisEntry> clone = new List<PatientAnalysisEntry>();
@@ -631,16 +680,20 @@ public class GameFlowManager : MonoBehaviour
         return clone;
     }
 
+    // =========================
+    // DOĞRU / YANLIŞ TEŞHİS SİSTEMİ
+    // =========================
+
+    // Doğru teşhis sonrası skor verilerini günceller.
     public void AddCorrectAnswer()
     {
         if (gameEnded) return;
 
         totalCorrect++;
         dayCorrect++;
-
-        Debug.Log("Doğru eklendi. Toplam doğru: " + totalCorrect);
     }
 
+    // Yanlış teşhis sonrası kalp ve skor sistemini günceller.
     public void AddWrongAnswer()
     {
         if (gameEnded) return;
@@ -654,12 +707,15 @@ public class GameFlowManager : MonoBehaviour
 
         UpdateHeartsUI();
 
-        Debug.Log("Yanlış eklendi. Toplam yanlış: " + totalWrong);
-
         if (remainingHearts <= 0)
             pendingLoseGameOver = true;
     }
 
+    // =========================
+    // GÜN GEÇİŞ VE SONUÇ PANELLERİ
+    // =========================
+
+    // Gün geçiş panelini belirtilen mesaj ile açar.
     public void ShowDayTransitionPanel(string message)
     {
         SetNotebookBlocked(true);
@@ -671,6 +727,7 @@ public class GameFlowManager : MonoBehaviour
             dayTransitionText.text = message;
     }
 
+    // Gün geçiş panelini kapatır.
     public void CloseDayTransitionPanel()
     {
         if (dayTransitionPanel != null)
@@ -679,6 +736,7 @@ public class GameFlowManager : MonoBehaviour
         SetNotebookBlocked(true);
     }
 
+    // Gün sonu değerlendirme panelini oluşturur.
     private void ShowEndOfDayPanel()
     {
         SetNotebookBlocked(true);
@@ -718,6 +776,7 @@ public class GameFlowManager : MonoBehaviour
         }
     }
 
+    // Gün sonu panelini kapatır ve gameplay moduna döner.
     private void CloseEndOfDayPanel()
     {
         if (endDayPanel != null)
@@ -729,6 +788,11 @@ public class GameFlowManager : MonoBehaviour
         SetNotebookBlocked(true);
     }
 
+    // =========================
+    // GAME OVER VE RAPOR SİSTEMİ
+    // =========================
+
+    // Oyun sonu panelini oluşturur ve sonucu ekrana yansıtır.
     private void ShowGameOverPanel(bool isVictory)
     {
         gameEnded = true;
@@ -748,6 +812,7 @@ public class GameFlowManager : MonoBehaviour
         if (endDayPanel != null) endDayPanel.SetActive(false);
         if (gameOverPanel != null) gameOverPanel.SetActive(true);
 
+        // Kazanma / kaybetme ses efektlerini oynatır.
         if (AudioManager.Instance != null)
         {
             AudioManager.Instance.StopAllMusic();
@@ -787,6 +852,7 @@ public class GameFlowManager : MonoBehaviour
         }
     }
 
+    // Oyun sonunda detaylı analiz raporu oluşturur.
     private string BuildDetailedGameOverText(bool isVictory)
     {
         StringBuilder sb = new StringBuilder();
@@ -817,6 +883,7 @@ public class GameFlowManager : MonoBehaviour
 
         int maxPlayedDay = patientAnalysisHistory.Max(x => x.dayNumber);
 
+        // Gün gün hasta teşhis sonuçlarını raporlar.
         for (int day = 1; day <= maxPlayedDay; day++)
         {
             List<PatientAnalysisEntry> dayEntries = patientAnalysisHistory
@@ -859,6 +926,11 @@ public class GameFlowManager : MonoBehaviour
         return sb.ToString();
     }
 
+    // =========================
+    // SESSION HISTORY SİSTEMİ
+    // =========================
+
+    // Oyun oturum geçmişi için kayıt verisi oluşturur.
     public SessionHistoryData BuildSessionHistoryData()
     {
         SessionHistoryData session = new SessionHistoryData();
@@ -879,6 +951,7 @@ public class GameFlowManager : MonoBehaviour
 
         int maxPlayedDay = patientAnalysisHistory.Max(x => x.dayNumber);
 
+        // Günlük hasta analiz kayıtlarını session datasına ekler.
         for (int day = 1; day <= maxPlayedDay; day++)
         {
             List<PatientAnalysisEntry> dayEntries = patientAnalysisHistory
@@ -909,6 +982,11 @@ public class GameFlowManager : MonoBehaviour
         return session;
     }
 
+    // =========================
+    // DEVAM BUTONU VE GÜN GEÇİŞ AKIŞI
+    // =========================
+
+    // Gün sonu veya oyun sonu devam butonlarını yönetir.
     public void OnContinueButtonPressed()
     {
         if (gameEnded)
@@ -924,6 +1002,7 @@ public class GameFlowManager : MonoBehaviour
         }
     }
 
+    // Hasta sonuç panelindeki devam akışını yönetir.
     public void OnPatientResultContinuePressed()
     {
         if (gameEnded)
@@ -966,6 +1045,7 @@ public class GameFlowManager : MonoBehaviour
         }
     }
 
+    // Gün geçiş animasyonunu oynatır ve yeni günü başlatır.
     private IEnumerator PlayDayTransitionAndStartNextDay()
     {
         CloseEndOfDayPanel();
@@ -1000,6 +1080,7 @@ public class GameFlowManager : MonoBehaviour
 
         float timer = 0f;
 
+        // Fade in animasyonu.
         while (timer < fadeInDuration)
         {
             timer += Time.deltaTime;
@@ -1011,6 +1092,7 @@ public class GameFlowManager : MonoBehaviour
 
         yield return new WaitForSeconds(holdDuration);
 
+        // Fade out animasyonu.
         timer = 0f;
         while (timer < fadeOutDuration)
         {
@@ -1030,6 +1112,11 @@ public class GameFlowManager : MonoBehaviour
             StartGameplayFlow();
     }
 
+    // =========================
+    // HASTA SONUÇ PANELİ
+    // =========================
+
+    // Hastaya ait teşhis sonucunu oyuncuya gösterir.
     private void ShowPatientResultPanel()
     {
         SetNotebookBlocked(true);
@@ -1083,6 +1170,7 @@ public class GameFlowManager : MonoBehaviour
         }
     }
 
+    // Hasta sonuç panelini kapatır.
     private void HidePatientResultPanel()
     {
         if (patientResultPanel != null)
@@ -1093,7 +1181,11 @@ public class GameFlowManager : MonoBehaviour
 
         SetNotebookBlocked(true);
     }
+    // =========================
+    // ANA MENÜ VE GAMEPLAY DURDURMA
+    // =========================
 
+    // Oyun sonu panellerinden ana menüye dönüş yapar.
     public void ReturnToMainMenuFromEndPanel()
     {
         SetNotebookBlocked(true);
@@ -1114,10 +1206,9 @@ public class GameFlowManager : MonoBehaviour
             mainMenuManager.ReturnToMenu(totalCorrect, totalWrong);
     }
 
+    // Gameplay sırasında çalışan tüm akışları zorla durdurur.
     public void ForceStopAllGameplay()
     {
-        Debug.Log("GAME HARD STOP");
-
         patientTransitionInProgress = false;
         diagnosisFlowInProgress = false;
         waitingForDayContinue = false;
@@ -1143,23 +1234,25 @@ public class GameFlowManager : MonoBehaviour
         SetNotebookBlocked(true);
     }
 
+    // =========================
+    // ENERJİ VE HINT SİSTEMİ
+    // =========================
+
+    // DoctorBook kullanımı için enerji harcar.
     public bool TryUseEnergyForDoctorBook()
     {
         if (gameEnded)
         {
-            Debug.Log("Oyun bittikten sonra enerji kullanılamaz.");
             return false;
         }
 
         if (doctorBookUnlockedForCurrentPatient)
         {
-            Debug.Log("DoctorBook bu hasta için zaten açık.");
             return false;
         }
 
         if (currentEnergy <= 0)
         {
-            Debug.Log("Enerji kalmadı.");
             return false;
         }
 
@@ -1167,15 +1260,16 @@ public class GameFlowManager : MonoBehaviour
         doctorBookUnlockedForCurrentPatient = true;
         UpdateEnergyUI();
 
-        Debug.Log("Enerji kullanıldı. DoctorBook bu hasta için açıldı. Kalan enerji: " + currentEnergy);
         return true;
     }
 
+    // Mevcut hastada DoctorBook kullanım durumunu döndürür.
     public bool IsDoctorBookUnlockedForCurrentPatient()
     {
         return doctorBookUnlockedForCurrentPatient;
     }
 
+    // Yeni hasta için DoctorBook ve AI erişimlerini sıfırlar.
     public void ResetDoctorBookForNewPatient()
     {
         doctorBookUnlockedForCurrentPatient = false;
@@ -1184,6 +1278,7 @@ public class GameFlowManager : MonoBehaviour
         UpdateEnergyUI();
     }
 
+    // DoctorBook açılabilir mi kontrol eder.
     public bool CanUseEnergyForDoctorBook()
     {
         if (gameEnded)
@@ -1195,6 +1290,7 @@ public class GameFlowManager : MonoBehaviour
         return currentEnergy > 0;
     }
 
+    // Hint panelinin açılabilir olup olmadığını kontrol eder.
     public bool CanOpenHintPanel()
     {
         if (gameEnded)
@@ -1233,6 +1329,7 @@ public class GameFlowManager : MonoBehaviour
         return currentEnergy > 0;
     }
 
+    // AI analiz panelinin açılabilir olup olmadığını kontrol eder.
     public bool CanOpenAIAnalysisPanel()
     {
         if (gameEnded)
@@ -1271,6 +1368,7 @@ public class GameFlowManager : MonoBehaviour
         return true;
     }
 
+    // AI analiz sistemi için enerji kullanımını yönetir.
     public bool TryUseEnergyForAIAnalysis()
     {
         if (gameEnded)
@@ -1284,7 +1382,6 @@ public class GameFlowManager : MonoBehaviour
 
         if (currentEnergy <= 0)
         {
-            Debug.Log("Enerji kalmadı.");
             return false;
         }
 
@@ -1294,16 +1391,20 @@ public class GameFlowManager : MonoBehaviour
 
         UpdateEnergyUI();
 
-        Debug.Log("AI analizi için 1 enerji harcandı. Kalan enerji: " + currentEnergy);
-
         return true;
     }
 
+    // Mevcut hastada AI analiz erişim durumunu döndürür.
     public bool IsAIAnalysisUnlockedForCurrentPatient()
     {
         return aiAnalysisUnlockedForCurrentPatient;
     }
 
+    // =========================
+    // UI GÜNCELLEME SİSTEMİ
+    // =========================
+
+    // Enerji panelinin görünürlüğünü ayarlar.
     private void SetEnergyPanelVisible(bool visible)
     {
         if (energyPanel != null)
@@ -1313,6 +1414,7 @@ public class GameFlowManager : MonoBehaviour
             UpdateEnergyUI();
     }
 
+    // Enerji UI sistemini günceller.
     private void UpdateEnergyUI()
     {
         if (energyUIManager == null)
@@ -1322,6 +1424,7 @@ public class GameFlowManager : MonoBehaviour
             energyUIManager.UpdateEnergyUI();
     }
 
+    // Kalp UI görünümünü mevcut can sayısına göre günceller.
     private void UpdateHeartsUI()
     {
         if (hearts == null || hearts.Length == 0)
@@ -1334,16 +1437,20 @@ public class GameFlowManager : MonoBehaviour
         }
     }
 
+    // Save sonrası UI verilerini tekrar senkronize eder.
     public void RefreshGameUIAfterLoad()
     {
         UpdateHeartsUI();
         UpdateEnergyUI();
     }
 
+    // =========================
+    // HASTA GİRİŞ / ÇIKIŞ AKIŞI
+    // =========================
+
+    // Hasta sahneye ulaştığında diyalog akışını başlatır.
     public void OnPatientArrived()
     {
-        Debug.Log("Hasta geldi.");
-
         patientTransitionInProgress = false;
         SetNotebookBlocked(true);
         SetEnergyPanelVisible(true);
@@ -1366,10 +1473,9 @@ public class GameFlowManager : MonoBehaviour
             Debug.LogError("DialogueManager bulunamadı!");
     }
 
+    // Hasta sahneden ayrıldığında sonuç paneline geçiş yapar.
     public void OnPatientExited()
     {
-        Debug.Log("Hasta çıktı.");
-
         diagnosisFlowInProgress = false;
 
         patientTransitionInProgress = false;
@@ -1393,6 +1499,7 @@ public class GameFlowManager : MonoBehaviour
         ShowPatientResultPanel();
     }
 
+    // Belirli gecikme sonrası yeni hasta akışını başlatır.
     private IEnumerator StartNextPatientAfterDelay(float delay)
     {
         yield return new WaitForSeconds(delay);
@@ -1403,6 +1510,11 @@ public class GameFlowManager : MonoBehaviour
         StartGameplayFlow();
     }
 
+    // =========================
+    // HASTA ANALİZ VE TEŞHİS SİSTEMİ
+    // =========================
+
+    // Hasta teşhis sonucunu analiz geçmişine kaydeder.
     private void RegisterPatientAnalysis(bool isCorrect, string correctDiagnosisName, string playerDiagnosisName)
     {
         int patientNumberInDay = ((currentPatientNumber - 1) % patientsPerDay) + 1;
@@ -1420,6 +1532,7 @@ public class GameFlowManager : MonoBehaviour
         patientAnalysisHistory.Add(entry);
     }
 
+    // Basit doğru/yanlış teşhis sonucu gönderir.
     public void SubmitDiagnosis(bool isCorrect)
     {
         lastDiagnosisWasCorrect = isCorrect;
@@ -1441,10 +1554,9 @@ public class GameFlowManager : MonoBehaviour
         FinishDiagnosisFlow(null);
     }
 
+    // Seçilen teşhis ID'sine göre sonucu değerlendirir.
     public void SubmitDiagnosis(string diagnosisId)
     {
-        Debug.Log("Seçilen teşhis ID: " + diagnosisId);
-
         DialogueManager dialogueManager = FindFirstObjectByType<DialogueManager>();
         bool isCorrect = false;
         string diagnosisResultText = "";
@@ -1483,12 +1595,10 @@ public class GameFlowManager : MonoBehaviour
         if (isCorrect)
         {
             AddCorrectAnswer();
-            Debug.Log("Doğru teşhis yapıldı.");
         }
         else
         {
             AddWrongAnswer();
-            Debug.Log("Yanlış teşhis yapıldı.");
         }
 
         diagnosisSubmittedForCurrentPatient = true;
@@ -1499,38 +1609,47 @@ public class GameFlowManager : MonoBehaviour
         FinishDiagnosisFlow(diagnosisResultText);
     }
 
+    // Teşhis sonrası hasta çıkış akışını başlatır.
     private void FinishDiagnosisFlow(string diagnosisResultText)
     {
         SetNotebookBlocked(true);
         patientTransitionInProgress = true;
 
         if (!string.IsNullOrEmpty(diagnosisResultText))
-            Debug.Log("Teşhis sonuç metni: " + diagnosisResultText);
 
-        if (patientMovement != null)
-            patientMovement.BeginExit();
+            if (patientMovement != null)
+                patientMovement.BeginExit();
     }
 
+    // =========================
+    // NOTEBOOK VE GAMEPLAY DURUM KONTROLLERİ
+    // =========================
+
+    // Notebook erişimini açıp kapatır.
     public void SetNotebookBlocked(bool blocked)
     {
         blockNotebookInteraction = blocked;
     }
 
+    // Notebook erişim durumunu döndürür.
     public bool IsNotebookBlocked()
     {
         return blockNotebookInteraction;
     }
 
+    // Hasta geçiş animasyonu aktif mi kontrol eder.
     public bool IsPatientTransitionInProgress()
     {
         return patientTransitionInProgress;
     }
 
+    // Teşhis akışı aktif mi kontrol eder.
     public bool IsDiagnosisFlowInProgress()
     {
         return diagnosisFlowInProgress;
     }
 
+    // Notebook panelinin açılabilir olup olmadığını kontrol eder.
     public bool CanOpenNotebook()
     {
         if (blockNotebookInteraction)
@@ -1563,6 +1682,7 @@ public class GameFlowManager : MonoBehaviour
         return true;
     }
 
+    // Free look moduna geçildiğinde notebook erişimini günceller.
     public void NotifyFreeLookStateEntered()
     {
         if (gameEnded)

@@ -4,17 +4,29 @@ using UnityEngine;
 [System.Serializable]
 public class DialogueNodeData
 {
+    // =====================================================
+    // NODE KİMLİĞİ VE AYARLARI
+    // =====================================================
+
     [Header("Node Kimliği")]
     public string nodeId;
 
     [Header("Node Ayarları")]
     public bool isHubNode; // Ana menü gibi davranır
 
-    [TextArea]
-    public string nodeIntroText; // Bu node'a girince üstte gösterilecek ek metin
+    // =====================================================
+    // NODE GİRİŞ METİNLERİ
+    // =====================================================
 
     [TextArea]
-    public string nodeAssistantText; // Bu node'a özel asistan metni
+    public string nodeIntroText;
+
+    [TextArea]
+    public string nodeAssistantText;
+
+    // =====================================================
+    // NODE SEÇENEKLERİ
+    // =====================================================
 
     [Header("Seçenekler")]
     public List<DialogueChoiceData> choices = new List<DialogueChoiceData>();

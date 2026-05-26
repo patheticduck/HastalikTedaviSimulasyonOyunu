@@ -6,10 +6,18 @@ public class UIScrollForwarder : MonoBehaviour, IScrollHandler, IBeginDragHandle
 {
     private ScrollRect parentScrollRect;
 
+    // =====================================================
+    // PARENT SCROLLRECT REFERANSINI ALMA
+    // =====================================================
+
     private void Awake()
     {
         parentScrollRect = GetComponentInParent<ScrollRect>();
     }
+
+    // =====================================================
+    // SCROLL EVENTLERİNİ PARENT SCROLLRECT'E AKTARMA
+    // =====================================================
 
     public void OnScroll(PointerEventData eventData)
     {
